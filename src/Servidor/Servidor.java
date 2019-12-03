@@ -1,47 +1,80 @@
 package Servidor;
 
+import Comum.Constants;
+
 import java.io.IOException;
 import java.net.*;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class Servidor {
-    static DatagramSocket udpSocket;
-    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://34.77.114.162/?autoReconnect=true&useSSL=false";
-    static final String USER = "PD";
-    static final String PASS = "PDcancro";
-    static final String IP_DS = "localhost";
-    static final int PORT_DS = 5000;
-    static final int PKT_SIZE = 4000;
+public class Servidor implements ServerConstants, Constants {
+    private static Servidor servidor;
 
-    static Connection conn = null;
-    static int id = -1;
+    private DatagramSocket dsSocket;
+    private Connection conn;
+    private String DBName;
+    private int id;
 
-    public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
-        udpSocket = new DatagramSocket();
-        byte[] b = "Server".getBytes();
-        DatagramPacket p = new DatagramPacket(b, b.length, InetAddress.getByName(IP_DS), PORT_DS);
-        udpSocket.send(p);
-        udpSocket.receive(p);
-        id = Integer.parseInt(new String(p.getData(), 0, p.getLength()));
+    public Servidor() throws SQLException, SocketException {
+        this.dsSocket = new DatagramSocket();
+        this.conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        this.id = -1;
+        DBName = null;
+        dsSocket.setSoTimeout(TIMEOUT);
+    }
 
-        System.out.println("DS disse que eu era o Servidor "+ id);
-        if(id == -1)
-            return;
-        Class.forName("com.mysql.jdbc.Driver");
-        System.out.println("Connecting to database...");
-        conn = DriverManager.getConnection(DB_URL, USER, PASS);
+    public static void main(String[] args){
+        try {
+            System.out.println("[INFO] Servidor a arrancar...");
+            servidor = new Servidor();
+
+            System.out.println("[INFO] A comunicar com o DS...");
+            int id = servidor.requestServerID();
+            System.out.println("[INFO] Atribuido o ID: "+ id);
+
+            System.out.println("[INFO] A criar a base de dados...");
+            servidor.createDatabase();
+
+
+        } catch (SocketException e) {
+            System.out.println("[ERRO] Houve um problema com o Socket:\n"+ e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("[ERRO] Houve com a base de dados:\n"+ e.getMessage());
+        } catch (IOException e) {
+            System.out.println("[ERRO] Houve um erro de IO:\n"+ e.getMessage());
+        }
+    }
+
+
+    private void createDatabase() throws SQLException {
         ResultSet resultSet = conn.getMetaData().getCatalogs();
+
+        //Verifica se a DB já existe e apaga
         while (resultSet.next()) {
-            if(resultSet.getString(1).equals("Servidor"+id)){
+            if (resultSet.getString(1).equals(DBName)) {
                 Statement s = conn.createStatement();
-                s.execute("DROP DATABASE Servidor"+id );
+                s.execute("DROP DATABASE " + DBName);
+                s.close();
             }
         }
+
+        //Cria DB
         resultSet.close();
         Statement s = conn.createStatement();
-        s.execute("CREATE DATABASE Servidor"+id);
+        s.execute("CREATE DATABASE Servidor" + id);
+        s.close();
+    }
 
+    private int requestServerID() throws IOException {
+        byte[] b = "Server".getBytes();
+
+        DatagramPacket p = new DatagramPacket(b, b.length, InetAddress.getByName(IP_DS), PORT_DS);
+        dsSocket.send(p);
+        dsSocket.receive(p);
+
+        id = Integer.parseInt(new String(p.getData(), 0, p.getLength()));
+        if(id < 0) throw new IOException("O ID do DS recebido não é válido");
+        DBName = "Servidor"+id;
+        return id;
     }
 }
