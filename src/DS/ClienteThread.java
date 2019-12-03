@@ -21,17 +21,29 @@ public class ClienteThread extends Thread {
 
                 ds.clienteDatagramSocket.receive(datagramPacket);
 
+                if(ds.servidores.isEmpty()){
+                    String resposta = "Impossivel ligar-se, nenhum servidor online";
+                    byte b[] = resposta.getBytes();
+                    datagramPacket.setData(b);
+                    datagramPacket.setLength(b.length);
+
+                    ds.clienteDatagramSocket.send(datagramPacket);
+                    continue;
+                }
+
                 String ServidorIP = ds.servidores.keySet().toArray()[ds.getProximoServidor()].toString();
                 String ServidorPort = ds.servidores.get(ds.getProximoServidor()).toString();
 
-                byte b[] = new byte[ds.TAM_BYTE_ARRAY];
-                b = ServidorIP.getBytes();
-                DatagramPacket pkt = new DatagramPacket(b, b.length, datagramPacket.getAddress(), datagramPacket.getPort());
-                ds.clienteDatagramSocket.send(pkt);
+                byte b[] = ServidorIP.getBytes();
+
+                datagramPacket.setData(b);
+                datagramPacket.setLength(b.length);
+                ds.clienteDatagramSocket.send(datagramPacket);
 
                 b = ServidorPort.getBytes();
-                pkt = new DatagramPacket(b, b.length, datagramPacket.getAddress(), datagramPacket.getPort());
-                ds.clienteDatagramSocket.send(pkt);
+                datagramPacket.setData(b);
+                datagramPacket.setLength(b.length);
+                ds.clienteDatagramSocket.send(datagramPacket);
 
                 ds.incrementaProximoServidor();
 
