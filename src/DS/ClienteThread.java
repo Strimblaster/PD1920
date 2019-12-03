@@ -15,9 +15,10 @@ public class ClienteThread extends Thread {
     }
 
     public void run(){
-        while(true){
-            datagramPacket = new DatagramPacket(new byte[ds.TAM_BYTE_ARRAY], ds.TAM_BYTE_ARRAY);
-            try {
+        try {
+            while(true){
+                datagramPacket = new DatagramPacket(new byte[ds.TAM_BYTE_ARRAY], ds.TAM_BYTE_ARRAY);
+
                 ds.clienteDatagramSocket.receive(datagramPacket);
 
                 String ServidorIP = ds.servidores.keySet().toArray()[ds.getProximoServidor()].toString();
@@ -34,12 +35,12 @@ public class ClienteThread extends Thread {
 
                 ds.incrementaProximoServidor();
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if(ds.clienteDatagramSocket != null)
-                    ds.clienteDatagramSocket.close();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(ds.clienteDatagramSocket != null)
+                ds.clienteDatagramSocket.close();
         }
     }
 }
