@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #2c3e50;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <VBox prefHeight="324.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Separator opacity="0.0" orientation="VERTICAL" prefHeight="200.0" />
+                  <VBox prefHeight="90.0" prefWidth="521.0">
+                     <children>
+                        <HBox alignment="CENTER" prefHeight="30.0" prefWidth="600.0">
+                           <children>
+                              <Label alignment="CENTER" contentDisplay="CENTER" lineSpacing="5.0" text="Username" textFill="WHITE">
+                                 <font>
+                                    <Font name="Roboto" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <TextField id="txtUsername" alignment="CENTER" prefHeight="28.0" prefWidth="536.0" style="-fx-border-radius: 0;">
+                           <cursor>
+                              <Cursor fx:constant="TEXT" />
+                           </cursor></TextField>
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox alignment="CENTER" prefHeight="30.0" prefWidth="397.0">
+                           <children>
+                              <Label alignment="CENTER" text="Password" textAlignment="CENTER" textFill="WHITE">
+                                 <font>
+                                    <Font name="Roboto" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <PasswordField id="txtPassword" alignment="CENTER">
+                           <cursor>
+                              <Cursor fx:constant="TEXT" />
+                           </cursor></PasswordField>
+                     </children>
+                  </VBox>
+               </children>
+            </VBox>
+            <HBox alignment="CENTER" prefHeight="124.0" prefWidth="358.0">
+               <children>
+                  <Button id="btnCancel" mnemonicParsing="false" prefHeight="28.0" prefWidth="101.0" style="-fx-background-color: red;" text="Cancelar" textAlignment="CENTER" textFill="WHITE" />
+                  <Separator opacity="0.0" prefHeight="7.0" prefWidth="43.0" style="-fx-background-color: 0;" />
+                  <Button id="btnLogin" mnemonicParsing="false" prefHeight="28.0" prefWidth="104.0" style="-fx-background-color: #27ae60;" text="Login" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font name="Roboto" size="13.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+         <opaqueInsets>
+            <Insets left="10.0" />
+         </opaqueInsets>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </VBox>
+   </center>
+   <left>
+      <Separator opacity="0.0" prefHeight="15.0" prefWidth="122.0" BorderPane.alignment="CENTER" />
+   </left>
+   <right>
+      <Separator opacity="0.0" prefHeight="8.0" prefWidth="120.0" BorderPane.alignment="CENTER" />
+   </right>
+</BorderPane>
