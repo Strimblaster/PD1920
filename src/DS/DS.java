@@ -1,5 +1,7 @@
 package DS;
 
+import Comum.ServerInfo;
+
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ public class DS{
     public static final int TAM_BYTE_ARRAY = 256;
     private int proximoServidor;
 
-    HashMap<InetAddress, Integer> servidores;
+    ArrayList<ServerInfo> servidores;
     DatagramSocket servidorDatagramSocket;
     DatagramSocket clienteDatagramSocket;
 
@@ -20,7 +22,7 @@ public class DS{
         servidorDatagramSocket = new DatagramSocket(SERVIDOR_PORT_DS);
         clienteDatagramSocket = new DatagramSocket(CLIENTE_PORT_DS);
         proximoServidor = 0;
-        servidores = new HashMap<>();
+        servidores = new ArrayList<>();
     }
 
     public int getProximoServidor(){

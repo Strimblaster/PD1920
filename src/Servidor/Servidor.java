@@ -20,7 +20,7 @@ public class Servidor {
 
     public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
         udpSocket = new DatagramSocket();
-        byte[] b = "Ola DS".getBytes();
+        byte[] b = "Server".getBytes();
         DatagramPacket p = new DatagramPacket(b, b.length, InetAddress.getByName(IP_DS), PORT_DS);
         udpSocket.send(p);
         udpSocket.receive(p);

@@ -1,5 +1,7 @@
 package DS;
 
+import Comum.ServerInfo;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -23,7 +25,8 @@ public class ServerThread extends Thread {
                 ds.servidorDatagramSocket.receive(datagramPacket);
                 System.out.println("Entrou um servidor: " + datagramPacket.getAddress() + ":" + datagramPacket.getPort());
 
-                ds.servidores.put(datagramPacket.getAddress(), datagramPacket.getPort());
+                ds.servidores.add(new ServerInfo(datagramPacket.getAddress(), datagramPacket.getPort()));
+
                 String id = nServers+"";
                 byte[] resp = id.getBytes();
                 datagramPacket.setData(resp);

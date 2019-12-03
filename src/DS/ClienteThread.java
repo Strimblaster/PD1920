@@ -1,6 +1,11 @@
 package DS;
 
+import Comum.ServerInfo;
+import com.sun.xml.internal.bind.v2.util.ByteArrayOutputStreamEx;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -31,28 +36,26 @@ public class ClienteThread extends Thread {
                     continue;
                 }
 
-                String ServidorIP = ds.servidores.keySet().toArray()[ds.getProximoServidor()].toString();
-                String ServidorPort = ds.servidores.get(ds.getProximoServidor()).toString();
 
-                byte b[] = ServidorIP.getBytes();
+                int nextServer = ds.getProximoServidor();
 
-                datagramPacket.setData(b);
-                datagramPacket.setLength(b.length);
+                ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                ObjectOutputStream oout = new ObjectOutputStream(bout);
+                oout.writeObject(ds.servidores.get(nextServer));
+                oout.flush();
+                oout.close();
+
+                byte[] resposta = bout.toByteArray();
+                datagramPacket.setData(resposta);
+                datagramPacket.setLength(resposta.length);
                 ds.clienteDatagramSocket.send(datagramPacket);
 
-                b = ServidorPort.getBytes();
-                datagramPacket.setData(b);
-                datagramPacket.setLength(b.length);
-                ds.clienteDatagramSocket.send(datagramPacket);
 
                 ds.incrementaProximoServidor();
 
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if(ds.clienteDatagramSocket != null)
-                ds.clienteDatagramSocket.close();
+
         }
     }
 }
