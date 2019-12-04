@@ -1,5 +1,6 @@
 package DS;
 
+import Comum.Constants;
 import Comum.ServerInfo;
 
 import java.io.IOException;
@@ -7,25 +8,25 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class DS{
-    public static final int SERVIDOR_PORT_DS = 5000;
-    public static final int CLIENTE_PORT_DS = 5001;
-    public static final int TAM_BYTE_ARRAY = 256;
+public class DS implements Constants {
     private int proximoServidor;
 
-    ArrayList<ServerInfo> servidores;
+    ArrayList<ServerInfo> servidoresTCP;
+    ArrayList<ServerInfo> servidoresUDP;
     DatagramSocket servidorDatagramSocket;
     DatagramSocket clienteDatagramSocket;
 
 
+
     public DS() throws SocketException {
-        servidorDatagramSocket = new DatagramSocket(SERVIDOR_PORT_DS);
-        clienteDatagramSocket = new DatagramSocket(CLIENTE_PORT_DS);
+        servidorDatagramSocket = new DatagramSocket(SERVER_PORT_DS);
+        clienteDatagramSocket = new DatagramSocket(CLIENT_PORT_DS);
         proximoServidor = 0;
-        servidores = new ArrayList<>();
+        servidoresTCP = new ArrayList<>();
+        servidoresUDP = new ArrayList<>();
     }
     int getTotalServidores(){
-        return servidores.size();
+        return servidoresTCP.size();
     }
 
     public int getProximoServidor(){
@@ -34,7 +35,7 @@ public class DS{
 
 
     public void incrementaProximoServidor(){
-        if(proximoServidor == servidores.size()-1)
+        if(proximoServidor == servidoresTCP.size()-1)
             proximoServidor = 0;
         else
             proximoServidor++;

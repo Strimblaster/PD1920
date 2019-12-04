@@ -7,26 +7,24 @@ import java.net.*;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class Servidor implements ServerConstants, Constants {
-    private static Servidor servidor;
+public class Servidor extends Comunicacao implements ServerConstants, Constants {
 
-    private DatagramSocket dsSocket;
     private Connection conn;
     private String DBName;
     private int id;
 
-    public Servidor() throws SQLException, SocketException {
-        this.dsSocket = new DatagramSocket();
+
+    private Servidor() throws SQLException, IOException {
+        super();
         this.conn = DriverManager.getConnection(DB_URL, USER, PASS);
         this.id = -1;
         DBName = null;
-        dsSocket.setSoTimeout(TIMEOUT);
     }
 
     public static void main(String[] args){
         try {
             System.out.println("[INFO] Servidor a arrancar...");
-            servidor = new Servidor();
+            Servidor servidor = new Servidor();
 
             System.out.println("[INFO] A comunicar com o DS...");
             int id = servidor.requestServerID();
@@ -66,9 +64,10 @@ public class Servidor implements ServerConstants, Constants {
     }
 
     private int requestServerID() throws IOException {
-        byte[] b = "Server".getBytes();
+        String porta = Integer.toString(serverSocket.getLocalPort());
+        byte[] b = porta.getBytes();
 
-        DatagramPacket p = new DatagramPacket(b, b.length, InetAddress.getByName(IP_DS), PORT_DS);
+        DatagramPacket p = new DatagramPacket(b, b.length, InetAddress.getByName(IP_DS), SERVER_PORT_DS);
         dsSocket.send(p);
         dsSocket.receive(p);
 
