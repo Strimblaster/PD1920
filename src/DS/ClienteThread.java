@@ -1,16 +1,12 @@
 package DS;
 
-import Comum.ServerInfo;
-import com.sun.xml.internal.bind.v2.util.ByteArrayOutputStreamEx;
+import Comum.Constants;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.net.SocketException;
 
-public class ClienteThread extends Thread {
+public class ClienteThread extends Thread implements Constants {
 
     DS ds;
     DatagramPacket datagramPacket;
@@ -20,42 +16,37 @@ public class ClienteThread extends Thread {
     }
 
     public void run(){
-        try {
+
             while(true){
-                datagramPacket = new DatagramPacket(new byte[ds.TAM_BYTE_ARRAY], ds.TAM_BYTE_ARRAY);
+                try {
+                    datagramPacket = new DatagramPacket(new byte[PKT_SIZE], PKT_SIZE);
+                    ds.clienteDatagramSocket.receive(datagramPacket);
+                    System.out.println("[INFO] [ThreadCliente] - Novo pedido!");
 
-                ds.clienteDatagramSocket.receive(datagramPacket);
+                    int nextServer = ds.getProximoServidor();
+                    ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                    ObjectOutputStream out = new ObjectOutputStream(bout);
+                    if(ds.getTotalServidores() > 0) {
+                        System.out.println("[INFO] [ThreadCliente] - Cliente " + datagramPacket.getAddress().toString() + datagramPacket.getPort() + " atribuido o Servidor " + nextServer );
+                        out.writeObject(ds.servidoresTCP.get(nextServer));
+                    }else{
+                        out.writeObject(null);
+                    }
+                    out.flush();
+                    out.close();
 
-                if(ds.servidores.isEmpty()){
-                    String resposta = "Impossivel ligar-se, nenhum servidor online";
-                    byte b[] = resposta.getBytes();
-                    datagramPacket.setData(b);
-                    datagramPacket.setLength(b.length);
-
+                    byte[] resposta = bout.toByteArray();
+                    datagramPacket.setData(resposta);
+                    datagramPacket.setLength(resposta.length);
                     ds.clienteDatagramSocket.send(datagramPacket);
-                    continue;
+
+                    ds.incrementaProximoServidor();
+
+                } catch (SocketException e) {
+                    return;
+                } catch (IOException e) {
+                    System.out.println("[Erro] [ThreadCliente] - Erro: " + e.getMessage());
                 }
-
-
-                int nextServer = ds.getProximoServidor();
-
-                ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                ObjectOutputStream oout = new ObjectOutputStream(bout);
-                oout.writeObject(ds.servidores.get(nextServer));
-                oout.flush();
-                oout.close();
-
-                byte[] resposta = bout.toByteArray();
-                datagramPacket.setData(resposta);
-                datagramPacket.setLength(resposta.length);
-                ds.clienteDatagramSocket.send(datagramPacket);
-
-
-                ds.incrementaProximoServidor();
-
             }
-        } catch (IOException e) {
-
-        }
     }
 }
