@@ -1,5 +1,6 @@
 package Cliente;
 
+import Comum.Constants;
 import Comum.ServerInfo;
 import Comum.Utilizador;
 
@@ -9,24 +10,26 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 
-class ClientModel {
-    private static final String HOST = "localhost";
-    private static final int PORT = 5001;
-    private static final int TIMEOUT = 5;
-    private static final int BYTESIZE = 50000;
+class ClientModel implements Constants {
+
     private ServerInfo server;
     private Utilizador utilizador;
 
     void sendMessageDS() throws IOException {
         DatagramSocket datagramSocket = new DatagramSocket();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        byte[] incommingData = new byte[BYTESIZE];
+        byte[] incommingData = new byte[PKT_SIZE];
 
 
+        //.... Tou só a a ver O.O
         PrintWriter out = new PrintWriter(byteArrayOutputStream,true);
         out.println("Olá DS!\n");
+<<<<<<< HEAD
         out.close();
         DatagramPacket datagramPacket = new DatagramPacket(byteArrayOutputStream.toByteArray(), byteArrayOutputStream.toByteArray().length, InetAddress.getByName(HOST), PORT);
+=======
+        DatagramPacket datagramPacket = new DatagramPacket(byteArrayOutputStream.toByteArray(), byteArrayOutputStream.toByteArray().length, InetAddress.getByName(IP_DS), CLIENT_PORT_DS);
+>>>>>>> 0e9c46fa36e24b4d53b2334785679feb7d7ec5a1
         datagramSocket.send(datagramPacket);
 
         System.out.println("Mensagem enviada ao DS!");
