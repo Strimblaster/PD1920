@@ -7,7 +7,6 @@ import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
 
 
 class ClientModel {
@@ -26,14 +25,13 @@ class ClientModel {
 
         PrintWriter out = new PrintWriter(byteArrayOutputStream,true);
         out.println("Olá DS!\n");
-//        out.close();
+        out.close();
         DatagramPacket datagramPacket = new DatagramPacket(byteArrayOutputStream.toByteArray(), byteArrayOutputStream.toByteArray().length, InetAddress.getByName(HOST), PORT);
         datagramSocket.send(datagramPacket);
 
         System.out.println("Mensagem enviada ao DS!");
         datagramPacket = new DatagramPacket(incommingData, incommingData.length);
         datagramSocket.receive(datagramPacket);
-        System.out.println("Informação recebida");
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(datagramPacket.getData());
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
         try {

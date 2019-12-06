@@ -99,3 +99,5 @@ modules.xml
 # End of https://www.gitignore.io/api/intellij
 
 /.idea/
+/lib/gson-2.8.6.jar
+/lib/fontawesomefx-8.9.jar
