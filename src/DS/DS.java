@@ -24,6 +24,9 @@ public class DS{
         proximoServidor = 0;
         servidores = new ArrayList<>();
     }
+    int getTotalServidores(){
+        return servidores.size();
+    }
 
     public int getProximoServidor(){
         return this.proximoServidor;
