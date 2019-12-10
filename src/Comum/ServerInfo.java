@@ -40,9 +40,7 @@ public class ServerInfo {
 
     @Override
     public String toString() {
-        return "ServerInfo{" +
-                "ip=" + ip +
-                ", port=" + port +
-                '}';
+        String ip = this.ip.getHostName();
+        return "Server " + id + " - " + ip + ":" + port;
     }
 }
