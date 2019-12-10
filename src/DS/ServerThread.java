@@ -33,23 +33,24 @@ public class ServerThread extends Thread implements Constants {
                 byte[] data = datagramPacket.getData();
                 int porta = Integer.parseInt(new String(data, 0, datagramPacket.getLength()));
 
-                ServerInfo serverInfoTCP = new ServerInfo(datagramPacket.getAddress(), porta);
+                int id = ds.getNextID();
+                ServerInfo serverInfoTCP = new ServerInfo(datagramPacket.getAddress(), porta, id);
                 ds.servidoresTCP.add(serverInfoTCP);
 
 
                 //Adiciona à lista de servidores o IP e porta UDP
-                ds.servidoresUDP.add(new ServerInfo(datagramPacket.getAddress(), datagramPacket.getPort()));
+                ds.servidoresUDP.add(new ServerInfo(datagramPacket.getAddress(), datagramPacket.getPort(), id));
 
 
                 //Envia de volta o ID que o servidor vai ser
-                String id = nServers + "";
-                byte[] resp = id.getBytes();
+                String strid = id + "";
+                byte[] resp = strid.getBytes();
                 datagramPacket.setData(resp);
                 datagramPacket.setLength(resp.length);
 
-                System.out.println("[INFO] - [ThreadServer] O servidor " + serverInfoTCP.getIp().toString() + " está disponivel na porta " + serverInfoTCP.getPort());
+                System.out.println("[INFO] - [ThreadServer]: O servidor " + serverInfoTCP.getIp().toString() + " está disponivel na porta " + serverInfoTCP.getPort());
                 ds.servidorDatagramSocket.send(datagramPacket);
-                nServers++;
+
 
             } catch (SocketException e) {
                 return;
