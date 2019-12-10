@@ -2,16 +2,17 @@ package DS;
 
 import Comum.Constants;
 import Comum.ServerInfo;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 public class ServerThread extends Thread implements Constants {
 
     DS ds;
     DatagramPacket datagramPacket;
-    int nServers = 0;
 
     public ServerThread(DS ds) {
         this.ds = ds;
@@ -50,6 +51,16 @@ public class ServerThread extends Thread implements Constants {
 
                 System.out.println("[INFO] - [ThreadServer]: O servidor " + serverInfoTCP.getIp().toString() + " está disponivel na porta " + serverInfoTCP.getPort());
                 ds.servidorDatagramSocket.send(datagramPacket);
+
+                //multicast
+//                ArrayList<ServerInfo> servidores = ds.servidoresUDP;
+//                Gson gson = new Gson();
+//                String jsonServerInfo = gson.toJson(servidores);
+//                System.out.println("[INFO] - [ThreadServer]: O servidor " + serverInfoTCP.getIp().toString() + " vai receber todos os servidores online");
+//                byte[] jsonBytes = jsonServerInfo.getBytes();
+//                datagramPacket.setData(jsonBytes);
+//                datagramPacket.setLength(jsonBytes.length);
+//                ds.servidorDatagramSocket.send(datagramPacket);
 
 
             } catch (SocketException e) {

@@ -14,6 +14,7 @@ public class DS implements Constants {
     ArrayList<ServerInfo> servidoresTCP;
     ArrayList<ServerInfo> servidoresUDP;
     DatagramSocket servidorDatagramSocket;
+    DatagramSocket servidorPingDatagramSocket;
     DatagramSocket clienteDatagramSocket;
 
 
@@ -21,6 +22,7 @@ public class DS implements Constants {
     public DS() throws SocketException {
         servidorDatagramSocket = new DatagramSocket(SERVER_PORT_DS);
         clienteDatagramSocket = new DatagramSocket(CLIENT_PORT_DS);
+        servidorPingDatagramSocket = new DatagramSocket(SERVER_PORT_DS_PING);
         proximoServidor = 0;
         servidoresTCP = new ArrayList<>();
         servidoresUDP = new ArrayList<>();
@@ -46,14 +48,18 @@ public class DS implements Constants {
 
     public static void main(String[] args) throws SocketException, InterruptedException {
         DS ds = new DS();
-        Thread servidorThread = new Thread(new ServerThread(ds));
-        Thread clienteThread = new Thread(new ClienteThread(ds));
+        Thread servidorThread = new ServerThread(ds);
+        Thread clienteThread = new ClienteThread(ds);
+
+        Thread pingServidores = new PingThread(ds);
 
         servidorThread.start();
         clienteThread.start();
+        pingServidores.start();
 
         servidorThread.join();
         clienteThread.join();
+        pingServidores.join();
     }
 
     public int getNextID() {

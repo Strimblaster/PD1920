@@ -1,6 +1,7 @@
 package Servidor;
 
 import Comum.Constants;
+import DS.ServerThread;
 
 import java.io.IOException;
 import java.net.*;
@@ -30,6 +31,10 @@ public class Servidor extends Comunicacao implements ServerConstants, Constants 
 
             System.out.println("[INFO] A criar a base de dados...");
             servidor.createDatabase();
+
+            System.out.println("[INFO] O servidor está pronto a ser utilizado");
+            Thread servidoresOn = new ServidorThread(servidor);
+            servidoresOn.start();
 
             servidor.startClientThread();
 
