@@ -5,7 +5,7 @@ import Comum.Constants;
 import java.io.IOException;
 import java.net.*;
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Servidor extends Comunicacao implements ServerConstants, Constants {
 
@@ -17,8 +17,8 @@ public class Servidor extends Comunicacao implements ServerConstants, Constants 
     private Servidor() throws SQLException, IOException {
         super();
         this.conn = DriverManager.getConnection(DB_URL, USER, PASS);
-        this.id = -1;
-        DBName = null;
+        this.id = requestServerID();
+        DBName = "Servidor"+id;;
     }
 
     public static void main(String[] args){
@@ -26,13 +26,16 @@ public class Servidor extends Comunicacao implements ServerConstants, Constants 
             System.out.println("[INFO] Servidor a arrancar...");
             Servidor servidor = new Servidor();
 
-            System.out.println("[INFO] A comunicar com o DS...");
-            int id = servidor.requestServerID();
-            System.out.println("[INFO] Atribuido o ID: "+ id);
+            System.out.println("[INFO] Atribuido o ID: "+ servidor.id);
 
             System.out.println("[INFO] A criar a base de dados...");
             servidor.createDatabase();
 
+            servidor.startClientThread();
+
+            Scanner sc = new Scanner(System.in);
+
+            while(!sc.next().equals("sair"));
 
         } catch (SocketException e) {
             System.out.println("[ERRO] Houve um problema com o Socket:\n"+ e.getMessage());
@@ -41,6 +44,9 @@ public class Servidor extends Comunicacao implements ServerConstants, Constants 
         } catch (IOException e) {
             System.out.println("[ERRO] Houve um erro de IO:\n"+ e.getMessage());
         }
+    }
+
+    private void startClientThread() {
     }
 
 
@@ -63,17 +69,4 @@ public class Servidor extends Comunicacao implements ServerConstants, Constants 
         s.close();
     }
 
-    private int requestServerID() throws IOException {
-        String porta = Integer.toString(serverSocket.getLocalPort());
-        byte[] b = porta.getBytes();
-
-        DatagramPacket p = new DatagramPacket(b, b.length, InetAddress.getByName(IP_DS), SERVER_PORT_DS);
-        dsSocket.send(p);
-        dsSocket.receive(p);
-
-        id = Integer.parseInt(new String(p.getData(), 0, p.getLength()));
-        if(id < 0) throw new IOException("O ID do DS recebido não é válido");
-        DBName = "Servidor"+id;
-        return id;
-    }
 }
