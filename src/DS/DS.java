@@ -6,13 +6,14 @@ import Comum.ServerInfo;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class DS implements Constants {
     private int proximoServidor;
 
-    ArrayList<ServerInfo> servidoresTCP;
-    ArrayList<ServerInfo> servidoresUDP;
+    final ArrayList<ServerInfo> servidoresTCP;
+    final ArrayList<ServerInfo> servidoresUDP;
     DatagramSocket servidorDatagramSocket;
     DatagramSocket servidorPingDatagramSocket;
     DatagramSocket clienteDatagramSocket;
@@ -63,9 +64,14 @@ public class DS implements Constants {
     }
 
     public int getNextID() {
+        //servidoresUDP.sort( (s1,s2) -> s1.getId() - s2.getId());
+        //É a mesma coisa o intellij é que sugeriu
+        servidoresUDP.sort(Comparator.comparingInt(ServerInfo::getId));
+        System.out.println(servidoresUDP);
         int i;
         //Nada para ver aqui
-        for(i = 0; i < servidoresUDP.size() && i == servidoresUDP.get(i).getId(); i++);
+        for (i = 0; i < servidoresUDP.size() && i == servidoresUDP.get(i).getId(); i++) ;
+
         return i;
     }
 }

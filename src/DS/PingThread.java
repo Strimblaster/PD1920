@@ -22,12 +22,13 @@ public class PingThread extends Thread implements Constants {
     @Override
     public void run() {
         while (true) {
-            try {
 
+            try {
+                Thread.sleep(3000);
                 String string = "Estas on?";
                 byte[] resp = string.getBytes();
 
-                ArrayList<ServerInfo> listaServidores = ds.servidoresUDP;
+                ArrayList<ServerInfo> listaServidores = (ArrayList<ServerInfo>) ds.servidoresUDP.clone();
 
                 ds.servidorPingDatagramSocket.setSoTimeout(1000);
 
@@ -38,12 +39,14 @@ public class PingThread extends Thread implements Constants {
 
                         ds.servidorPingDatagramSocket.receive(datagramPacket);
 
-                    } catch (SocketTimeoutException e) {
+                    } catch (IOException e) {
                         ds.servidoresUDP.remove(server);
+                        ds.servidoresTCP.remove(server);
+                        System.out.println("[INFO] - [ThreadPings]: " + server.toString() + " não respondeu ao ping! Foi removido da lista de servidores.");
                     }
                 }
 
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 System.out.println("[Erro] [ServidorThread] - Erro: " + e.getMessage());
             }
         }
