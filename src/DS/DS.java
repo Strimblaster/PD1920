@@ -30,6 +30,8 @@ public class DS implements Constants {
     }
 
     public int getProximoServidor(){
+        if(this.proximoServidor >= servidoresTCP.size())
+            return 0;
         return this.proximoServidor;
     }
 
@@ -52,5 +54,12 @@ public class DS implements Constants {
 
         servidorThread.join();
         clienteThread.join();
+    }
+
+    public int getNextID() {
+        int i;
+        //Nada para ver aqui
+        for(i = 0; i < servidoresUDP.size() && i == servidoresUDP.get(i).getId(); i++);
+        return i;
     }
 }

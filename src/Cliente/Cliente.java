@@ -10,10 +10,18 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class Cliente extends Application {
-    private ClientController clientController = new ClientController();
+import static javafx.application.Platform.exit;
 
-    public Cliente() throws IOException, InvalidServerException {
+public class Cliente extends Application {
+    private ClientController clientController ;
+
+    public Cliente() throws IOException {
+        try {
+            clientController = new ClientController();
+        } catch (InvalidServerException e){
+            System.out.println(e.getMessage());
+            exit();
+        }
     }
 
     public static void main(String[] args){

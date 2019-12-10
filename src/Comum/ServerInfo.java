@@ -1,16 +1,25 @@
 package Comum;
 
-import java.io.Serializable;
 import java.net.InetAddress;
 
 public class ServerInfo {
 
     private InetAddress ip;
     private int port;
+    private int id;
 
-    public ServerInfo(InetAddress ip, int port) {
+    public ServerInfo(InetAddress ip, int port, int id) {
         this.ip = ip;
         this.port = port;
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public InetAddress getIp() {

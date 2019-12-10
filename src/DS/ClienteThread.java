@@ -23,23 +23,25 @@ public class ClienteThread extends Thread implements Constants {
                 try {
                     datagramPacket = new DatagramPacket(new byte[PKT_SIZE], PKT_SIZE);
                     ds.clienteDatagramSocket.receive(datagramPacket);
-                    System.out.println("[INFO] [ThreadCliente] - Novo pedido!");
+                    System.out.println("[INFO] - [ThreadCliente]: - Novo pedido!");
 
                     int nextServer = ds.getProximoServidor();
-                    ServerInfo serverInfo = ds.servidoresTCP.get(nextServer);
+
 
                     if(ds.getTotalServidores() > 0) {
+                        ServerInfo serverInfo = ds.servidoresTCP.get(nextServer);
                         Gson gson = new Gson();
                         String jsonServerInfo = gson.toJson(serverInfo);
-                        System.out.println("[INFO] [ThreadCliente] - Cliente " + datagramPacket.getAddress().toString() + datagramPacket.getPort() + " atribuido o Servidor " + nextServer );
+                        System.out.println("[INFO] - [ThreadCliente]: - Cliente " + datagramPacket.getAddress().toString() + ":"+ datagramPacket.getPort() + " atribuido o Servidor " + nextServer );
                         byte[] jsonBytes = jsonServerInfo.getBytes();
                         datagramPacket.setData(jsonBytes);
                         datagramPacket.setLength(jsonBytes.length);
                     }else{
-                        datagramPacket.setData(null);
+                        //Isto tá meio manhoso mas funfa
+                        datagramPacket.setData("".getBytes());
+                        datagramPacket.setLength("".getBytes().length);
                     }
 
-                    System.out.println("Teste: " + new String(datagramPacket.getData(), 0, datagramPacket.getLength()));
                     ds.clienteDatagramSocket.send(datagramPacket);
                     ds.incrementaProximoServidor();
 
