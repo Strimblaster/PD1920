@@ -1,6 +1,8 @@
 package DS;
 
 import Comum.Constants;
+import Comum.ServerInfo;
+import com.google.gson.Gson;
 
 import java.io.*;
 import java.net.DatagramPacket;
@@ -8,8 +10,8 @@ import java.net.SocketException;
 
 public class ClienteThread extends Thread implements Constants {
 
-    DS ds;
-    DatagramPacket datagramPacket;
+    private DS ds;
+    private DatagramPacket datagramPacket;
 
     public ClienteThread(DS ds) {
         this.ds = ds;
@@ -24,22 +26,21 @@ public class ClienteThread extends Thread implements Constants {
                     System.out.println("[INFO] [ThreadCliente] - Novo pedido!");
 
                     int nextServer = ds.getProximoServidor();
-                    ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                    ObjectOutputStream out = new ObjectOutputStream(bout);
+                    ServerInfo serverInfo = ds.servidoresTCP.get(nextServer);
+
                     if(ds.getTotalServidores() > 0) {
+                        Gson gson = new Gson();
+                        String jsonServerInfo = gson.toJson(serverInfo);
                         System.out.println("[INFO] [ThreadCliente] - Cliente " + datagramPacket.getAddress().toString() + datagramPacket.getPort() + " atribuido o Servidor " + nextServer );
-                        out.writeObject(ds.servidoresTCP.get(nextServer));
+                        byte[] jsonBytes = jsonServerInfo.getBytes();
+                        datagramPacket.setData(jsonBytes);
+                        datagramPacket.setLength(jsonBytes.length);
                     }else{
-                        out.writeObject(null);
+                        datagramPacket.setData(null);
                     }
-                    out.flush();
-                    out.close();
 
-                    byte[] resposta = bout.toByteArray();
-                    datagramPacket.setData(resposta);
-                    datagramPacket.setLength(resposta.length);
+                    System.out.println("Teste: " + new String(datagramPacket.getData(), 0, datagramPacket.getLength()));
                     ds.clienteDatagramSocket.send(datagramPacket);
-
                     ds.incrementaProximoServidor();
 
                 } catch (SocketException e) {

@@ -20,4 +20,16 @@ public class Comunicacao implements IComunicacao, Constants, ServerConstants {
     }
 
 
+    public int requestServerID() throws IOException {
+        String porta = Integer.toString(serverSocket.getLocalPort());
+        byte[] b = porta.getBytes();
+
+        DatagramPacket p = new DatagramPacket(b, b.length, InetAddress.getByName(IP_DS), SERVER_PORT_DS);
+        dsSocket.send(p);
+        dsSocket.receive(p);
+
+        return Integer.parseInt(new String(p.getData(), 0, p.getLength()));
+    }
+
+
 }

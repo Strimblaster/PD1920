@@ -3,9 +3,8 @@ package Comum;
 import java.io.Serializable;
 import java.net.InetAddress;
 
-public class ServerInfo implements Serializable {
+public class ServerInfo {
 
-    public static final long serialVersionUID = 123L;
     private InetAddress ip;
     private int port;
 
@@ -28,5 +27,13 @@ public class ServerInfo implements Serializable {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    @Override
+    public String toString() {
+        return "ServerInfo{" +
+                "ip=" + ip +
+                ", port=" + port +
+                '}';
     }
 }
