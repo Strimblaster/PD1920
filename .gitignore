@@ -74,17 +74,10 @@ fabric.properties
 ### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 
-<<<<<<< HEAD
-#*.iml
-#modules.xml
-#.idea/misc.xml
-#*.ipr
-=======
 *.iml
 modules.xml
 .idea/misc.xml
 *.ipr
->>>>>>> master
 
 # Sonarlint plugin
 .idea/**/sonarlint/
@@ -99,3 +92,5 @@ modules.xml
 # End of https://www.gitignore.io/api/intellij
 
 /.idea/
+/lib/fontawesomefx-8.9.jar
+/lib/gson-2.8.6.jar

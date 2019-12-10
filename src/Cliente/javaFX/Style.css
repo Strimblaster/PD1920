@@ -1,0 +1,27 @@
+
+
+.btnLogin{
+    -fx-background-color:#27ae60 !important;
+    -fx-text-fill: white !important;
+    -fx-background-radius: 0;
+}
+.btnLogin:hover{
+    -fx-background-color:white !important;
+    -fx-text-fill: #27ae60 !important;
+}
+
+.btnCancel{
+    -fx-background-color: red !important;
+    -fx-text-fill: white !important;
+    -fx-background-radius: 0;
+}
+.btnCancel:hover{
+    -fx-background-color:white !important;
+    -fx-text-fill: red !important;
+}
+.backgroundDark{
+    -fx-background-color:  #2c3e50;
+}
+.navbar{
+    -fx-background-color: 0;
+}
