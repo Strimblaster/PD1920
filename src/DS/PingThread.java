@@ -30,7 +30,7 @@ public class PingThread extends Thread implements Constants {
 
                 ArrayList<ServerInfo> listaServidores = new ArrayList<>(ds.servidoresUDP);
 
-                ds.servidorPingDatagramSocket.setSoTimeout(1000);
+                ds.servidorPingDatagramSocket.setSoTimeout(PING_TIMEOUT_MS);
 
                 for (ServerInfo server: listaServidores) {
                     try{
