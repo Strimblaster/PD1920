@@ -1,42 +1,48 @@
 package Servidor;
 
 import Comum.Constants;
-import DS.ServerThread;
+import Servidor.Interfaces.IComunicacaoServer;
+import Servidor.Interfaces.IEvent;
+import Servidor.Interfaces.ServerConstants;
 
 import java.io.IOException;
 import java.net.*;
 import java.sql.*;
 import java.util.Scanner;
 
-public class Servidor extends Comunicacao implements ServerConstants, Constants {
+public class Servidor implements ServerConstants, Constants, IComunicacaoServer {
 
     private Connection conn;
     private String DBName;
     private int id;
+    private IEvent listener;
 
 
     private Servidor() throws SQLException, IOException {
         super();
         this.conn = DriverManager.getConnection(DB_URL, USER, PASS);
-        this.id = requestServerID();
-        DBName = "Servidor"+id;;
+    }
+
+    public void setListener(IEvent listener) {
+        this.listener = listener;
     }
 
     public static void main(String[] args){
         try {
             System.out.println("[INFO] Servidor a arrancar...");
             Servidor servidor = new Servidor();
+            new Comunicacao(servidor);
+
+            servidor.requestID();
 
             System.out.println("[INFO] Atribuido o ID: "+ servidor.id);
 
             System.out.println("[INFO] A criar a base de dados...");
             servidor.createDatabase();
 
-            System.out.println("[INFO] O servidor está pronto a ser utilizado");
-            Thread servidoresOn = new ServidorThread(servidor);
-            servidoresOn.start();
+            System.out.println("[INFO] Servidor pronto");
+            servidor.ready();
 
-            servidor.startClientThread();
 
             Scanner sc = new Scanner(System.in);
 
@@ -51,9 +57,13 @@ public class Servidor extends Comunicacao implements ServerConstants, Constants 
         }
     }
 
-    private void startClientThread() {
+    private void ready() {
+        listener.serverReady();
     }
 
+    private void requestID() throws IOException {
+        listener.needID();
+    }
 
     private void createDatabase() throws SQLException {
         ResultSet resultSet = conn.getMetaData().getCatalogs();
@@ -74,4 +84,9 @@ public class Servidor extends Comunicacao implements ServerConstants, Constants 
         s.close();
     }
 
+    @Override
+    public void setID(int id) {
+        this.id = id;
+        DBName = "Servidor"+id;
+    }
 }

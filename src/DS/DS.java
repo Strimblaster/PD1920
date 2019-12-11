@@ -67,7 +67,6 @@ public class DS implements Constants {
         //servidoresUDP.sort( (s1,s2) -> s1.getId() - s2.getId());
         //É a mesma coisa o intellij é que sugeriu
         servidoresUDP.sort(Comparator.comparingInt(ServerInfo::getId));
-        System.out.println(servidoresUDP);
         int i;
         //Nada para ver aqui
         for (i = 0; i < servidoresUDP.size() && i == servidoresUDP.get(i).getId(); i++) ;

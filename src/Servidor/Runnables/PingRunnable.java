@@ -1,6 +1,7 @@
-package Servidor;
+package Servidor.Runnables;
 
 import Comum.Constants;
+import Servidor.Servidor;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -8,23 +9,22 @@ import java.net.DatagramSocket;
 import java.net.MulticastSocket;
 import java.net.SocketException;
 
-public class ServidorThread extends Thread implements Constants {
+public class PingRunnable implements Runnable, Constants {
 
-    Servidor servidor;
-    DatagramPacket datagramPacket;
+    private DatagramSocket datagramSocket;
 
-    public ServidorThread(Servidor servidor) {
-        this.servidor = servidor;
+    public PingRunnable(DatagramSocket datagramSocket) {
+        this.datagramSocket = datagramSocket;
     }
 
     @Override
     public void run() {
         while (true) {
             try {
-                datagramPacket = new DatagramPacket(new byte[PKT_SIZE], PKT_SIZE);
+                DatagramPacket datagramPacket = new DatagramPacket(new byte[PKT_SIZE], PKT_SIZE);
 
                 //Espera packet de um servidor (ping)
-                servidor.dsSocket.receive(datagramPacket);
+                datagramSocket.receive(datagramPacket);
 
                 //Envia de volta uma mensagem a dizer que está on
                 String string = "Estou on";
@@ -32,7 +32,7 @@ public class ServidorThread extends Thread implements Constants {
                 datagramPacket.setData(resp);
                 datagramPacket.setLength(resp.length);
 
-                servidor.dsSocket.send(datagramPacket);
+                datagramSocket.send(datagramPacket);
 
             } catch (SocketException e) {
                 return;

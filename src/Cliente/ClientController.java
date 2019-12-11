@@ -10,7 +10,7 @@ class ClientController {
     ClientController() throws IOException, InvalidServerException {
         super();
         this.model = new ClientModel();
-        System.out.println(model.getServerInfo().toString());
+        System.out.println(model.getServer());
     }
 
 

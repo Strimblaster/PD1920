@@ -1,5 +1,6 @@
 package Cliente;
 
+import Cliente.Interfaces.IComunicacaoCliente;
 import Comum.Exceptions.InvalidServerException;
 import Comum.*;
 import com.google.gson.Gson;
@@ -7,7 +8,7 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.net.*;
 
-public class Comunicacao implements IComunicacao, Constants {
+public class Comunicacao implements IComunicacaoCliente, Constants {
     Socket tcpSocket;
     DatagramSocket udpSocket;
 
@@ -15,7 +16,8 @@ public class Comunicacao implements IComunicacao, Constants {
         udpSocket = new DatagramSocket();
     }
 
-    ServerInfo getServerInfo() throws IOException, InvalidServerException {
+    @Override
+    public ServerInfo getServerInfo() throws IOException, InvalidServerException {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byte[] incommingData = new byte[PKT_SIZE];
@@ -40,4 +42,5 @@ public class Comunicacao implements IComunicacao, Constants {
 
         return server;
     }
+
 }

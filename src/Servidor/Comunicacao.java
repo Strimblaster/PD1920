@@ -1,38 +1,42 @@
 package Servidor;
 
 import Comum.Constants;
-import Comum.IComunicacao;
-import Comum.ServerInfo;
-import com.google.gson.Gson;
+import Servidor.Interfaces.IComunicacaoServer;
+import Servidor.Interfaces.IEvent;
+import Servidor.Interfaces.ServerConstants;
+import Servidor.Runnables.PingRunnable;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.*;
 import java.util.ArrayList;
 
-public class Comunicacao implements IComunicacao, Constants, ServerConstants {
-    ServerSocket serverSocket;
-    DatagramSocket dsSocket;
-    ArrayList<Socket> clientes;
-    ArrayList<ServerInfo> servidores;
+public class Comunicacao implements IEvent, Constants, ServerConstants {
+    private ServerSocket serverSocket;
+    private DatagramSocket datagramSocket;
+    private ArrayList<Socket> clientes;
+    private IComunicacaoServer server;
+    private Thread pingThread;
 
 
-    public Comunicacao() throws IOException {
+
+    public Comunicacao(Servidor servidor) throws IOException {
         serverSocket = new ServerSocket(0);
-        dsSocket = new DatagramSocket();
+        datagramSocket = new DatagramSocket();
         clientes = new ArrayList<>();
-        dsSocket.setSoTimeout(TIMEOUT);
+        datagramSocket.setSoTimeout(TIMEOUT);
+
+        server = servidor;
+        servidor.setListener(this);
     }
 
-
-    public int requestServerID() throws IOException {
+    private int requestServerID() throws IOException {
         String porta = Integer.toString(serverSocket.getLocalPort());
         byte[] b = porta.getBytes();
         int id;
 
         DatagramPacket p = new DatagramPacket(b, b.length, InetAddress.getByName(IP_DS), SERVER_PORT_DS);
-        dsSocket.send(p);
-        dsSocket.receive(p);
+        datagramSocket.send(p);
+        datagramSocket.receive(p);
         id = Integer.parseInt(new String(p.getData(), 0, p.getLength()));
 
         //multicast
@@ -46,4 +50,14 @@ public class Comunicacao implements IComunicacao, Constants, ServerConstants {
     }
 
 
+    @Override
+    public void serverReady() {
+        pingThread = new Thread(new PingRunnable(datagramSocket));
+        pingThread.start();
+    }
+
+    @Override
+    public void needID() throws IOException {
+        server.setID(requestServerID());
+    }
 }

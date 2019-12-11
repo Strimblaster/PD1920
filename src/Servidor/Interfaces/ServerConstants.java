@@ -1,4 +1,6 @@
-package Servidor;
+package Servidor.Interfaces;
+
+import Servidor.Servidor;
 
 public interface ServerConstants {
     String JDBC_DRIVER = "com.mysql.jdbc.Driver";
