@@ -1,10 +1,11 @@
 package Cliente;
 
-import Comum.Exceptions.InvalidServerException;
+import Comum.Exceptions.*;
+import javafx.scene.control.PasswordField;
 
 import java.io.IOException;
 
-class ClientController {
+public class ClientController {
     private ClientModel model;
 
     ClientController() throws IOException, InvalidServerException {
@@ -14,4 +15,10 @@ class ClientController {
     }
 
 
+    public void login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
+        if(username == null || username.equals("")) throw new InvalidUsernameException();
+        if(password == null || password.equals("")) throw new InvalidPasswordException();
+
+        model.login(username, password);
+    }
 }

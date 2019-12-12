@@ -2,11 +2,12 @@ package Comum;
 
 public class Utilizador {
     private String name;
-    private String email; //ou username
     private String password;
 
-
-    public Utilizador() { }
+    public Utilizador(String name, String password) {
+        this.name = name;
+        this.password = password;
+    }
 
     public String getName() {
         return name;
@@ -14,14 +15,6 @@ public class Utilizador {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPassword() {

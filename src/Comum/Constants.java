@@ -8,6 +8,6 @@ public interface Constants {
     int PING_SLEEP_MS = 3000;
     int PING_TIMEOUT_MS = 1000;
 
-    int PKT_SIZE = 4000;
+    int PKT_SIZE = 8000;
     int TIMEOUT = 5000;
 }

@@ -11,14 +11,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="backgroundDark" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:controller="Cliente.javaFX.LoginController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="backgroundDark" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <VBox prefHeight="324.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
                   <Separator opacity="0.0" orientation="VERTICAL" prefHeight="200.0" />
-                  <TextField id="txtUsername" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="500.0" promptText="Username" style="-fx-background-radius: 0;">
+                  <TextField fx:id="txtUsername" id="txtUsername" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="500.0" promptText="Username" style="-fx-background-radius: 0;">
                      <cursor>
                         <Cursor fx:constant="TEXT" />
                      </cursor>
@@ -26,7 +26,7 @@
                         <Insets bottom="20.0" />
                      </VBox.margin>
                   </TextField>
-                  <PasswordField id="txtPassword" maxHeight="40.0" maxWidth="500.0" minHeight="40.0" minWidth="500.0" prefHeight="40.0" prefWidth="500.0" promptText="Password" style="-fx-background-radius: 0;">
+                  <PasswordField fx:id="txtPassword" id="txtPassword" maxHeight="40.0" maxWidth="500.0" minHeight="40.0" minWidth="500.0" prefHeight="40.0" prefWidth="500.0" promptText="Password" style="-fx-background-radius: 0;">
                      <cursor>
                         <Cursor fx:constant="TEXT" />
                      </cursor>
@@ -35,7 +35,7 @@
             </VBox>
             <HBox alignment="CENTER" prefHeight="190.0" prefWidth="500.0">
                <children>
-                  <Button id="btnCancel" focusTraversable="false" maxHeight="45.0" maxWidth="130.0" minHeight="45.0" minWidth="130.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" styleClass="btnCancel" stylesheets="@Style.css" text="Cancelar" textAlignment="CENTER" textFill="WHITE">
+                  <Button fx:id="btnCancel" id="btnCancel" focusTraversable="false" maxHeight="45.0" maxWidth="130.0" minHeight="45.0" minWidth="130.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" styleClass="btnCancel" stylesheets="@Style.css" text="Cancelar" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="Roboto Medium" size="17.0" />
                      </font>
@@ -43,7 +43,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor></Button>
                   <Separator opacity="0.0" prefHeight="7.0" prefWidth="43.0" />
-                  <Button id="btnLogin" maxHeight="45.0" maxWidth="130.0" minHeight="45.0" minWidth="130.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" styleClass="btnLogin" stylesheets="@Style.css" text="Login" textAlignment="CENTER" textFill="WHITE">
+                  <Button fx:id="btnLogin" id="btnLogin" onAction="#handleBtnLogin" maxHeight="45.0" maxWidth="130.0" minHeight="45.0" minWidth="130.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" styleClass="btnLogin" stylesheets="@Style.css" text="Login" textAlignment="CENTER" textFill="WHITE">
                      <font>
                         <Font name="Roboto Medium" size="17.0" />
                      </font>

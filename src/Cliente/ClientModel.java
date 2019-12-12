@@ -3,6 +3,8 @@ package Cliente;
 import Cliente.Interfaces.IComunicacaoCliente;
 import Comum.Constants;
 import Comum.Exceptions.InvalidServerException;
+import Comum.Pedidos.PedidoLogin;
+import Comum.Pedidos.Resposta;
 import Comum.ServerInfo;
 import Comum.Utilizador;
 import Cliente.Interfaces.IEvent;
@@ -36,5 +38,12 @@ class ClientModel implements Constants, IEvent {
 
     public void setUtilizador(Utilizador utilizador) {
         this.utilizador = utilizador;
+    }
+
+
+
+    public void login(String username, String password) {
+        Resposta resposta = comunicacao.login(new PedidoLogin(new Utilizador(username,password)));
+        System.out.println(resposta.toString());
     }
 }

@@ -1,13 +1,30 @@
 package Comum.Pedidos;
 
-import java.net.InetAddress;
+import Comum.Utilizador;
+import com.google.gson.JsonDeserializer;
 
-public abstract class Pedido {
-    InetAddress ipCliente;
-    int port;
+public abstract class Pedido  {
+    private Utilizador utilizador;
+    private TipoPedido tipo; // Este tipo é necessario para depois ao deserializar de JSON sabermos em que classe temos que deserializar;
 
-    public Pedido(InetAddress ipCliente, int port) {
-        this.ipCliente = ipCliente;
-        this.port = port;
+    public Pedido(Utilizador cliente, TipoPedido tipo) {
+        this.utilizador = cliente;
+        this.tipo = tipo;
+    }
+
+    public Pedido(TipoPedido tipo) {
+        this.tipo = tipo;
+    }
+
+    public Utilizador getUtilizador() {
+        return utilizador;
+    }
+
+    public TipoPedido getTipo() {
+        return tipo;
+    }
+
+    public void setUtilizador(Utilizador utilizador) {
+        this.utilizador = utilizador;
     }
 }

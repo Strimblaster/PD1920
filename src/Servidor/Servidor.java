@@ -1,6 +1,9 @@
 package Servidor;
 
 import Comum.Constants;
+import Comum.Pedidos.PedidoLogin;
+import Comum.Pedidos.Resposta;
+import Comum.Utilizador;
 import Servidor.Interfaces.IComunicacaoServer;
 import Servidor.Interfaces.IEvent;
 import Servidor.Interfaces.ServerConstants;
@@ -76,17 +79,40 @@ public class Servidor implements ServerConstants, Constants, IComunicacaoServer 
                 s.close();
             }
         }
+        resultSet.close();
 
         //Cria DB
-        resultSet.close();
         Statement s = conn.createStatement();
-        s.execute("CREATE DATABASE Servidor" + id);
+        s.execute(DB_CREATE_QUERY1+ DBName +DB_CREATE_QUERY2+ DBName +DB_CREATE_QUERY3+ DBName +DB_CREATE_QUERY4+ DBName +DB_CREATE_QUERY5);
         s.close();
+
     }
+
 
     @Override
     public void setID(int id) {
         this.id = id;
         DBName = "Servidor"+id;
+    }
+
+    @Override
+    public Resposta login(PedidoLogin pedido) {
+        try{
+            Utilizador utilizador = pedido.getUtilizador();
+            Statement s = conn.createStatement();
+            ResultSet resultSetUsername = s.executeQuery("SELECT nome FROM utilizadores WHERE nome= \' " + utilizador.getName() + '\'');
+            if(!resultSetUsername.next())
+                return new Resposta(pedido, false, "Username não foi encontrado");
+
+            ResultSet resultSetPassword = s.executeQuery("SELECT password FROM utilizadores WHERE nome= \'" + utilizador.getName() + '\'');
+            resultSetPassword.next();
+            if(!resultSetPassword.getString(1).equals(utilizador.getPassword()))
+                return new Resposta(pedido, false, "Password Incorreta");
+
+            return new Resposta(pedido, true, "Login concluido");
+
+        } catch (SQLException e) {
+            return new Resposta(pedido, false, "Erro no servidor", e);
+        }
     }
 }

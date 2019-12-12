@@ -1,5 +1,6 @@
 package Cliente;
 
+import Cliente.javaFX.LoginController;
 import Comum.Exceptions.InvalidServerException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -33,6 +34,9 @@ public class Cliente extends Application {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("javaFX/login.fxml"));
             BorderPane root =  loader.load();
+
+            ((LoginController)loader.getController()).setClientController(clientController);
+
             Scene scene = new Scene(root);
 
             stage.setScene(scene);

@@ -1,19 +1,21 @@
 package Servidor;
 
 import Comum.Constants;
-import Servidor.Interfaces.IComunicacaoServer;
-import Servidor.Interfaces.IEvent;
-import Servidor.Interfaces.ServerConstants;
+import Comum.Pedidos.*;
+import Comum.Pedidos.Serializers.PedidoDeserializer;
+import Servidor.Interfaces.*;
+import Servidor.Runnables.Login;
 import Servidor.Runnables.PingRunnable;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.*;
-import java.util.ArrayList;
 
-public class Comunicacao implements IEvent, Constants, ServerConstants {
+public class Comunicacao extends Thread implements IEvent, Constants, ServerConstants {
     private ServerSocket serverSocket;
     private DatagramSocket datagramSocket;
-    private ArrayList<Socket> clientes;
     private IComunicacaoServer server;
     private Thread pingThread;
 
@@ -22,7 +24,6 @@ public class Comunicacao implements IEvent, Constants, ServerConstants {
     public Comunicacao(Servidor servidor) throws IOException {
         serverSocket = new ServerSocket(0);
         datagramSocket = new DatagramSocket();
-        clientes = new ArrayList<>();
         datagramSocket.setSoTimeout(TIMEOUT);
 
         server = servidor;
@@ -54,10 +55,40 @@ public class Comunicacao implements IEvent, Constants, ServerConstants {
     public void serverReady() {
         pingThread = new Thread(new PingRunnable(datagramSocket));
         pingThread.start();
+        start();
     }
 
     @Override
     public void needID() throws IOException {
         server.setID(requestServerID());
+    }
+
+    @Override
+    public void run() {
+        Gson gson = new GsonBuilder().registerTypeAdapter(Pedido.class, new PedidoDeserializer()).create();
+
+        try{
+            while(true){
+                Socket s = serverSocket.accept();
+                System.out.println("[INFO] - [Comunicação]: Novo pedido recebido de: " + s.getInetAddress().getHostName() + ":" + s.getPort());
+                InputStream inputStream = s.getInputStream();
+                byte[] bytes = new byte[PKT_SIZE];
+                int read = inputStream.read(bytes);
+                String str = new String(bytes, 0, read);
+                Pedido pedido = gson.fromJson(str, Pedido.class);
+
+                if(pedido instanceof PedidoLogin)
+                    new Login(s,(PedidoLogin) pedido,server).start();
+                else
+                    System.out.println("[INFO] - [Comunicação]: Recebi um pedido não identificado");
+
+
+            }
+        }catch (SocketException ignored){
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
