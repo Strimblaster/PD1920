@@ -67,7 +67,6 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             gson = new GsonBuilder().registerTypeAdapter(Resposta.class, new RespostaDeserializer()).create();
             return gson.fromJson(json, Resposta.class);
 
-
         } catch (IOException e) {
             System.out.println("Ocorreu um erro no login: " + e.getMessage());
         }

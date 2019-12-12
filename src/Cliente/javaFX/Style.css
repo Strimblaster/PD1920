@@ -9,6 +9,14 @@
     -fx-background-color:white !important;
     -fx-text-fill: #27ae60 !important;
 }
+.btnBlue:hover{
+    -fx-background-color:white !important;
+    -fx-text-fill: #27ae60 !important;
+}
+.btnBlue{
+    -fx-background-color: #1abc9c;
+    -fx-background-radius: 0;
+}
 
 .btnCancel{
     -fx-background-color: red !important;
@@ -25,3 +33,7 @@
 .navbar{
     -fx-background-color: 0;
 }
+.text{
+    -fx-text-fill: white;
+}
+
