@@ -33,7 +33,7 @@
 .navbar{
     -fx-background-color: 0;
 }
-.text{
-    -fx-text-fill: white;
-}
 
+.label, .text{
+    -fx-text-fill :white;
+}

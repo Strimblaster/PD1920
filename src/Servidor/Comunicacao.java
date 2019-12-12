@@ -6,9 +6,11 @@ import Comum.Pedidos.Serializers.PedidoDeserializer;
 import Servidor.Interfaces.*;
 import Servidor.Runnables.Login;
 import Servidor.Runnables.PingRunnable;
+import Servidor.Runnables.SignUp;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
@@ -79,10 +81,12 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
 
                 if(pedido instanceof PedidoLogin)
                     new Login(s,(PedidoLogin) pedido,server).start();
-                else
+                else if(pedido instanceof PedidoSignUp) {
+                        new SignUp(s, (PedidoSignUp) pedido, server).start();
+                }
+                else{
                     System.out.println("[INFO] - [Comunicação]: Recebi um pedido não identificado");
-
-
+                }
             }
         }catch (SocketException ignored){
 

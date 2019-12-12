@@ -2,6 +2,7 @@ package Servidor;
 
 import Comum.Constants;
 import Comum.Pedidos.PedidoLogin;
+import Comum.Pedidos.PedidoSignUp;
 import Comum.Pedidos.Resposta;
 import Comum.Utilizador;
 import Servidor.Interfaces.IComunicacaoServer;
@@ -113,6 +114,24 @@ public class Servidor implements ServerConstants, Constants, IComunicacaoServer 
 
         } catch (SQLException e) {
             return new Resposta(pedido, false, "Erro no servidor", e);
+        }
+    }
+
+    @Override
+    public Resposta signUp(PedidoSignUp pedidoSignUp) {
+        try{
+            Utilizador utilizador = pedidoSignUp.getUtilizador();
+            Statement s = conn.createStatement();
+            ResultSet resultSetUsername = s.executeQuery("SELECT nome FROM utilizadores WHERE nome= \' " + utilizador.getName() + '\'');
+            if(resultSetUsername.next()){
+                return new Resposta(pedidoSignUp, false, "Username já está registado");
+            }
+                int resultSet = s.executeUpdate("INSERT INTO utilizadores(nome, password) VALUES (\'"+utilizador.getName()+"\', \'"+utilizador.getPassword()+"\')");
+
+            return new Resposta(pedidoSignUp, true, "Registo concluido");
+
+        } catch (SQLException e) {
+            return new Resposta(pedidoSignUp, false, "Erro no servidor", e);
         }
     }
 }
