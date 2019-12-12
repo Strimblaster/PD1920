@@ -44,7 +44,6 @@ class ClientModel implements Constants, IEvent {
 
 
     public void login(String username, String password) {
-        Resposta resposta = comunicacao.signUp(new PedidoSignUp(new Utilizador(username,password)));
-        System.out.println(resposta.toString());
+        Resposta resposta = comunicacao.login(new PedidoLogin(new Utilizador(username,password)));
     }
 }

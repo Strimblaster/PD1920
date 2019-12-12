@@ -8,9 +8,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-public class LoginController {
+import java.io.IOException;
 
-    private ClientController clientController;
+public class MenuController extends SceneController {
 
     public Button btnLogin;
     public Button btnCancel;
@@ -27,7 +27,19 @@ public class LoginController {
         }
     }
 
-    public void setClientController(ClientController clientController) {
-        this.clientController = clientController;
+    public void handleBtnGoToLogin(ActionEvent actionEvent) {
+        try {
+            load("Login.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void handleBtnGoToSignUp(ActionEvent actionEvent) {
+        try {
+            load("SignUp.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

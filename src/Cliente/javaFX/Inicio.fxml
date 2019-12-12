@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="backgroundDark" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:controller="Cliente.javaFX.MenuController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="backgroundDark" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="20.0" stylesheets="@Style.css" BorderPane.alignment="CENTER">
          <children>
@@ -21,7 +21,7 @@
                   <Insets />
                </VBox.margin>
             </Label>
-            <Button alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="40.0" mnemonicParsing="false" styleClass="btnLogin" stylesheets="@Style.css" text="Login">
+            <Button onAction="#handleBtnGoToLogin" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="40.0" mnemonicParsing="false" styleClass="btnLogin" stylesheets="@Style.css" text="Login">
                <VBox.margin>
                   <Insets left="150.0" right="150.0" />
                </VBox.margin>
@@ -29,7 +29,7 @@
                   <Font size="14.0" />
                </font>
             </Button>
-            <Button alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="40.0" mnemonicParsing="false" stylesheets="@Style.css" text="Registo">
+            <Button onAction="#handleBtnGoToSignUp" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="40.0" mnemonicParsing="false" stylesheets="@Style.css" text="Registo">
                <VBox.margin>
                   <Insets left="150.0" right="150.0" />
                </VBox.margin>

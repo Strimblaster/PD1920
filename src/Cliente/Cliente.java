@@ -1,11 +1,10 @@
 package Cliente;
 
-import Cliente.javaFX.LoginController;
+import Cliente.javaFX.MenuController;
 import Comum.Exceptions.InvalidServerException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -32,10 +31,10 @@ public class Cliente extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("javaFX/login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("javaFX/Inicio.fxml"));
             BorderPane root =  loader.load();
 
-            ((LoginController)loader.getController()).setClientController(clientController);
+            ((MenuController)loader.getController()).setClientController(clientController);
 
             Scene scene = new Scene(root);
 

@@ -121,8 +121,9 @@ public class Servidor implements ServerConstants, Constants, IComunicacaoServer 
     public Resposta signUp(PedidoSignUp pedidoSignUp) {
         try{
             Utilizador utilizador = pedidoSignUp.getUtilizador();
-            Statement s = conn.createStatement();
-            ResultSet resultSetUsername = s.executeQuery("SELECT nome FROM utilizadores WHERE nome= \' " + utilizador.getName() + '\'');
+            PreparedStatement s = conn.prepareStatement("SELECT nome FROM utilizadores WHERE nome=?");
+            s.setString(1,utilizador.getName());
+            ResultSet resultSetUsername = s.executeQuery();
             if(resultSetUsername.next()){
                 return new Resposta(pedidoSignUp, false, "Username já está registado");
             }
