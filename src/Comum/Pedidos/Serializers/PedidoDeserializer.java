@@ -2,6 +2,7 @@ package Comum.Pedidos.Serializers;
 
 import Comum.Pedidos.Pedido;
 import Comum.Pedidos.PedidoLogin;
+import Comum.Pedidos.PedidoSignUp;
 import Comum.Pedidos.TipoPedido;
 import Comum.Utilizador;
 import com.google.gson.*;
@@ -18,6 +19,12 @@ public class PedidoDeserializer implements JsonDeserializer<Pedido> {
 
         if(tipo.equals(TipoPedido.PedidoLogin.toString())){
             PedidoLogin p = new PedidoLogin();
+            p.setUtilizador(u);
+            return p;
+        }
+
+        if(tipo.equals(TipoPedido.PedidoSignUp.toString())){
+            PedidoSignUp p = new PedidoSignUp();
             p.setUtilizador(u);
             return p;
         }

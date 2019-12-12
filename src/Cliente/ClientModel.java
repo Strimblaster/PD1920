@@ -4,6 +4,7 @@ import Cliente.Interfaces.IComunicacaoCliente;
 import Comum.Constants;
 import Comum.Exceptions.InvalidServerException;
 import Comum.Pedidos.PedidoLogin;
+import Comum.Pedidos.PedidoSignUp;
 import Comum.Pedidos.Resposta;
 import Comum.ServerInfo;
 import Comum.Utilizador;
@@ -43,7 +44,7 @@ class ClientModel implements Constants, IEvent {
 
 
     public void login(String username, String password) {
-        Resposta resposta = comunicacao.login(new PedidoLogin(new Utilizador(username,password)));
+        Resposta resposta = comunicacao.signUp(new PedidoSignUp(new Utilizador(username,password)));
         System.out.println(resposta.toString());
     }
 }

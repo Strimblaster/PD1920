@@ -2,8 +2,6 @@ package Comum.Pedidos;
 
 import com.google.gson.annotations.Expose;
 
-import java.sql.SQLException;
-
 public class Resposta {
 
     private Pedido pedido;
@@ -33,7 +31,7 @@ public class Resposta {
         this.exception = exception;
     }
 
-    public Resposta(PedidoLogin pedido, boolean sucess, String info, Exception exception) {
+    public Resposta(Pedido pedido, boolean sucess, String info, Exception exception) {
         this.pedido = pedido;
         this.sucess = sucess;
         this.info = info;

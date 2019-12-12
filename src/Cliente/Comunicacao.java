@@ -5,6 +5,7 @@ import Comum.Exceptions.InvalidServerException;
 import Comum.*;
 import Comum.Pedidos.Pedido;
 import Comum.Pedidos.PedidoLogin;
+import Comum.Pedidos.PedidoSignUp;
 import Comum.Pedidos.Resposta;
 import Comum.Pedidos.Serializers.PedidoDeserializer;
 import Comum.Pedidos.Serializers.RespostaDeserializer;
@@ -67,6 +68,30 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             gson = new GsonBuilder().registerTypeAdapter(Resposta.class, new RespostaDeserializer()).create();
             return gson.fromJson(json, Resposta.class);
 
+        } catch (IOException e) {
+            System.out.println("Ocorreu um erro no login: " + e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public Resposta signUp(PedidoSignUp pedidoSignUp) {
+        try {
+            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
+            Gson gson = new Gson();
+            InputStream inputStream = tcpSocket.getInputStream();
+            OutputStream outputStream = tcpSocket.getOutputStream();
+
+            String json = gson.toJson(pedidoSignUp);
+            outputStream.write(json.getBytes());
+
+            byte[] buffer = new byte[PKT_SIZE];
+            int nread = inputStream.read(buffer);
+
+            json = new String(buffer, 0 , nread);
+
+            gson = new GsonBuilder().registerTypeAdapter(Resposta.class, new RespostaDeserializer()).create();
+            return gson.fromJson(json, Resposta.class);
 
         } catch (IOException e) {
             System.out.println("Ocorreu um erro no login: " + e.getMessage());

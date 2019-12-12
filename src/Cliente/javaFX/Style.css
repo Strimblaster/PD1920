@@ -1,5 +1,3 @@
-
-
 .btnLogin{
     -fx-background-color:#27ae60 !important;
     -fx-text-fill: white !important;
@@ -24,4 +22,8 @@
 }
 .navbar{
     -fx-background-color: 0;
+}
+
+.label{
+    -fx-text-fill :white;
 }
