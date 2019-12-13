@@ -25,6 +25,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     @Override
     public ServerInfo getServerInfo() throws IOException, InvalidServerException {
         DatagramSocket udpSocket = new DatagramSocket();
+        udpSocket.setSoTimeout(TIMEOUT_2s);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byte[] incommingData = new byte[PKT_SIZE];
 
@@ -50,7 +51,8 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     }
 
     @Override
-    public Resposta login(PedidoLogin pedidoLogin) {
+    public Resposta login(String username, String password) {
+        PedidoLogin pedidoLogin = new PedidoLogin(new Utilizador(username, password));
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
             Gson gson = new Gson();
@@ -75,7 +77,8 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     }
 
     @Override
-    public Resposta signUp(PedidoSignUp pedidoSignUp) {
+    public Resposta signUp(String username, String password) {
+        PedidoSignUp pedidoSignUp = new PedidoSignUp(new Utilizador(username, password));
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
             Gson gson = new Gson();

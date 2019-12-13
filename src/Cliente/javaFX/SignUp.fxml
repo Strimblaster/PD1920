@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="backgroundDark" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Cliente.javaFX.LoginController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="backgroundDark" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Cliente.javaFX.MenuController">
    <left>
       <Separator opacity="0.0" prefHeight="15.0" prefWidth="122.0" BorderPane.alignment="CENTER" />
    </left>
@@ -58,7 +58,7 @@
    <bottom>
       <HBox alignment="CENTER" prefHeight="190.0" prefWidth="500.0" BorderPane.alignment="CENTER">
          <children>
-            <Button id="btnCancel" fx:id="btnCancel" focusTraversable="false" maxHeight="45.0" maxWidth="130.0" minHeight="45.0" minWidth="130.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" styleClass="btnCancel" stylesheets="@Style.css" text="Cancelar" textAlignment="CENTER" textFill="WHITE">
+            <Button onAction="#handlebtnGoToInicio" id="btnCancel" fx:id="btnCancel" focusTraversable="false" maxHeight="45.0" maxWidth="130.0" minHeight="45.0" minWidth="130.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" styleClass="btnCancel" stylesheets="@Style.css" text="Cancelar" textAlignment="CENTER" textFill="WHITE">
                <font>
                   <Font name="Roboto Medium" size="17.0" />
                </font>
@@ -67,7 +67,7 @@
                </cursor>
             </Button>
             <Separator opacity="0.0" prefHeight="7.0" prefWidth="43.0" />
-            <Button id="btnLogin" fx:id="btnLogin" maxHeight="45.0" maxWidth="130.0" minHeight="45.0" minWidth="130.0" mnemonicParsing="false" onAction="#handleBtnLogin" prefHeight="45.0" prefWidth="130.0" styleClass="btnLogin" stylesheets="@Style.css" text="Sign Up" textAlignment="CENTER" textFill="WHITE">
+            <Button id="btnLogin" fx:id="btnLogin" maxHeight="45.0" maxWidth="130.0" minHeight="45.0" minWidth="130.0" mnemonicParsing="false" onAction="#handleBtnSignUp" prefHeight="45.0" prefWidth="130.0" styleClass="btnLogin" stylesheets="@Style.css" text="Sign Up" textAlignment="CENTER" textFill="WHITE">
                <font>
                   <Font name="Roboto Medium" size="17.0" />
                </font>

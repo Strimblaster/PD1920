@@ -41,7 +41,11 @@ public class PingThread extends Thread implements Constants {
 
                     } catch (IOException e) {
                         ds.servidoresUDP.remove(server);
-                        ds.servidoresTCP.remove(server);
+                        for(ServerInfo s: ds.servidoresTCP)
+                            if(s.getId() == server.getId()){
+                                ds.servidoresTCP.remove(s);
+                                break;
+                            }
                         System.out.println("[INFO] - [ThreadPings]: " + server.toString() + " não respondeu ao ping! Foi removido da lista de servidores.");
                     }
                 }

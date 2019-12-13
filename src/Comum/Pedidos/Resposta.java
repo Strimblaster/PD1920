@@ -62,6 +62,14 @@ public class Resposta {
         this.info = info;
     }
 
+    public void setException(Exception exception) {
+        this.exception = exception;
+    }
+
+    public Exception getException() {
+        return exception;
+    }
+
     @Override
     public String toString() {
 

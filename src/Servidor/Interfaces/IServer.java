@@ -5,7 +5,7 @@ import Servidor.Servidor;
 
 import java.io.IOException;
 
-public interface IComunicacaoServer extends IComunicacao {
+public interface IServer extends IComunicacao {
 
     void setID(int id);
 }

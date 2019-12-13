@@ -6,6 +6,7 @@ import Comum.Pedidos.Resposta;
 
 public interface IComunicacao {
 
-    Resposta login(PedidoLogin pedidoLogin);
-    Resposta signUp(PedidoSignUp pedidoSignUp);
+    Resposta login(String username, String password);
+    Resposta signUp(String username, String password);
+
 }

@@ -7,6 +7,11 @@ public interface ServerConstants {
     String USER = "PD";
     String PASS = "PDcancro";
 
+    String SERVER_STORAGE_PATH = "C://temp/";
+
+
+
+
     String DB_CREATE_QUERY1 = "/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;" +
             "/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;" +
             "/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;" +

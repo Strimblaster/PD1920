@@ -37,7 +37,7 @@ public class PingRunnable implements Runnable, Constants {
             } catch (SocketException e) {
                 return;
             } catch (IOException e) {
-                System.out.println("[Erro] [ServidorThread] - Erro: " + e.getMessage());
+                System.out.println("[Erro] [PingThread] - Erro: " + e.getMessage());
             }
         }
     }

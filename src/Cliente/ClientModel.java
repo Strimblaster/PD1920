@@ -4,7 +4,6 @@ import Cliente.Interfaces.IComunicacaoCliente;
 import Comum.Constants;
 import Comum.Exceptions.InvalidServerException;
 import Comum.Pedidos.PedidoLogin;
-import Comum.Pedidos.PedidoSignUp;
 import Comum.Pedidos.Resposta;
 import Comum.ServerInfo;
 import Comum.Utilizador;
@@ -12,7 +11,7 @@ import Cliente.Interfaces.IEvent;
 
 import java.io.*;
 
-//O IEvent talvez acabe por não ficar aqui, depende depois de como for fazer a grafica
+
 class ClientModel implements Constants, IEvent {
 
     private ServerInfo server;
@@ -43,7 +42,11 @@ class ClientModel implements Constants, IEvent {
 
 
 
-    public void login(String username, String password) {
-        Resposta resposta = comunicacao.login(new PedidoLogin(new Utilizador(username,password)));
+    public Resposta login(String username, String password) {
+        return comunicacao.login(username, password);
+    }
+
+    public Resposta  signUp(String username, String password){
+        return comunicacao.signUp(username, password);
     }
 }

@@ -4,13 +4,12 @@ import Comum.Constants;
 import Comum.Pedidos.*;
 import Comum.Pedidos.Serializers.PedidoDeserializer;
 import Servidor.Interfaces.*;
-import Servidor.Runnables.Login;
+import Servidor.Runnables.LoginRunnable;
 import Servidor.Runnables.PingRunnable;
-import Servidor.Runnables.SignUp;
+import Servidor.Runnables.SignUpRunnable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
@@ -18,7 +17,7 @@ import java.net.*;
 public class Comunicacao extends Thread implements IEvent, Constants, ServerConstants {
     private ServerSocket serverSocket;
     private DatagramSocket datagramSocket;
-    private IComunicacaoServer server;
+    private IServer server;
     private Thread pingThread;
 
 
@@ -26,7 +25,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
     public Comunicacao(Servidor servidor) throws IOException {
         serverSocket = new ServerSocket(0);
         datagramSocket = new DatagramSocket();
-        datagramSocket.setSoTimeout(TIMEOUT);
+        datagramSocket.setSoTimeout(TIMEOUT_5s);
 
         server = servidor;
         servidor.setListener(this);
@@ -79,14 +78,19 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                 String str = new String(bytes, 0, read);
                 Pedido pedido = gson.fromJson(str, Pedido.class);
 
+                Runnable pedidoRunnable;
+
                 if(pedido instanceof PedidoLogin)
-                    new Login(s,(PedidoLogin) pedido,server).start();
+                    pedidoRunnable = new LoginRunnable(s,(PedidoLogin) pedido,server);
                 else if(pedido instanceof PedidoSignUp) {
-                        new SignUp(s, (PedidoSignUp) pedido, server).start();
+                    pedidoRunnable = new SignUpRunnable(s, (PedidoSignUp) pedido, server);
                 }
                 else{
                     System.out.println("[INFO] - [Comunicação]: Recebi um pedido não identificado");
+                    continue;
                 }
+
+                new Thread(pedidoRunnable).start();
             }
         }catch (SocketException ignored){
 

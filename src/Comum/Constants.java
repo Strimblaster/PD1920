@@ -9,5 +9,7 @@ public interface Constants {
     int PING_TIMEOUT_MS = 1000;
 
     int PKT_SIZE = 8000;
-    int TIMEOUT = 5000;
+    int TIMEOUT_5s = 5000;
+    int TIMEOUT_2s = 2000;
+
 }

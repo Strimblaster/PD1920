@@ -9,6 +9,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 import static javafx.application.Platform.exit;
 
@@ -18,7 +19,7 @@ public class Cliente extends Application {
     public Cliente() throws IOException {
         try {
             clientController = new ClientController();
-        } catch (InvalidServerException e){
+        } catch (InvalidServerException | SocketTimeoutException e){
             System.out.println(e.getMessage());
             exit();
         }
@@ -35,6 +36,7 @@ public class Cliente extends Application {
             BorderPane root =  loader.load();
 
             ((MenuController)loader.getController()).setClientController(clientController);
+            ((MenuController)loader.getController()).stage = stage;
 
             Scene scene = new Scene(root);
 

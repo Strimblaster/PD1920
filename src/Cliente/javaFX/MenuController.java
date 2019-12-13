@@ -4,6 +4,7 @@ import Cliente.ClientController;
 import Comum.Exceptions.InvalidPasswordException;
 import Comum.Exceptions.InvalidUsernameException;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -22,8 +23,29 @@ public class MenuController extends SceneController {
 
         try {
             clientController.login(txtUsername.getText(), txtPassword.getText());
-        } catch (InvalidUsernameException | InvalidPasswordException e) {
-            e.getMessage();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro");
+            alert.setHeaderText("Login");
+            alert.setContentText(e.getMessage());
+
+            alert.showAndWait();
+        }
+    }
+
+    public void handleBtnSignUp(ActionEvent actionEvent) {
+        if(clientController == null) return;
+
+        try {
+            clientController.signUp(txtUsername.getText(), txtPassword.getText());
+            load("Inicio.fxml");
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro");
+            alert.setHeaderText("Sign Up");
+            alert.setContentText(e.getMessage());
+
+            alert.showAndWait();
         }
     }
 
@@ -42,4 +64,14 @@ public class MenuController extends SceneController {
             e.printStackTrace();
         }
     }
+
+    public void handlebtnGoToInicio(ActionEvent actionEvent) {
+        try {
+            load("Inicio.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

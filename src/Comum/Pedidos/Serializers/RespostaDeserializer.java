@@ -11,9 +11,11 @@ public class RespostaDeserializer implements JsonDeserializer<Resposta> {
         Gson gson = new GsonBuilder().registerTypeAdapter(Pedido.class, new PedidoDeserializer()).create();
         Gson gson1 = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
+        Exception exception = gson.fromJson(jsonElement.getAsJsonObject().get("exception"), Exception.class);
         Pedido pedido = gson.fromJson(jsonElement.getAsJsonObject().get("pedido"), Pedido.class);
         Resposta resposta = gson1.fromJson(jsonElement.getAsJsonObject(), Resposta.class);
         resposta.setPedido(pedido);
+        resposta.setException(exception);
 
         return resposta;
     }

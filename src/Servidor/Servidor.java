@@ -5,7 +5,7 @@ import Comum.Pedidos.PedidoLogin;
 import Comum.Pedidos.PedidoSignUp;
 import Comum.Pedidos.Resposta;
 import Comum.Utilizador;
-import Servidor.Interfaces.IComunicacaoServer;
+import Servidor.Interfaces.IServer;
 import Servidor.Interfaces.IEvent;
 import Servidor.Interfaces.ServerConstants;
 
@@ -14,7 +14,7 @@ import java.net.*;
 import java.sql.*;
 import java.util.Scanner;
 
-public class Servidor implements ServerConstants, Constants, IComunicacaoServer {
+public class Servidor implements ServerConstants, Constants, IServer {
 
     private Connection conn;
     private String DBName;
@@ -97,17 +97,16 @@ public class Servidor implements ServerConstants, Constants, IComunicacaoServer 
     }
 
     @Override
-    public Resposta login(PedidoLogin pedido) {
+    public Resposta login(String username, String password) {
+        PedidoLogin pedido = new PedidoLogin(new Utilizador(username, password));
         try{
             Utilizador utilizador = pedido.getUtilizador();
-            Statement s = conn.createStatement();
-            ResultSet resultSetUsername = s.executeQuery("SELECT nome FROM utilizadores WHERE nome= \' " + utilizador.getName() + '\'');
-            if(!resultSetUsername.next())
+            PreparedStatement s = conn.prepareStatement("SELECT nome,password FROM utilizadores WHERE nome=?");
+            s.setString(1, utilizador.getName());
+            ResultSet resultSet = s.executeQuery();
+            if(!resultSet.next())
                 return new Resposta(pedido, false, "Username não foi encontrado");
-
-            ResultSet resultSetPassword = s.executeQuery("SELECT password FROM utilizadores WHERE nome= \'" + utilizador.getName() + '\'');
-            resultSetPassword.next();
-            if(!resultSetPassword.getString(1).equals(utilizador.getPassword()))
+            if(!resultSet.getString("password").equals(password))
                 return new Resposta(pedido, false, "Password Incorreta");
 
             return new Resposta(pedido, true, "Login concluido");
@@ -118,7 +117,8 @@ public class Servidor implements ServerConstants, Constants, IComunicacaoServer 
     }
 
     @Override
-    public Resposta signUp(PedidoSignUp pedidoSignUp) {
+    public Resposta signUp(String username, String password) {
+        PedidoSignUp pedidoSignUp = new PedidoSignUp(new Utilizador(username, password));
         try{
             Utilizador utilizador = pedidoSignUp.getUtilizador();
             PreparedStatement s = conn.prepareStatement("SELECT nome FROM utilizadores WHERE nome=?");

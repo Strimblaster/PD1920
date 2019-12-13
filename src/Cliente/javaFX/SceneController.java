@@ -21,16 +21,13 @@ public abstract class SceneController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(res));
         AnchorPane root = null;
         BorderPane root1 = null;
-        try {
-            root = loader.load();
-        } catch (IOException e){
-            root1 = loader.load();
-        }
+        Object obj = loader.load();
+        if(obj instanceof  AnchorPane) root = (AnchorPane) obj;
+        else root1 = (BorderPane) obj;
 
-        Object obj =  loader.getController();
-        if(!(obj instanceof SceneController)) return;
+        if(!(loader.getController() instanceof SceneController)) return;
 
-        SceneController controller = (SceneController) obj;
+        SceneController controller = loader.getController();
 
         controller.stage = stage;
         controller.setClientController(clientController);
