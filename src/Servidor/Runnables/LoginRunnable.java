@@ -39,6 +39,8 @@ public class LoginRunnable implements Runnable  {
             cliente.close();
         } catch (IOException e) {
             System.out.println("[Erro] - [LoginThread]: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }

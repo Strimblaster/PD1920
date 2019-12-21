@@ -1,8 +1,10 @@
 package Cliente;
 
 import Cliente.Interfaces.IComunicacaoCliente;
+import Comum.Exceptions.InvalidPasswordException;
 import Comum.Exceptions.InvalidServerException;
 import Comum.*;
+import Comum.Exceptions.InvalidUsernameException;
 import Comum.Pedidos.Pedido;
 import Comum.Pedidos.PedidoLogin;
 import Comum.Pedidos.PedidoSignUp;
@@ -51,7 +53,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     }
 
     @Override
-    public Resposta login(String username, String password) {
+    public Resposta login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
         PedidoLogin pedidoLogin = new PedidoLogin(new Utilizador(username, password));
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
@@ -68,6 +70,10 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             json = new String(buffer, 0 , nread);
 
             gson = new GsonBuilder().registerTypeAdapter(Resposta.class, new RespostaDeserializer()).create();
+
+            Resposta resposta = gson.fromJson(json, Resposta.class);
+            if(resposta.getException() != null) throwException(resposta.getException());
+
             return gson.fromJson(json, Resposta.class);
 
         } catch (IOException e) {
@@ -76,8 +82,15 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         return null;
     }
 
+    private void throwException(Exception exception) throws InvalidPasswordException, InvalidUsernameException {
+        if(exception instanceof InvalidPasswordException)
+            throw (InvalidPasswordException) exception;
+        if(exception instanceof InvalidUsernameException)
+            throw (InvalidUsernameException) exception;
+    }
+
     @Override
-    public Resposta signUp(String username, String password) {
+    public Resposta signUp(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
         PedidoSignUp pedidoSignUp = new PedidoSignUp(new Utilizador(username, password));
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
@@ -92,9 +105,12 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             int nread = inputStream.read(buffer);
 
             json = new String(buffer, 0 , nread);
-
             gson = new GsonBuilder().registerTypeAdapter(Resposta.class, new RespostaDeserializer()).create();
-            return gson.fromJson(json, Resposta.class);
+
+            Resposta resposta = gson.fromJson(json, Resposta.class);
+            if(resposta.getException() != null) throwException(resposta.getException());
+
+            return resposta;
 
         } catch (IOException e) {
             System.out.println("Ocorreu um erro no login: " + e.getMessage());

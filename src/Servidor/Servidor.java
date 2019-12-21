@@ -112,7 +112,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
             return new Resposta(pedido, true, "Login concluido");
 
         } catch (SQLException e) {
-            return new Resposta(pedido, false, "Erro no servidor", e);
+            return new Resposta(pedido, false, "Erro no servidor", tipoExcecao, e);
         }
     }
 
@@ -132,7 +132,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
             return new Resposta(pedidoSignUp, true, "Registo concluido");
 
         } catch (SQLException e) {
-            return new Resposta(pedidoSignUp, false, "Erro no servidor", e);
+            return new Resposta(pedidoSignUp, false, "Erro no servidor", tipoExcecao, e);
         }
     }
 }

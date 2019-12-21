@@ -1,5 +1,7 @@
 package Servidor.Runnables;
 
+import Comum.Exceptions.InvalidPasswordException;
+import Comum.Exceptions.InvalidUsernameException;
 import Comum.Pedidos.PedidoSignUp;
 import Comum.Pedidos.Resposta;
 import Comum.Pedidos.Serializers.ExceptionSerializer;
@@ -41,6 +43,8 @@ public class SignUpRunnable implements Runnable {
             cliente.close();
         } catch (IOException e) {
             System.out.println("[Erro] - [Thread]: " + e.getMessage());
+        } catch (InvalidUsernameException | InvalidPasswordException e) {
+            e.printStackTrace();
         }
 
     }
