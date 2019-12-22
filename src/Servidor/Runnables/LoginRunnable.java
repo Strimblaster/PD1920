@@ -1,5 +1,8 @@
 package Servidor.Runnables;
 
+import Comum.Exceptions.InvalidPasswordException;
+import Comum.Exceptions.InvalidUsernameException;
+import Comum.Pedidos.Enums.TipoExcecao;
 import Comum.Pedidos.PedidoLogin;
 import Comum.Pedidos.Resposta;
 import Comum.Pedidos.Serializers.ExceptionSerializer;
@@ -32,15 +35,20 @@ public class LoginRunnable implements Runnable  {
             OutputStream outputStream = cliente.getOutputStream();
             System.out.println("[INFO] - [Login]: Pedido de login de " + cliente.getInetAddress().getHostName() + ":" + cliente.getPort() + " em processamento");
             Utilizador utilizador = pedidoLogin.getUtilizador();
-            Resposta resposta = servidor.login(utilizador.getName(), utilizador.getPassword());
+            Resposta resposta = null;
+            try {
+                resposta = servidor.login(utilizador.getName(), utilizador.getPassword());
+            } catch (InvalidUsernameException e) {
+                resposta = new Resposta(pedidoLogin, false, e.getMessage(), TipoExcecao.InvalidUsername, e);
+            } catch (InvalidPasswordException e) {
+                resposta = new Resposta(pedidoLogin, false, e.getMessage(), TipoExcecao.InvalidPassword, e);
+            }
             String str = gson.toJson(resposta);
 
             outputStream.write(str.getBytes());
             cliente.close();
         } catch (IOException e) {
             System.out.println("[Erro] - [LoginThread]: " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
     }

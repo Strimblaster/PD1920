@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Playlist {
     private String name;
-    private ArrayList<Music>musicList;
+    private ArrayList<Song>musicList;
     private Utilizador owner;
 
     public Playlist(String name, Utilizador owner) {
@@ -21,15 +21,15 @@ public class Playlist {
         return owner;
     }
 
-    public ArrayList<Music> getMusics() {
+    public ArrayList<Song> getMusics() {
         return musicList;
     }
-    public void addMusic(Music music){
+    public void addMusic(Song music){
         this.musicList.add(music);
     }
     public void removeMusic(String name){
-        Music toRemove = null;
-        for (Music music:musicList) {
+        Song toRemove = null;
+        for (Song music:musicList) {
             if (music.getNome().equals(name)){
                 toRemove = music;
             }
@@ -38,14 +38,14 @@ public class Playlist {
             this.musicList.remove(toRemove);
         }
     }
-    public void removeMusic(Music music){
+    public void removeMusic(Song music){
         if (isMusicInList(music)){
             this.musicList.remove(music);
         }
     }
 
-    public boolean isMusicInList(Music music){
-        for (Music m: musicList) {
+    public boolean isMusicInList(Song music){
+        for (Song m: musicList) {
             if(m.equals(music)){
                 return true;
             }
@@ -53,36 +53,36 @@ public class Playlist {
         return false;
     }
 
-    public ArrayList<Music> getMusicsByAuthor(String author) {
-        ArrayList<Music> list = new ArrayList<>();
-        for (Music music : musicList) {
+    public ArrayList<Song> getMusicsByAuthor(String author) {
+        ArrayList<Song> list = new ArrayList<>();
+        for (Song music : musicList) {
             if(music.getAutor().equals( author)){
                 list.add(music);
             }
         }
         return list;
     }
-    public ArrayList<Music> getMusicsByAlbum(String album) {
-        ArrayList<Music> list = new ArrayList<>();
-        for (Music music : musicList) {
+    public ArrayList<Song> getMusicsByAlbum(String album) {
+        ArrayList<Song> list = new ArrayList<>();
+        for (Song music : musicList) {
             if(music.getAlbum().equals(album)){
                 list.add(music);
             }
         }
         return list;
     }
-    public ArrayList<Music> getMusicsByYear(int year) {
-        ArrayList<Music> list = new ArrayList<>();
-        for (Music music : musicList) {
+    public ArrayList<Song> getMusicsByYear(int year) {
+        ArrayList<Song> list = new ArrayList<>();
+        for (Song music : musicList) {
             if(music.getAno() == year){
                 list.add(music);
             }
         }
         return list;
     }
-    public ArrayList<Music> getMusicsByGenre(String genre) {
-        ArrayList<Music> list = new ArrayList<>();
-        for (Music music : musicList) {
+    public ArrayList<Song> getMusicsByGenre(String genre) {
+        ArrayList<Song> list = new ArrayList<>();
+        for (Song music : musicList) {
             if(music.getGenero().equals(genre)){
                 list.add(music);
             }

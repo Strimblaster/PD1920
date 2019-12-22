@@ -7,6 +7,7 @@ import Servidor.Interfaces.*;
 import Servidor.Runnables.LoginRunnable;
 import Servidor.Runnables.PingRunnable;
 import Servidor.Runnables.SignUpRunnable;
+import Servidor.Runnables.UploadFileRunnable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -82,9 +83,10 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
 
                 if(pedido instanceof PedidoLogin)
                     pedidoRunnable = new LoginRunnable(s,(PedidoLogin) pedido,server);
-                else if(pedido instanceof PedidoSignUp) {
+                else if(pedido instanceof PedidoSignUp)
                     pedidoRunnable = new SignUpRunnable(s, (PedidoSignUp) pedido, server);
-                }
+                else if(pedido instanceof PedidoUploadFile)
+                    pedidoRunnable = new UploadFileRunnable(s, (PedidoUploadFile) pedido, server);
                 else{
                     System.out.println("[INFO] - [Comunicação]: Recebi um pedido não identificado");
                     continue;

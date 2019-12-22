@@ -1,7 +1,7 @@
 package Comum.Pedidos;
 
+import Comum.Pedidos.Enums.TipoPedido;
 import Comum.Utilizador;
-import com.google.gson.JsonDeserializer;
 
 public abstract class Pedido  {
     private Utilizador utilizador;

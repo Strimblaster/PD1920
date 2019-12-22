@@ -1,17 +1,16 @@
 package Comum;
 
-public class Music {
+public class Song {
     private String nome;
-    private String autor;
+    private Utilizador autor;
     private String album;
     private int ano;
     private int duracao;
     private String genero;
     private String filename;
 
-    public Music(String nome, String autor, String album, int ano, int duracao, String genero, String filename) {
+    public Song(String nome, String album, int ano, int duracao, String genero, String filename) {
         this.nome = nome;
-        this.autor = autor;
         this.album = album;
         this.ano = ano;
         this.duracao = duracao;
@@ -19,11 +18,20 @@ public class Music {
         this.filename = filename;
     }
 
+    public Song(String nome, Utilizador autor, String album, int ano, int duracao, String genero, String filename) {
+        this.nome = nome;
+        this.album = album;
+        this.ano = ano;
+        this.duracao = duracao;
+        this.genero = genero;
+        this.autor = autor;
+    }
+
     public String getNome() {
         return nome;
     }
 
-    public String getAutor() {
+    public Utilizador getAutor() {
         return autor;
     }
 
@@ -45,5 +53,9 @@ public class Music {
 
     public String getFilename() {
         return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }

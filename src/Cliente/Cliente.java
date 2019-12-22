@@ -18,7 +18,7 @@ public class Cliente extends Application {
 
     public Cliente() throws IOException {
         try {
-            clientController = new ClientController();
+            clientController = new ClientController(System.getProperty("user.dir"));
         } catch (InvalidServerException | SocketTimeoutException e){
             System.out.println(e.getMessage());
             exit();
@@ -30,13 +30,16 @@ public class Cliente extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("javaFX/Inicio.fxml"));
             BorderPane root =  loader.load();
 
             ((MenuController)loader.getController()).setClientController(clientController);
             ((MenuController)loader.getController()).stage = stage;
+            ((MenuController)loader.getController()).setMusicDirectory(clientController.getMusicDirectory());
+
+
 
             Scene scene = new Scene(root);
 

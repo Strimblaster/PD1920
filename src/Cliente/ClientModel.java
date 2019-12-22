@@ -4,24 +4,26 @@ import Cliente.Interfaces.IComunicacaoCliente;
 import Comum.Constants;
 import Comum.Exceptions.InvalidPasswordException;
 import Comum.Exceptions.InvalidServerException;
+import Comum.Exceptions.InvalidSongDescriptionException;
 import Comum.Exceptions.InvalidUsernameException;
 import Comum.Pedidos.PedidoLogin;
 import Comum.Pedidos.Resposta;
 import Comum.ServerInfo;
+import Comum.Song;
 import Comum.Utilizador;
 import Cliente.Interfaces.IEvent;
 
 import java.io.*;
 
 
-class ClientModel implements Constants, IEvent {
+class ClientModel implements Constants {
 
     private ServerInfo server;
     private Utilizador utilizador;
     private IComunicacaoCliente comunicacao;
 
-    public ClientModel() throws IOException, InvalidServerException {
-        comunicacao = new Comunicacao();
+    public ClientModel(ClientController clientController, File musicDir) throws IOException, InvalidServerException {
+        comunicacao = new Comunicacao(clientController, musicDir);
         this.server = comunicacao.getServerInfo();
 
     }
@@ -45,10 +47,16 @@ class ClientModel implements Constants, IEvent {
 
 
     public Resposta login(String username, String password) throws InvalidPasswordException, InvalidUsernameException {
-        return comunicacao.login(username, password);
+        Resposta resposta  = comunicacao.login(username, password);
+        utilizador = resposta.getPedido().getUtilizador();
+        return resposta;
     }
 
-    public Resposta  signUp(String username, String password) throws InvalidPasswordException, InvalidUsernameException {
+    public Resposta signUp(String username, String password) throws InvalidPasswordException, InvalidUsernameException {
         return comunicacao.signUp(username, password);
+    }
+
+    public Resposta uploadFile(Song musica) throws InvalidSongDescriptionException {
+        return comunicacao.uploadFile(utilizador, musica);
     }
 }

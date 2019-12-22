@@ -1,5 +1,6 @@
 package Comum.Pedidos;
 
+import Comum.Pedidos.Enums.TipoPedido;
 import Comum.Utilizador;
 
 public class PedidoSignUp extends Pedido {

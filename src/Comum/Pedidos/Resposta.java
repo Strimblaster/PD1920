@@ -1,5 +1,6 @@
 package Comum.Pedidos;
 
+import Comum.Pedidos.Enums.TipoExcecao;
 import com.google.gson.annotations.Expose;
 
 public class Resposta {
@@ -12,13 +13,7 @@ public class Resposta {
     @Expose
     private TipoExcecao tipoExcecao;
 
-    @Expose
     private Exception exception;
-
-
-    public TipoExcecao getTipoExcecao() {
-        return tipoExcecao;
-    }
 
     public Resposta(Pedido pedido, boolean sucess, String info) {
         this.pedido = pedido;
@@ -27,25 +22,15 @@ public class Resposta {
         exception = null;
     }
 
-    public Resposta(boolean sucess, String info) {
-        this.sucess = sucess;
-        this.info = info;
-        exception = null;
-    }
-
-    public Resposta(boolean sucess, String info, TipoExcecao tipoExcecao, Exception exception) {
-        this.sucess = sucess;
-        this.info = info;
-        this.tipoExcecao = tipoExcecao;
-        this.exception = exception;
-    }
-
     public Resposta(Pedido pedido, boolean sucess, String info, TipoExcecao tipoExcecao, Exception exception) {
         this.pedido = pedido;
         this.sucess = sucess;
         this.info = info;
         this.tipoExcecao = tipoExcecao;
         this.exception = exception;
+    }
+    public TipoExcecao getTipoExcecao() {
+        return tipoExcecao;
     }
 
     public Pedido getPedido() {

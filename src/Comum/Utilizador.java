@@ -1,6 +1,7 @@
 package Comum;
 
 public class Utilizador {
+    private int id;
     private String name;
     private String password;
 
@@ -9,19 +10,23 @@ public class Utilizador {
         this.password = password;
     }
 
-    public String getName() {
-        return name;
+    public Utilizador(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
-    public void setName(String name) {
+    public Utilizador(String name) {
         this.name = name;
+    }
+
+    public int getId() { return id; }
+
+    public String getName() {
+        return name;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

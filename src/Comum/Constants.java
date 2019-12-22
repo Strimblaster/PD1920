@@ -12,4 +12,7 @@ public interface Constants {
     int TIMEOUT_5s = 5000;
     int TIMEOUT_2s = 2000;
 
+    String CLIENT_DIR = "\\temp\\clientes\\";
+    String SERVER_DIR = "\\temp\\servers\\";
+
 }

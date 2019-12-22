@@ -3,7 +3,9 @@ package Comum.Pedidos.Serializers;
 import Comum.Pedidos.Pedido;
 import Comum.Pedidos.PedidoLogin;
 import Comum.Pedidos.PedidoSignUp;
-import Comum.Pedidos.TipoPedido;
+import Comum.Pedidos.Enums.TipoPedido;
+import Comum.Pedidos.PedidoUploadFile;
+import Comum.Song;
 import Comum.Utilizador;
 import com.google.gson.*;
 
@@ -26,6 +28,15 @@ public class PedidoDeserializer implements JsonDeserializer<Pedido> {
         if(tipo.equals(TipoPedido.PedidoSignUp.toString())){
             PedidoSignUp p = new PedidoSignUp();
             p.setUtilizador(u);
+            return p;
+        }
+
+        if(tipo.equals(TipoPedido.PedidoUploadFile.toString())){
+            PedidoUploadFile p = new PedidoUploadFile();
+            p.setUtilizador(u);
+
+            Song musica = gson.fromJson(jsonObject.get("musica"), Song.class);
+            p.setMusica(musica);
             return p;
         }
 

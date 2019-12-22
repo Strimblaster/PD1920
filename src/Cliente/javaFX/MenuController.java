@@ -22,14 +22,9 @@ public class MenuController extends SceneController {
 
         try {
             clientController.login(txtUsername.getText(), txtPassword.getText());
-
-        } catch (InvalidUsernameException | InvalidPasswordException  e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erro");
-            alert.setHeaderText("Login");
-            alert.setContentText(e.getMessage());
-
-            alert.showAndWait();
+            load("Main.fxml");
+        } catch (InvalidUsernameException | InvalidPasswordException | IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Erro", "Login", e.getMessage());
         }
     }
 
@@ -40,12 +35,7 @@ public class MenuController extends SceneController {
             clientController.signUp(txtUsername.getText(), txtPassword.getText());
             load("Inicio.fxml");
         } catch (InvalidUsernameException | InvalidPasswordException | IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erro");
-            alert.setHeaderText("Sign Up");
-            alert.setContentText(e.getMessage());
-
-            alert.showAndWait();
+            showAlert(Alert.AlertType.ERROR, "Erro", "Sign Up", e.getMessage());
         }
     }
 

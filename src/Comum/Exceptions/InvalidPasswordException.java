@@ -3,7 +3,7 @@ package Comum.Exceptions;
 public class InvalidPasswordException extends Exception {
 
     public InvalidPasswordException() {
-        super("Username invalido");
+        super("Password Invalida");
     }
 
     public InvalidPasswordException(String message) {
