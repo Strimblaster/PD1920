@@ -5,11 +5,13 @@ import Cliente.javaFX.SceneController;
 import Comum.Exceptions.*;
 import Comum.Pedidos.Resposta;
 import Comum.Song;
+import Comum.Utilizador;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static Comum.Constants.CLIENT_DIR;
 
@@ -91,4 +93,11 @@ public class ClientController implements IEvent {
         return musicDirectory;
     }
 
+    public Utilizador getUtilizador(){
+        return model.getUtilizador();
+    }
+
+    public ArrayList<Song> getMyMusics() {
+        return model.getMyMusics();
+    }
 }

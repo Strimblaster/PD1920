@@ -29,4 +29,6 @@ public class Utilizador {
         return password;
     }
 
+    public void resetPassword(){ password = "";}
+
 }

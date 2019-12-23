@@ -45,10 +45,12 @@ public class LoginRunnable implements Runnable  {
             }
             String str = gson.toJson(resposta);
 
+            System.out.println("DEBUG: " + str.getBytes().length + " bytes enviados (Não apagar isto por enquanto pls)");
+
             outputStream.write(str.getBytes());
             cliente.close();
         } catch (IOException e) {
-            System.out.println("[Erro] - [LoginThread]: " + e.getMessage());
+            System.out.println("[Erro] - [Login]: " + e.getMessage());
         }
 
     }

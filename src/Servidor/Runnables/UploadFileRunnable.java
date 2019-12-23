@@ -57,6 +57,7 @@ public class UploadFileRunnable implements Runnable {
 
             servidor.addNewSong(pedidoUploadFile.getMusica(), file);
 
+            outputStream.close();
             cliente.close();
         } catch (IOException e) {
             System.out.println("[Erro] - [LoginThread]: " + e.getMessage());

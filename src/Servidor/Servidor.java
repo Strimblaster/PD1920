@@ -14,6 +14,7 @@ import Comum.Utilizador;
 import Servidor.Interfaces.IServer;
 import Servidor.Interfaces.IEvent;
 import Servidor.Interfaces.ServerConstants;
+import com.google.gson.internal.$Gson$Types;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.*;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Servidor implements ServerConstants, Constants, IServer {
@@ -154,7 +156,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
             getIDStatment.close();
 
             //Guarda o ficheiro na pasta do servidor
-            FileOutputStream fileOutputStream = new FileOutputStream(musicDir.getAbsolutePath() + "\\" + id + ".mp3");
+            FileOutputStream fileOutputStream = new FileOutputStream(musicDir.getAbsolutePath() + File.separator + id + ".mp3");
             fileOutputStream.write(file);
             fileOutputStream.flush();
             fileOutputStream.close();
@@ -198,13 +200,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
             preparedStatement.close();
 
             //Buscar o ID do utilizador que está a enviar a musica
-            PreparedStatement getIDUtilizadorStatement = conn.prepareStatement("SELECT id from utilizadores where nome = ?");
-            getIDUtilizadorStatement.setString(1, utilizador.getName());
-            ResultSet userResultSet = getIDUtilizadorStatement.executeQuery();
-            if(!userResultSet.next())
-                throw new SQLException("Algo correu mal, o utilizador invalido ao dar upload do ficheiro");
-            int id = userResultSet.getInt("id");
-            getIDUtilizadorStatement.close();
+            int id = getIDUtilizador(utilizador);
 
             //Adicionar a musica à BD
             PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO musicas(nome, autor, album, duracao, ano, genero) VALUES (?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
@@ -231,6 +227,53 @@ public class Servidor implements ServerConstants, Constants, IServer {
     }
 
 
+
+    @Override
+    public ArrayList<Song> getMusicas(Utilizador utilizador) {
+        try{
+            int id = getIDUtilizador(utilizador);
+            if(id == -1) throw new SQLException("O utilizador " + utilizador.getName() + " não foi encontrado");
+
+            ArrayList<Song> arrayList = new ArrayList<>();
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * from musicas where autor = ?");
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            utilizador.resetPassword();
+
+            while(resultSet.next()){
+                String nome = resultSet.getString("nome");
+                String album = resultSet.getString("album");
+                String genero = resultSet.getString("nome");
+                String filename = resultSet.getString("ficheiro");
+                int duracao = resultSet.getInt("duracao");
+                int ano = resultSet.getInt("ano");
+
+                arrayList.add(new Song(nome,utilizador, album, ano, duracao, genero, filename));
+            }
+
+            preparedStatement.close();
+            return arrayList;
+
+        }catch (SQLException e){
+            System.out.println("Erro de SQL no getMusicas: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private int getIDUtilizador(Utilizador utilizador) throws SQLException {
+
+        PreparedStatement getIDUtilizadorStatement = conn.prepareStatement("SELECT id from utilizadores where nome = ?");
+        getIDUtilizadorStatement.setString(1, utilizador.getName());
+        ResultSet userResultSet = getIDUtilizadorStatement.executeQuery();
+
+        if(!userResultSet.next())
+            return -1;
+        int id = userResultSet.getInt("id");
+        getIDUtilizadorStatement.close();
+
+        return id;
+    }
+
     @Override
     public void setID(int id) {
         this.id = id;
@@ -243,8 +286,10 @@ public class Servidor implements ServerConstants, Constants, IServer {
                 throw new RuntimeException("Não consegui criar uma pasta para guardar os ficheiros mp3");
         }
         musicDir = new File(serverRunningPath + SERVER_DIR + id);
-        if(musicDir.exists())
+        if(musicDir.exists()) {
+            System.out.println("[INFO] Tentar eliminar pasta de servidor ja existente...");
             musicDir.delete();
+        }
         if(!musicDir.mkdir())
             throw new RuntimeException("Não consegui criar uma pasta para guardar os ficheiros mp3");
 

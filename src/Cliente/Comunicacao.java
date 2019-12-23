@@ -11,9 +11,12 @@ import Comum.Pedidos.Serializers.PedidoDeserializer;
 import Comum.Pedidos.Serializers.RespostaDeserializer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.*;
+import java.util.ArrayList;
 
 public class Comunicacao implements IComunicacaoCliente, Constants {
 
@@ -118,6 +121,34 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         return null;
     }
 
+    @Override
+    public ArrayList<Song> getMusicas(Utilizador utilizador) {
+        PedidoMusicas pedidoMusicas = new PedidoMusicas(utilizador);
+        try {
+            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
+            InputStream inputStream = tcpSocket.getInputStream();
+            byte[] buffer = new byte[PKT_SIZE];
+            Gson gson = new Gson();
+
+            enviaPedido(tcpSocket,pedidoMusicas);
+
+            int nread = inputStream.read(buffer);
+            System.out.println("DEBUG: " + nread + " bytes recebidos (Não apagar isto por enquanto pls)");
+            String json = new String(buffer, 0 , nread);
+
+
+            Type listType = new TypeToken<ArrayList<Song>>(){}.getType();
+            ArrayList<Song> songs = gson.fromJson(json, listType);
+
+
+            tcpSocket.close();
+            return songs;
+
+        } catch (IOException e) {
+            System.out.println("Ocorreu um erro no signUp: " + e.getMessage());
+        }
+        return null;
+    }
 
 
     void enviaPedido(Socket socket, Pedido pedido) throws IOException {
@@ -134,6 +165,8 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         InputStream inputStream = socket.getInputStream();
         byte[] buffer = new byte[PKT_SIZE];
         int nread = inputStream.read(buffer);
+
+        System.out.println("DEBUG: " + nread + " bytes recebidos (Não apagar isto por enquanto pls)");
 
         String json = new String(buffer, 0 , nread);
         Gson gson = new GsonBuilder().registerTypeAdapter(Resposta.class, new RespostaDeserializer()).create();

@@ -14,6 +14,7 @@ import Comum.Utilizador;
 import Cliente.Interfaces.IEvent;
 
 import java.io.*;
+import java.util.ArrayList;
 
 
 class ClientModel implements Constants {
@@ -58,5 +59,9 @@ class ClientModel implements Constants {
 
     public Resposta uploadFile(Song musica) throws InvalidSongDescriptionException {
         return comunicacao.uploadFile(utilizador, musica);
+    }
+
+    public ArrayList<Song> getMyMusics() {
+        return comunicacao.getMusicas(utilizador);
     }
 }

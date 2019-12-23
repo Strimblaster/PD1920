@@ -13,7 +13,7 @@ import java.net.SocketTimeoutException;
 
 import static javafx.application.Platform.exit;
 
-public class Cliente extends Application {
+public class Cliente extends javafx.application.Application {
     private ClientController clientController ;
 
     public Cliente() throws IOException {
