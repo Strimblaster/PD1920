@@ -13,7 +13,7 @@
    <left>
       <Accordion prefHeight="400.0" prefWidth="165.0" BorderPane.alignment="CENTER">
         <panes>
-          <TitledPane animated="false" prefHeight="315.0" prefWidth="189.0" text="My Playlists">
+          <TitledPane fx:id="playlists" animated="false" prefHeight="315.0" prefWidth="189.0" text="My Playlists">
             <content>
               <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                      <children>
@@ -27,7 +27,7 @@
                   </AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane animated="false" text="My Songs">
+          <TitledPane fx:id="musicas" animated="false" text="My Songs">
             <content>
               <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -59,7 +59,7 @@
                   <Insets left="60.0" right="60.0" top="50.0" />
                </VBox.margin>
             </Button>
-            <Button fx:id="btnUpload" onAction="#handleBtnUpload" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="33.0" prefWidth="194.0" text="Upload " textAlignment="CENTER">
+            <Button fx:id="btnUpload" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleBtnUpload" prefHeight="33.0" prefWidth="194.0" text="Upload " textAlignment="CENTER">
                <VBox.margin>
                   <Insets left="60.0" right="60.0" />
                </VBox.margin>
