@@ -63,6 +63,14 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
     }
 
     @Override
+    public void serverExit() {
+        try {
+            serverSocket.close();
+        } catch (IOException ignored) { }
+        datagramSocket.close();
+    }
+
+    @Override
     public void run() {
         Gson gson = new GsonBuilder().registerTypeAdapter(Pedido.class, new PedidoDeserializer()).create();
 
@@ -86,6 +94,8 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                     pedidoRunnable = new UploadFileRunnable(s, (PedidoUploadFile) pedido, server);
                 else if(pedido instanceof PedidoMusicas)
                     pedidoRunnable = new GetMusicasRunnable(s, (PedidoMusicas) pedido, server);
+                else if(pedido instanceof PedidoSearch)
+                    pedidoRunnable = new SearchRunnable(s, (PedidoSearch) pedido, server);
                 else{
                     System.out.println("[INFO] - [Comunicação]: Recebi um pedido não identificado");
                     continue;

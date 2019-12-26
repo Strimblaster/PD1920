@@ -1,6 +1,6 @@
 package Servidor;
 
-import Comum.Constants;
+import Comum.*;
 import Comum.Exceptions.InvalidPasswordException;
 import Comum.Exceptions.InvalidSongDescriptionException;
 import Comum.Exceptions.InvalidUsernameException;
@@ -9,8 +9,6 @@ import Comum.Pedidos.PedidoSignUp;
 import Comum.Pedidos.PedidoUploadFile;
 import Comum.Pedidos.Resposta;
 import Comum.Pedidos.Enums.TipoExcecao;
-import Comum.Song;
-import Comum.Utilizador;
 import Servidor.Interfaces.IServer;
 import Servidor.Interfaces.IEvent;
 import Servidor.Interfaces.ServerConstants;
@@ -61,7 +59,12 @@ public class Servidor implements ServerConstants, Constants, IServer {
 
             Scanner sc = new Scanner(System.in);
 
-            while(!sc.next().equals("sair"));
+            while(true){
+                String s = sc.next();
+                System.out.println(s);
+                if(s.equals("sair")) break;
+            }
+            servidor.exit();
 
         } catch (SocketException e) {
             System.out.println("[ERRO] Houve um problema com o Socket:\n"+ e.getMessage());
@@ -70,6 +73,11 @@ public class Servidor implements ServerConstants, Constants, IServer {
         } catch (IOException e) {
             System.out.println("[ERRO] Houve um erro de IO:\n"+ e.getMessage());
         }
+    }
+
+    private void exit() throws SQLException {
+        conn.close();
+        listener.serverExit();
     }
 
     private void ready() {
@@ -226,8 +234,6 @@ public class Servidor implements ServerConstants, Constants, IServer {
 
     }
 
-
-
     @Override
     public ArrayList<Song> getMusicas(Utilizador utilizador) {
         try{
@@ -260,6 +266,32 @@ public class Servidor implements ServerConstants, Constants, IServer {
         }
     }
 
+    @Override
+    public FilteredResult search(Utilizador utilizador, boolean songs, boolean playlists, String nome, String album, String genero, int ano, int duracao) {
+        ArrayList<Song> songsArrayList = new ArrayList<>();
+        ArrayList<Playlist> playlistsArrayList = new ArrayList<>();
+        try {
+            if(songs){
+                String query = constructQuerySongs(nome, album, genero, ano, duracao);
+                PreparedStatement preparedStatement = conn.prepareStatement(query);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next())
+                    songsArrayList.add(new Song(
+                            resultSet.getString("nome"),
+                            resultSet.getString("album"),
+                            resultSet.getInt("ano"),
+                            resultSet.getInt("duracao"),
+                            resultSet.getString("genero"),
+                            resultSet.getString("ficheiro")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return new FilteredResult(songsArrayList, playlistsArrayList);
+    }
+
     private int getIDUtilizador(Utilizador utilizador) throws SQLException {
 
         PreparedStatement getIDUtilizadorStatement = conn.prepareStatement("SELECT id from utilizadores where nome = ?");
@@ -288,7 +320,8 @@ public class Servidor implements ServerConstants, Constants, IServer {
         musicDir = new File(serverRunningPath + SERVER_DIR + id);
         if(musicDir.exists()) {
             System.out.println("[INFO] Tentar eliminar pasta de servidor ja existente...");
-            musicDir.delete();
+            if(!musicDir.delete())
+                throw new RuntimeException("Não consegui apagar pasta já existente");
         }
         if(!musicDir.mkdir())
             throw new RuntimeException("Não consegui criar uma pasta para guardar os ficheiros mp3");
@@ -297,4 +330,52 @@ public class Servidor implements ServerConstants, Constants, IServer {
     }
 
 
+
+
+
+
+
+
+//Não gosto de como isto está feito... se quiserem podem mudar desde que funfe
+    private String constructQuerySongs(String nome, String album, String genero, int ano, int duracao) {
+        StringBuilder base = new StringBuilder("SELECT * FROM musicas");
+        StringBuilder condicoes = new StringBuilder();
+        int contador = 0;
+
+        if(validToQueryBuilder(nome)){
+            condicoes.append(" nome = ").append(nome);
+            contador++;
+        }
+        if(validToQueryBuilder(album)){
+            if(contador > 0) condicoes.append(" AND");
+            condicoes.append(" album = ").append(album);
+            contador++;
+        }
+        if(validToQueryBuilder(genero)){
+            if(contador > 0) condicoes.append(" AND");
+            condicoes.append(" genero = ").append(genero);
+            contador++;
+        }
+        if(validToQueryBuilder(ano)){
+            if(contador > 0) condicoes.append(" AND");
+            condicoes.append(" ano = ").append(ano);
+            contador++;
+        }
+        if(validToQueryBuilder(ano)){
+            if(contador > 0) condicoes.append(" AND");
+            condicoes.append(" duracao = ").append(duracao);
+            contador++;
+        }
+        if(contador > 0) {
+            base.append(" WHERE");
+            base.append(condicoes);
+        }
+        return base.toString();
+    }
+
+    boolean validToQueryBuilder(String s){
+        if(s == null) return false;
+        return !s.equals("");
+    }
+    boolean validToQueryBuilder(int i){ return i!=-1;}
 }

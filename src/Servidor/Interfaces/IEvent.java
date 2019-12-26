@@ -7,6 +7,8 @@ public interface IEvent {
 
     void needID() throws IOException;
 
+    void serverExit();
+
     // void newMusic(Music x); multicast
 
 }

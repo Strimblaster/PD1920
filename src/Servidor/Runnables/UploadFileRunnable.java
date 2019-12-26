@@ -15,16 +15,13 @@ import java.net.Socket;
 
 import static Comum.Constants.PKT_SIZE;
 
-public class UploadFileRunnable implements Runnable {
+public class UploadFileRunnable extends RunnableBase implements Runnable {
 
-    private Socket cliente;
     private PedidoUploadFile pedidoUploadFile;
-    private IServer servidor;
 
-    public UploadFileRunnable (Socket cliente, PedidoUploadFile pedidoUploadFile, IServer servidor) {
-        this.cliente = cliente;
+    public UploadFileRunnable(Socket cliente, PedidoUploadFile pedidoUploadFile, IServer servidor) {
+        super(cliente, servidor);
         this.pedidoUploadFile = pedidoUploadFile;
-        this.servidor = servidor;
     }
 
     @Override
@@ -33,7 +30,6 @@ public class UploadFileRunnable implements Runnable {
         try {
             InputStream inputStream = cliente.getInputStream();
             OutputStream outputStream = cliente.getOutputStream();
-            System.out.println("[INFO] - [UploadFile]: Novo pedido de Upload: " + cliente.getInetAddress().getHostName() + ":" + cliente.getPort());
 
             Resposta resposta;
             try {
@@ -54,10 +50,8 @@ public class UploadFileRunnable implements Runnable {
                 System.arraycopy(buffer, 0, temp, file.length, nRead);
                 file = temp;
             }
-
             servidor.addNewSong(pedidoUploadFile.getMusica(), file);
 
-            outputStream.close();
             cliente.close();
         } catch (IOException e) {
             System.out.println("[Erro] - [LoginThread]: " + e.getMessage());

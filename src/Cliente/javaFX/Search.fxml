@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Cliente.javaFX.SearchController">
+   <center>
+      <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="panes" stylesheets="@Search.css" BorderPane.alignment="CENTER">
+         <content>
+            <VBox alignment="TOP_CENTER" maxWidth="1.7976931348623157E308" spacing="30.0" stylesheets="@Search.css">
+               <children>
+                  <VBox fx:id="musicasList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                     <children>
+                        <Label alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" prefHeight="34.0" prefWidth="457.0" styleClass="musicasLabel" stylesheets="@Search.css" text="Musicas">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <HBox alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="30.0">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <children>
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="165.0" styleClass="borderRight" stylesheets="@Search.css" text="Nome" textAlignment="CENTER" />
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="108.0" styleClass="borderRight" stylesheets="@Search.css" text="Genero" textAlignment="CENTER" />
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="86.0" styleClass="borderRight" stylesheets="@Search.css" text="Albúm" textAlignment="CENTER" />
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="53.0" styleClass="borderRight" stylesheets="@Search.css" text="Ano" textAlignment="CENTER" />
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="69.0" styleClass="borderBottom" stylesheets="@Search.css" text="Duração" textAlignment="CENTER" />
+                           </children>
+                        </HBox>
+                        <HBox fx:id="baseSongRow" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="30.0">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <children>
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="167.0" stylesheets="@Search.css" text="Barbie girl" textAlignment="CENTER" />
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="105.0" stylesheets="@Search.css" text="ex" textAlignment="CENTER" />
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="87.0" stylesheets="@Search.css" text="ex" textAlignment="CENTER" />
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="53.0" stylesheets="@Search.css" text="1111" textAlignment="CENTER" />
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="69.0" stylesheets="@Search.css" text="123" textAlignment="CENTER" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <VBox fx:id="playlistsList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                     <children>
+                        <Label alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="457.0" styleClass="playlistsLabel" stylesheets="@Search.css" text="Playlists">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <HBox alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="30.0">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <children>
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="311.0" styleClass="borderRight" stylesheets="@Search.css" text="Nome" textAlignment="CENTER" />
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="175.0" styleClass="borderBottom" stylesheets="@Search.css" text="Autor" textAlignment="CENTER" />
+                           </children>
+                        </HBox>
+                        <HBox fx:id="basePlaylistRow" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="30.0">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <children>
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="310.0" stylesheets="@Search.css" text="Corno manso" textAlignment="CENTER" />
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="175.0" stylesheets="@Search.css" text="Cornudo" textAlignment="CENTER" />
+                           </children>
+                        </HBox>
+                     </children>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </VBox>
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+   <left>
+      <VBox prefHeight="351.0" prefWidth="119.0" spacing="4.0" styleClass="filtro" stylesheets="@Search.css" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="32.0" prefWidth="119.0" text="Filtros">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <CheckBox fx:id="filterSongs" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="80.0" text="Songs" />
+            <CheckBox fx:id="filterPlaylists" alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="80.0" text="Playlists" />
+            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Nome" />
+            <TextField fx:id="filterNome" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="12.0" prefWidth="98.0">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </TextField>
+            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Albúm" />
+            <TextField fx:id="filterAlbum" alignment="CENTER" maxWidth="1.7976931348623157E308">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </TextField>
+            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Genero" />
+            <TextField fx:id="filterGenero" alignment="CENTER" maxWidth="1.7976931348623157E308">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </TextField>
+            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Ano" />
+            <TextField fx:id="filterAno" alignment="CENTER" maxWidth="1.7976931348623157E308">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </TextField>
+            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Duração" />
+            <TextField fx:id="filterDuracao" alignment="CENTER" maxWidth="1.7976931348623157E308">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </TextField>
+            <Button alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdate" text="Search">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
+   </left>
+   <top>
+      <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="46.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleVoltar" prefHeight="35.0" prefWidth="44.0" text="&lt;-">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Button>
+            <Label alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="46.0" prefWidth="529.0" text="Search" textAlignment="CENTER">
+               <font>
+                  <Font size="22.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+   </top>
+</BorderPane>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox fx:id="baseSongRow" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="30.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/">
+    <cursor>
+        <Cursor fx:constant="HAND" />
+    </cursor>
+    <children>
+        <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="167.0" stylesheets="@Search.css" text="Barbie girl" textAlignment="CENTER" />
+        <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="105.0" stylesheets="@Search.css" text="ex" textAlignment="CENTER" />
+        <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="87.0" stylesheets="@Search.css" text="ex" textAlignment="CENTER" />
+        <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="53.0" stylesheets="@Search.css" text="1111" textAlignment="CENTER" />
+        <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="69.0" stylesheets="@Search.css" text="123" textAlignment="CENTER" />
+    </children>
+</HBox>

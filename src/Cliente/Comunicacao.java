@@ -150,6 +150,25 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         return null;
     }
 
+    @Override
+    public FilteredResult search(Utilizador utilizador, boolean songs, boolean playlists, String nome, String album, String genero, int ano, int duracao) {
+        PedidoSearch pedidoSearch = new PedidoSearch(utilizador, songs, playlists, nome, album, genero, ano, duracao);
+        try {
+            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+            enviaPedido(tcpSocket,pedidoSearch);
+
+            Resposta resposta = recebeResposta(tcpSocket);
+
+            tcpSocket.close();
+            return ((PedidoSearch)resposta.getPedido()).getFilteredResult();
+
+        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidUsernameException | InvalidPasswordException e) {
+            System.out.println("Ocorreu um erro no pedido de Search: " + e.getMessage());
+        }
+        return null;
+    }
+
 
     void enviaPedido(Socket socket, Pedido pedido) throws IOException {
         Gson gson = new Gson();
@@ -166,9 +185,10 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         byte[] buffer = new byte[PKT_SIZE];
         int nread = inputStream.read(buffer);
 
-        System.out.println("DEBUG: " + nread + " bytes recebidos (Não apagar isto por enquanto pls)");
+        //System.out.println("DEBUG: " + nread + " bytes recebidos (Não apagar isto por enquanto pls)");
 
         String json = new String(buffer, 0 , nread);
+        System.out.println("[DEBUG] - Recebi " + nread + " bytes");
         Gson gson = new GsonBuilder().registerTypeAdapter(Resposta.class, new RespostaDeserializer()).create();
 
         Resposta resposta = gson.fromJson(json, Resposta.class);

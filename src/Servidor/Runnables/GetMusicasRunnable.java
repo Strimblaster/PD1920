@@ -18,16 +18,13 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class GetMusicasRunnable implements Runnable {
+public class GetMusicasRunnable extends RunnableBase implements Runnable {
 
-    private Socket cliente;
     private PedidoMusicas pedidoMusicas;
-    private IServer servidor;
 
     public GetMusicasRunnable(Socket cliente, PedidoMusicas pedidoMusicas, IServer servidor) {
-        this.cliente = cliente;
+        super(cliente, servidor);
         this.pedidoMusicas = pedidoMusicas;
-        this.servidor = servidor;
     }
 
     @Override
@@ -35,7 +32,6 @@ public class GetMusicasRunnable implements Runnable {
         Gson gson = new GsonBuilder().registerTypeAdapter(Exception.class, new ExceptionSerializer()).create();
         try {
             OutputStream outputStream = cliente.getOutputStream();
-            System.out.println("[INFO] - [GetMusicasRunnable]: Pedido de Musicas de " + cliente.getInetAddress().getHostName() + ":" + cliente.getPort() + " em processamento");
             Utilizador utilizador = pedidoMusicas.getUtilizador();
 
             ArrayList<Song> songs = servidor.getMusicas(utilizador);

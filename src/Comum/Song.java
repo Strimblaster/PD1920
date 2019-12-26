@@ -58,4 +58,17 @@ public class Song {
     public void setFilename(String filename) {
         this.filename = filename;
     }
+
+    @Override
+    public String toString() {
+        return "Song{" +
+                "nome='" + nome + '\'' +
+                ", autor=" + autor +
+                ", album='" + album + '\'' +
+                ", ano=" + ano +
+                ", duracao=" + duracao +
+                ", genero='" + genero + '\'' +
+                ", filename='" + filename + '\'' +
+                '}';
+    }
 }

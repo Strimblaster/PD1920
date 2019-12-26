@@ -44,7 +44,7 @@
    <center>
       <VBox prefHeight="400.0" prefWidth="331.0" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="btnSearch" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="33.0" prefWidth="194.0" text="Search" textAlignment="CENTER">
+            <Button fx:id="btnSearch" onAction="#handleBtnSearch" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="33.0" prefWidth="194.0" text="Search" textAlignment="CENTER">
                <VBox.margin>
                   <Insets left="60.0" right="60.0" top="50.0" />
                </VBox.margin>

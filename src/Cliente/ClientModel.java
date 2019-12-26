@@ -1,16 +1,13 @@
 package Cliente;
 
 import Cliente.Interfaces.IComunicacaoCliente;
-import Comum.Constants;
+import Comum.*;
 import Comum.Exceptions.InvalidPasswordException;
 import Comum.Exceptions.InvalidServerException;
 import Comum.Exceptions.InvalidSongDescriptionException;
 import Comum.Exceptions.InvalidUsernameException;
 import Comum.Pedidos.PedidoLogin;
 import Comum.Pedidos.Resposta;
-import Comum.ServerInfo;
-import Comum.Song;
-import Comum.Utilizador;
 import Cliente.Interfaces.IEvent;
 
 import java.io.*;
@@ -63,5 +60,9 @@ class ClientModel implements Constants {
 
     public ArrayList<Song> getMyMusics() {
         return comunicacao.getMusicas(utilizador);
+    }
+
+    public FilteredResult search(boolean songs, boolean playlists, String nome, String album, String genero, int ano, int duracao) {
+        return comunicacao.search(utilizador, songs, playlists, nome, album, genero, ano, duracao);
     }
 }

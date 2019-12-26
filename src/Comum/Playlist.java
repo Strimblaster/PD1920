@@ -89,4 +89,13 @@ public class Playlist {
         }
         return list;
     }
+
+    @Override
+    public String toString() {
+        return "Playlist{" +
+                "name='" + name + '\'' +
+                ", musicList=" + musicList +
+                ", owner=" + owner +
+                '}';
+    }
 }

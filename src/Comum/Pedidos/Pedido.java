@@ -24,6 +24,10 @@ public abstract class Pedido  {
         return tipo;
     }
 
+    public void setTipo(TipoPedido tipo) {
+        this.tipo = tipo;
+    }
+
     public void setUtilizador(Utilizador utilizador) {
         this.utilizador = utilizador;
     }

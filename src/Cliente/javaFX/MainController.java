@@ -55,4 +55,12 @@ public class MainController extends SceneController {
         }
 
     }
+
+    public void handleBtnSearch(ActionEvent actionEvent) {
+        try {
+            load("Search.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -15,16 +15,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class LoginRunnable implements Runnable  {
+public class LoginRunnable extends RunnableBase implements Runnable  {
 
-    private Socket cliente;
     private PedidoLogin pedidoLogin;
-    private IServer servidor;
 
     public LoginRunnable(Socket cliente, PedidoLogin pedidoLogin, IServer servidor) {
-        this.cliente = cliente;
+        super(cliente, servidor);
         this.pedidoLogin = pedidoLogin;
-        this.servidor = servidor;
     }
 
     @Override
@@ -33,7 +30,6 @@ public class LoginRunnable implements Runnable  {
         Gson gson = new GsonBuilder().registerTypeAdapter(Exception.class, new ExceptionSerializer()).create();
         try {
             OutputStream outputStream = cliente.getOutputStream();
-            System.out.println("[INFO] - [Login]: Pedido de login de " + cliente.getInetAddress().getHostName() + ":" + cliente.getPort() + " em processamento");
             Utilizador utilizador = pedidoLogin.getUtilizador();
             Resposta resposta = null;
             try {

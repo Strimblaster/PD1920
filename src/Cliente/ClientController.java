@@ -3,6 +3,7 @@ package Cliente;
 import Cliente.Interfaces.IEvent;
 import Cliente.javaFX.SceneController;
 import Comum.Exceptions.*;
+import Comum.FilteredResult;
 import Comum.Pedidos.Resposta;
 import Comum.Song;
 import Comum.Utilizador;
@@ -61,8 +62,7 @@ public class ClientController implements IEvent {
     }
 
     public void uploadFile(Song musica) throws InvalidSongDescriptionException {
-        Resposta resposta = model.uploadFile(musica);
-        System.out.println(resposta);
+        model.uploadFile(musica);
     }
 
     public void setSceneController(SceneController sceneController) {
@@ -99,5 +99,9 @@ public class ClientController implements IEvent {
 
     public ArrayList<Song> getMyMusics() {
         return model.getMyMusics();
+    }
+
+    public FilteredResult search(boolean songs, boolean playlists, String nome, String album, String genero, int ano, int duracao) {
+        return model.search(songs, playlists, nome, album, genero, ano, duracao);
     }
 }

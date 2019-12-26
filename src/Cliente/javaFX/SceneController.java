@@ -62,6 +62,15 @@ public abstract class SceneController {
         alert.showAndWait();
     }
 
+    public void showAlert(String cabeçalho, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erro");
+        alert.setHeaderText(cabeçalho);
+        alert.setContentText(message);
+
+        alert.showAndWait();
+    }
+
     public void setMusicDirectory(File musicDirectory) {
         this.musicDirectory = musicDirectory;
     }
