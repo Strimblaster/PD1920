@@ -20,18 +20,14 @@ class ClientModel implements Constants {
     private Utilizador utilizador;
     private IComunicacaoCliente comunicacao;
 
-    public ClientModel(ClientController clientController, File musicDir) throws IOException, InvalidServerException {
-        comunicacao = new Comunicacao(clientController, musicDir);
+    public ClientModel(ClientController clientController) throws IOException, InvalidServerException {
+        comunicacao = new Comunicacao(clientController);
         this.server = comunicacao.getServerInfo();
 
     }
 
     public ServerInfo getServer() {
         return server;
-    }
-
-    public void setServer(ServerInfo server) {
-        this.server = server;
     }
 
     public Utilizador getUtilizador() {
@@ -64,5 +60,9 @@ class ClientModel implements Constants {
 
     public FilteredResult search(boolean songs, boolean playlists, String nome, String album, String genero, int ano, int duracao) {
         return comunicacao.search(utilizador, songs, playlists, nome, album, genero, ano, duracao);
+    }
+
+    public void setFileDir(File musicDirectory) {
+        comunicacao.setMusicDir(musicDirectory);
     }
 }

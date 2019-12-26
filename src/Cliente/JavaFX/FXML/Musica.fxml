@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Cliente.JavaFX.MusicaController">
+   <top>
+      <Label fx:id="lblNomeMusica" alignment="CENTER" prefHeight="94.0" text="Nome da musica" textAlignment="CENTER" BorderPane.alignment="CENTER">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Label>
+   </top>
+   <center>
+      <VBox alignment="TOP_CENTER" maxWidth="1.7976931348623157E308" spacing="10.0" BorderPane.alignment="TOP_CENTER">
+         <children>
+            <HBox alignment="TOP_CENTER">
+               <children>
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="100.0" text="Autor:">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblAutor" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="68.0" text="nome">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox alignment="TOP_CENTER">
+               <children>
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="100.0" text="Album:">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblAlbum" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="68.0" text="album">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox alignment="TOP_CENTER">
+               <children>
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="100.0" text="Genero:">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblGenero" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="68.0" text="genero">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox alignment="TOP_CENTER">
+               <children>
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="100.0" text="Ano:">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblAno" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="68.0" text="ano">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox alignment="TOP_CENTER">
+               <children>
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="100.0" text="Duração:">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblDuracao" alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="68.0" text="d">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox alignment="TOP_CENTER" spacing="50.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#handleBtnVoltar" prefHeight="40.0" prefWidth="110.0" text="Voltar" />
+                  <Button mnemonicParsing="false" onAction="#handleBtnAdicionarPlaylist" prefHeight="40.0" prefWidth="139.0" text="Adicionar a Playlist" />
+                  <Button fx:id="btnPlayDownload" mnemonicParsing="false" prefHeight="40.0" prefWidth="110.0" text="Play/Download" />
+               </children>
+               <VBox.margin>
+                  <Insets top="40.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>

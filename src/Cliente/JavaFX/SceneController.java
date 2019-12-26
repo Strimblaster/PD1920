@@ -1,6 +1,7 @@
 package Cliente.JavaFX;
 
 import Cliente.ClientController;
+import Comum.Song;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
@@ -20,7 +21,7 @@ public abstract class SceneController {
         this.clientController = controllerClient;
     }
 
-
+//Codigo do load está mau mas funciona...
     public void load(String res) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(res));
         AnchorPane root = null;
@@ -38,6 +39,38 @@ public abstract class SceneController {
         controller.stage = stage;
         controller.musicDirectory = musicDirectory;
         clientController.setSceneController(controller);
+        controller.setClientController(clientController);
+
+
+
+        if(root1 != null)
+            stage.getScene().setRoot(root1);
+        else if(root2 != null)
+            stage.getScene().setRoot(root2);
+        else
+            stage.getScene().setRoot(root);
+
+    }
+
+    public void load(String res, Song song) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(res));
+        AnchorPane root = null;
+        BorderPane root1 = null;
+        VBox root2 = null;
+        Object obj = loader.load();
+        if(obj instanceof  AnchorPane) root = (AnchorPane) obj;
+        if(obj instanceof VBox) root2 = (VBox) obj;
+        else root1 = (BorderPane) obj;
+
+        if(!(loader.getController() instanceof SceneController)) return;
+
+        SceneController controller = loader.getController();
+
+        controller.stage = stage;
+        controller.musicDirectory = musicDirectory;
+        clientController.setSceneController(controller);
+        if(controller instanceof MusicaController)
+            ((MusicaController)controller).setSong(song);
         controller.setClientController(clientController);
 
 

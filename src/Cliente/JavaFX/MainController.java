@@ -36,6 +36,11 @@ public class MainController extends SceneController {
     public void setClientController(ClientController clientController) {
         super.setClientController(clientController);
 
+        fillMySongsPlaylists();
+
+    }
+
+    private void fillMySongsPlaylists() {
         vboxMyPlaylists.getChildren().clear();
         vboxMySongs.getChildren().clear();
 
@@ -46,9 +51,17 @@ public class MainController extends SceneController {
             Button btn = new Button(song.getNome());
             btn.setAlignment(Pos.CENTER);
             btn.setMaxWidth(Double.MAX_VALUE);
+
+            btn.setOnAction(evt->{
+                try {
+                    load("FXML/Musica.fxml", song);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
             vboxMySongs.getChildren().add(btn);
         }
-
     }
 
     public void handleBtnSearch(ActionEvent actionEvent) {
@@ -65,5 +78,9 @@ public class MainController extends SceneController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void handleRefresh(ActionEvent actionEvent) {
+        fillMySongsPlaylists();
     }
 }

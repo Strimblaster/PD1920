@@ -1,5 +1,7 @@
 package Comum;
 
+import java.io.File;
+
 public interface Constants {
     String IP_DS = "localhost";
     int SERVER_PORT_DS = 5000;
@@ -12,7 +14,7 @@ public interface Constants {
     int TIMEOUT_5s = 5000;
     int TIMEOUT_2s = 2000;
 
-    String CLIENT_DIR = "\\temp\\clientes\\";
-    String SERVER_DIR = "\\temp\\servers\\";
+    String CLIENT_DIR = File.separator + "temp" + File.separator +"clientes"+ File.separator;
+    String SERVER_DIR = File.separator + "temp" + File.separator +"servers"+ File.separator;
 
 }

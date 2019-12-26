@@ -36,7 +36,6 @@ public class Cliente extends javafx.application.Application {
 
             ((MenuController)loader.getController()).setClientController(clientController);
             ((MenuController)loader.getController()).stage = stage;
-            ((MenuController)loader.getController()).setMusicDirectory(clientController.getMusicDirectory());
 
 
 

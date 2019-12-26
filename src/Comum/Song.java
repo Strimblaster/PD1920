@@ -1,6 +1,7 @@
 package Comum;
 
 public class Song {
+
     private String nome;
     private Utilizador autor;
     private String album;
@@ -25,6 +26,7 @@ public class Song {
         this.duracao = duracao;
         this.genero = genero;
         this.autor = autor;
+        this.filename = filename;
     }
 
     public String getNome() {
@@ -63,7 +65,7 @@ public class Song {
     public String toString() {
         return "Song{" +
                 "nome='" + nome + '\'' +
-                ", autor=" + autor +
+                ", autor=" + autor.toString() +
                 ", album='" + album + '\'' +
                 ", ano=" + ano +
                 ", duracao=" + duracao +

@@ -32,7 +32,7 @@ public class UploadFileRunnable implements Runnable {
 
             File fileToSend = new File(song.getFilename());
             //Guardar o ficheiro tambem na pasta temporaria de cada cliente para nao dar upload e depois ter que dar download do ficheiro que acabou de dar upload!
-            File fileToCache = new File(clientMusicDir.getAbsolutePath() + "\\" + filenameMusicID);
+            File fileToCache = new File(clientMusicDir.getAbsolutePath() + File.separator + filenameMusicID);
             FileOutputStream fileOutputStream = new FileOutputStream(fileToCache);
 
             if(!fileToSend.exists() || !fileToSend.canWrite())

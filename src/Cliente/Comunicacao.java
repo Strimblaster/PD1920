@@ -22,9 +22,8 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     IEvent event;
     File musicDir;
 
-    public Comunicacao(IEvent clientController, File musicDir) {
+    public Comunicacao(IEvent clientController) {
         this.event = clientController;
-        this.musicDir = musicDir;
     }
 
     @Override
@@ -53,6 +52,11 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             throw new InvalidServerException();
 
         return serverInfo;
+    }
+
+    @Override
+    public void setMusicDir(File dir) {
+        musicDir = dir;
     }
 
     @Override
@@ -96,6 +100,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     @Override
     public Resposta uploadFile(Utilizador utilizador, Song song) throws InvalidSongDescriptionException {
         PedidoUploadFile pedidoUploadFile = new PedidoUploadFile(utilizador, song);
+        if(musicDir == null) throw new RuntimeException("[Erro] [Comunicação]: musicDir == null ");
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
 
@@ -131,13 +136,12 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             enviaPedido(tcpSocket,pedidoMusicas);
 
             int nread = inputStream.read(buffer);
-            System.out.println("DEBUG: " + nread + " bytes recebidos (Não apagar isto por enquanto pls)");
+            System.out.println("[DEBUG] - Recebi " + nread + " bytes");
             String json = new String(buffer, 0 , nread);
 
 
             Type listType = new TypeToken<ArrayList<Song>>(){}.getType();
             ArrayList<Song> songs = gson.fromJson(json, listType);
-
 
             tcpSocket.close();
             return songs;

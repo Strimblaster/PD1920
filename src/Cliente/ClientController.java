@@ -7,6 +7,7 @@ import Comum.FilteredResult;
 import Comum.Pedidos.Resposta;
 import Comum.Song;
 import Comum.Utilizador;
+import com.sun.webkit.network.Util;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
@@ -20,11 +21,11 @@ public class ClientController implements IEvent {
     private ClientModel model;
     private SceneController sceneController;
     private File musicDirectory;
+    private String clientRunningPath;
 
     ClientController(String clientDir) throws IOException, InvalidServerException {
-        super();
-        setFileDirectory(clientDir);
-        this.model = new ClientModel(this, musicDirectory);
+        this.clientRunningPath = clientDir;
+        this.model = new ClientModel(this);
         System.out.println(model.getServer());
     }
 
@@ -46,8 +47,11 @@ public class ClientController implements IEvent {
         if(password.equals("")) throw new InvalidUsernameException();
 
         Resposta resposta = model.login(username, password);
-
-
+        if(resposta.isSucess()) {
+            setFileDirectory();
+            sceneController.setMusicDirectory(musicDirectory);
+            model.setFileDir(musicDirectory);
+        }
     }
 
     public void signUp(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
@@ -56,8 +60,7 @@ public class ClientController implements IEvent {
         if(password == null) throw new InvalidPasswordException();
         if(password.equals("")) throw new InvalidUsernameException();
 
-
-        Resposta resposta = model.signUp(username, password);
+        model.signUp(username, password);
 
     }
 
@@ -69,28 +72,21 @@ public class ClientController implements IEvent {
         this.sceneController = sceneController;
     }
 
-    public void setFileDirectory(String path) {
-        File temp = new File(path + CLIENT_DIR);
-        if(!temp.exists()) {
-            temp.mkdirs();
-            File dir = new File(path + CLIENT_DIR + "1");
+    public void setFileDirectory() {
+        File clientFolder = new File(clientRunningPath + CLIENT_DIR);
+        Utilizador utilizador = model.getUtilizador();
+        File dir = new File(clientRunningPath + CLIENT_DIR + utilizador.getName());
+        if(!clientFolder.exists()) {
+            clientFolder.mkdirs();
             dir.mkdir();
             musicDirectory = dir;
         }
         else{
-            File dir;
-
-            for (int i = 1; (dir = new File(path + CLIENT_DIR + i)).exists(); i++);
-
-            dir.mkdir();
+            if(!dir.exists())
+                dir.mkdir();
             musicDirectory = dir;
         }
-        musicDirectory.deleteOnExit();
-        System.out.println(musicDirectory.getAbsolutePath());
-    }
-
-    public File getMusicDirectory() {
-        return musicDirectory;
+        System.out.println("Folder: " + musicDirectory.getAbsolutePath());
     }
 
     public Utilizador getUtilizador(){
