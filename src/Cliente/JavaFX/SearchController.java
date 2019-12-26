@@ -1,10 +1,8 @@
-package Cliente.javaFX;
+package Cliente.JavaFX;
 
 import Cliente.ClientController;
 import Comum.FilteredResult;
 import Comum.Song;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -63,7 +61,7 @@ public class SearchController extends SceneController {
         try {
             for (Song song: result.songs) {
 
-                HBox row = new FXMLLoader(getClass().getResource("SongRow.fxml")).load();
+                HBox row = new FXMLLoader(getClass().getResource("FXML/SongRow.fxml")).load();
                 ObservableList<Node> children = row.getChildren();
                 ((Label)children.get(0)).setText(song.getNome());
                 ((Label)children.get(1)).setText(song.getGenero());
@@ -92,7 +90,7 @@ public class SearchController extends SceneController {
 
     public void handleVoltar(ActionEvent actionEvent) {
         try {
-            load("Main.fxml");
+            load("FXML/Main.fxml");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,7 +1,7 @@
 package Cliente;
 
 import Cliente.Interfaces.IEvent;
-import Cliente.javaFX.SceneController;
+import Cliente.JavaFX.SceneController;
 import Comum.Exceptions.*;
 import Comum.FilteredResult;
 import Comum.Pedidos.Resposta;

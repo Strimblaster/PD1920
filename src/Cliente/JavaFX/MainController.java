@@ -1,20 +1,15 @@
-package Cliente.javaFX;
+package Cliente.JavaFX;
 
 import Cliente.ClientController;
 import Comum.Song;
-import Comum.Utilizador;
 import javafx.event.ActionEvent;
-import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 public class MainController extends SceneController {
 
@@ -28,7 +23,7 @@ public class MainController extends SceneController {
 
     public void handleBtnUpload(ActionEvent actionEvent) {
         try {
-            load("NewSong.fxml");
+            load("FXML/NewSong.fxml");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,7 +53,15 @@ public class MainController extends SceneController {
 
     public void handleBtnSearch(ActionEvent actionEvent) {
         try {
-            load("Search.fxml");
+            load("FXML/Search.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void handleBtnVoltar(ActionEvent actionEvent) {
+        try {
+            load("FXML/Inicio.fxml");
         } catch (IOException e) {
             e.printStackTrace();
         }

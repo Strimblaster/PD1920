@@ -1,4 +1,4 @@
-package Cliente.javaFX;
+package Cliente.JavaFX;
 
 import Comum.Exceptions.InvalidPasswordException;
 import Comum.Exceptions.InvalidUsernameException;
@@ -22,7 +22,7 @@ public class MenuController extends SceneController {
 
         try {
             clientController.login(txtUsername.getText(), txtPassword.getText());
-            load("Main.fxml");
+            load("FXML/Main.fxml");
         } catch (InvalidUsernameException | InvalidPasswordException | IOException e) {
             showAlert(Alert.AlertType.ERROR, "Erro", "Login", e.getMessage());
         }
@@ -33,7 +33,7 @@ public class MenuController extends SceneController {
 
         try {
             clientController.signUp(txtUsername.getText(), txtPassword.getText());
-            load("Inicio.fxml");
+            load("FXML/Inicio.fxml");
         } catch (InvalidUsernameException | InvalidPasswordException | IOException e) {
             showAlert(Alert.AlertType.ERROR, "Erro", "Sign Up", e.getMessage());
         }
@@ -41,7 +41,7 @@ public class MenuController extends SceneController {
 
     public void handleBtnGoToLogin(ActionEvent actionEvent) {
         try {
-            load("Login.fxml");
+            load("FXML/Login.fxml");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -49,7 +49,7 @@ public class MenuController extends SceneController {
 
     public void handleBtnGoToSignUp(ActionEvent actionEvent) {
         try {
-            load("SignUp.fxml");
+            load("FXML/SignUp.fxml");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -57,7 +57,7 @@ public class MenuController extends SceneController {
 
     public void handlebtnGoToInicio(ActionEvent actionEvent) {
         try {
-            load("Inicio.fxml");
+            load("FXML/Inicio.fxml");
         } catch (IOException e) {
             e.printStackTrace();
         }

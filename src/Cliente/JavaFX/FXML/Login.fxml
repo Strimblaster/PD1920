@@ -12,20 +12,12 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="backgroundDark" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Cliente.javaFX.MenuController">
-   <left>
-      <Separator opacity="0.0" prefHeight="15.0" prefWidth="122.0" BorderPane.alignment="CENTER" />
-   </left>
-   <right>
-      <Separator opacity="0.0" prefHeight="8.0" prefWidth="120.0" BorderPane.alignment="CENTER" />
-   </right>
-   <cursor>
-      <Cursor fx:constant="DEFAULT" />
-   </cursor>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="backgroundDark" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Cliente.JavaFX.MenuController">
    <center>
       <VBox prefHeight="324.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
-            <Label alignment="TOP_CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@Style.css" text="Sign Up">
+            <Separator opacity="0.0" orientation="VERTICAL" prefHeight="200.0" />
+            <Label alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Login">
                <font>
                   <Font size="36.0" />
                </font>
@@ -55,6 +47,15 @@
          </cursor>
       </VBox>
    </center>
+   <left>
+      <Separator opacity="0.0" prefHeight="15.0" prefWidth="122.0" BorderPane.alignment="CENTER" />
+   </left>
+   <right>
+      <Separator opacity="0.0" prefHeight="8.0" prefWidth="120.0" BorderPane.alignment="CENTER" />
+   </right>
+   <cursor>
+      <Cursor fx:constant="DEFAULT" />
+   </cursor>
    <bottom>
       <HBox alignment="CENTER" prefHeight="190.0" prefWidth="500.0" BorderPane.alignment="CENTER">
          <children>
@@ -67,7 +68,7 @@
                </cursor>
             </Button>
             <Separator opacity="0.0" prefHeight="7.0" prefWidth="43.0" />
-            <Button id="btnLogin" fx:id="btnLogin" maxHeight="45.0" maxWidth="130.0" minHeight="45.0" minWidth="130.0" mnemonicParsing="false" onAction="#handleBtnSignUp" prefHeight="45.0" prefWidth="130.0" styleClass="btnLogin" stylesheets="@Style.css" text="Sign Up" textAlignment="CENTER" textFill="WHITE">
+            <Button id="btnLogin" fx:id="btnLogin" maxHeight="45.0" maxWidth="130.0" minHeight="45.0" minWidth="130.0" mnemonicParsing="false" onAction="#handleBtnLogin" prefHeight="45.0" prefWidth="130.0" styleClass="btnLogin" stylesheets="@Style.css" text="Login" textAlignment="CENTER" textFill="WHITE">
                <font>
                   <Font name="Roboto Medium" size="17.0" />
                </font>

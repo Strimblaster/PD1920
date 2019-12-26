@@ -1,4 +1,4 @@
-package Cliente.javaFX;
+package Cliente.JavaFX;
 
 import Cliente.ClientController;
 import javafx.fxml.FXMLLoader;
@@ -10,8 +10,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-
-import static Comum.Constants.CLIENT_DIR;
 
 public abstract class SceneController {
     public ClientController clientController;

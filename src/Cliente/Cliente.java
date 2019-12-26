@@ -1,8 +1,7 @@
 package Cliente;
 
-import Cliente.javaFX.MenuController;
+import Cliente.JavaFX.MenuController;
 import Comum.Exceptions.InvalidServerException;
-import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -32,7 +31,7 @@ public class Cliente extends javafx.application.Application {
     @Override
     public void start(Stage stage){
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("javaFX/Inicio.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("JavaFX/FXML/Inicio.fxml"));
             BorderPane root =  loader.load();
 
             ((MenuController)loader.getController()).setClientController(clientController);

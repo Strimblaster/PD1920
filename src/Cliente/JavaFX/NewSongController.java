@@ -1,8 +1,6 @@
-package Cliente.javaFX;
+package Cliente.JavaFX;
 
-import Comum.Exceptions.InvalidPasswordException;
 import Comum.Exceptions.InvalidSongDescriptionException;
-import Comum.Exceptions.InvalidUsernameException;
 import Comum.Song;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
@@ -11,7 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 public class NewSongController extends SceneController {
@@ -42,7 +39,7 @@ public class NewSongController extends SceneController {
 
     public void handleCancelar(ActionEvent actionEvent) {
         try {
-            load("Main.fxml");
+            load("FXML/Main.fxml");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -57,7 +54,7 @@ public class NewSongController extends SceneController {
 
         try {
             clientController.uploadFile(new Song(txtNome.getText(), txtAlbum.getText(), Integer.parseInt(txtAno.getText()), Integer.parseInt(txtDuracao.getText()), txtGenero.getText(), ficheiro.getAbsolutePath()));
-            load("main.fxml");
+            load("FXML/Main.fxml");
         } catch (IOException | InvalidSongDescriptionException e) {
             showAlert(Alert.AlertType.ERROR, "Erro", "Upload Ficheiro", e.getMessage());
         } catch (NumberFormatException e){
