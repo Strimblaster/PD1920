@@ -19,6 +19,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.*;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -273,6 +276,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
         try {
             if(songs){
                 String query = constructQuerySongs(nome, album, genero, ano, duracao);
+                System.out.println(query);
                 PreparedStatement preparedStatement = conn.prepareStatement(query);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 while (resultSet.next())
@@ -286,7 +290,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+            return new FilteredResult(songsArrayList, playlistsArrayList);
         }
 
         return new FilteredResult(songsArrayList, playlistsArrayList);
@@ -311,49 +315,58 @@ public class Servidor implements ServerConstants, Constants, IServer {
         this.id = id;
         DBName = "Servidor"+id;
 
+        createServerDirectory(id);
+
+    }
+
+    private void createServerDirectory(int id) {
+        //Path da diretoria em que o servidor está a correr
         String serverRunningPath = System.getProperty("user.dir");
+
+        //Se a pasta temp/servers não existe, cria-a
         File temp = new File(serverRunningPath + SERVER_DIR);
         if(!temp.exists()) {
             if(!temp.mkdirs())
                 throw new RuntimeException("Não consegui criar uma pasta para guardar os ficheiros mp3");
         }
+
+        //Dentro da pasta temp/servers tenta criar uma pasta com o id do servidor
         musicDir = new File(serverRunningPath + SERVER_DIR + id);
+        //Verifica antes se ela já existe e apaga-a se existir
         if(musicDir.exists()) {
             System.out.println("[INFO] Tentar eliminar pasta de servidor ja existente...");
+            String[]files = musicDir.list();
+            for(String s: files){
+                File currentFile = new File(musicDir.getPath(),s);
+                currentFile.delete();
+            }
             if(!musicDir.delete())
-                throw new RuntimeException("Não consegui apagar pasta já existente");
+                throw new RuntimeException("Não consegui eliminar a pasta de servidor já existente");
         }
-        if(!musicDir.mkdir())
+        if(!musicDir.mkdirs())
             throw new RuntimeException("Não consegui criar uma pasta para guardar os ficheiros mp3");
 
-        musicDir.deleteOnExit();
     }
 
 
-
-
-
-
-
-
-//Não gosto de como isto está feito... se quiserem podem mudar desde que funfe
+    //Não gosto de como isto está feito... se quiserem podem mudar desde que funfe
     private String constructQuerySongs(String nome, String album, String genero, int ano, int duracao) {
         StringBuilder base = new StringBuilder("SELECT * FROM musicas");
         StringBuilder condicoes = new StringBuilder();
         int contador = 0;
 
         if(validToQueryBuilder(nome)){
-            condicoes.append(" nome = ").append(nome);
+            condicoes.append(" nome = '").append(nome + "'");
             contador++;
         }
         if(validToQueryBuilder(album)){
             if(contador > 0) condicoes.append(" AND");
-            condicoes.append(" album = ").append(album);
+            condicoes.append(" album = '").append(album + "'");
             contador++;
         }
         if(validToQueryBuilder(genero)){
             if(contador > 0) condicoes.append(" AND");
-            condicoes.append(" genero = ").append(genero);
+            condicoes.append(" genero = '").append(genero + "'");
             contador++;
         }
         if(validToQueryBuilder(ano)){
@@ -361,7 +374,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
             condicoes.append(" ano = ").append(ano);
             contador++;
         }
-        if(validToQueryBuilder(ano)){
+        if(validToQueryBuilder(duracao)){
             if(contador > 0) condicoes.append(" AND");
             condicoes.append(" duracao = ").append(duracao);
             contador++;
