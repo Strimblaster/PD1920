@@ -27,7 +27,6 @@ public class DownloadFileRunnable extends RunnableBase implements Runnable {
     @Override
     public void run() {
         try {
-            System.out.println("ola");
             OutputStream outputStream = cliente.getOutputStream();
 
             byte[] musica = servidor.downloadFile(pedidoDownloadFile.getUtilizador(), pedidoDownloadFile.getMusica());

@@ -83,7 +83,6 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                 int read = inputStream.read(bytes);
                 String str = new String(bytes, 0, read);
                 Pedido pedido = gson.fromJson(str, Pedido.class);
-                System.out.println("ola");
                 Runnable pedidoRunnable;
 
                 if(pedido instanceof PedidoLogin)

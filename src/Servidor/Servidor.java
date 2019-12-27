@@ -235,7 +235,6 @@ public class Servidor implements ServerConstants, Constants, IServer {
     @Override
     public byte[] downloadFile(Utilizador utilizador, Song musica) throws InvalidSongDescriptionException {
 
-        System.out.println("ola");
         PedidoDownloadFile pedido = new PedidoDownloadFile(utilizador,musica);
 
         try {
@@ -244,7 +243,8 @@ public class Servidor implements ServerConstants, Constants, IServer {
 
             //Adicionar a musica à BD
 
-            PreparedStatement insertStatement = conn.prepareStatement("select * from musicas where (nome, autor, album, duracao, ano, genero) VALUES (?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement insertStatement = conn.prepareStatement("select * from musicas where nome=? AND autor=? AND album=? AND duracao=? AND ano=? AND genero=?", Statement.RETURN_GENERATED_KEYS);
+
             insertStatement.setString(1,  musica.getNome());
             insertStatement.setString(2,  musica.getAutor().getName());
             insertStatement.setString(3,  musica.getAlbum());
@@ -264,8 +264,9 @@ public class Servidor implements ServerConstants, Constants, IServer {
             byte[] buffer = new byte[PKT_SIZE];
             int nRead;
 
-            FileInputStream inputStream = new FileInputStream(musicDir.getAbsoluteFile());
-
+            System.out.println(musicDir.getAbsolutePath());
+            FileInputStream inputStream = new FileInputStream(musicDir);
+            System.out.println("ola1");
             while((nRead=inputStream.read(buffer))!=-1) {
                 byte[] temp = new byte[file.length + nRead];
                 System.arraycopy(file, 0, temp, 0, file.length);
@@ -273,7 +274,6 @@ public class Servidor implements ServerConstants, Constants, IServer {
                 file = temp;
             }
 
-            System.out.println("ol2");
             return file;
         } catch (SQLException | FileNotFoundException e) {
             return null;

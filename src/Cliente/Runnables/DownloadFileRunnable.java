@@ -26,7 +26,6 @@ public class DownloadFileRunnable implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("ola");
         Song song = pedido.getMusica();
         try {
             File fileToReceive = new File(clientMusicDir.getAbsolutePath()+File.separator+song.getFilename());
