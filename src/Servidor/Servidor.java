@@ -4,20 +4,15 @@ import Comum.*;
 import Comum.Exceptions.InvalidPasswordException;
 import Comum.Exceptions.InvalidSongDescriptionException;
 import Comum.Exceptions.InvalidUsernameException;
-import Comum.Pedidos.PedidoLogin;
-import Comum.Pedidos.PedidoSignUp;
-import Comum.Pedidos.PedidoUploadFile;
-import Comum.Pedidos.Resposta;
+import Comum.Pedidos.*;
 import Comum.Pedidos.Enums.TipoExcecao;
 import Servidor.Interfaces.IServer;
 import Servidor.Interfaces.IEvent;
 import Servidor.Interfaces.ServerConstants;
+import com.google.gson.Gson;
 import com.google.gson.internal.$Gson$Types;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
@@ -235,6 +230,58 @@ public class Servidor implements ServerConstants, Constants, IServer {
             return new Resposta(pedido, false, "Erro no servidor", TipoExcecao.Exception, e);
         }
 
+    }
+
+    @Override
+    public byte[] downloadFile(Utilizador utilizador, Song musica) throws InvalidSongDescriptionException {
+
+        PedidoDownloadFile pedido = new PedidoDownloadFile(utilizador,musica);
+
+        try {
+            //Buscar o ID do utilizador que está a receber a musica
+            int id = getIDUtilizador(utilizador);
+
+            //Adicionar a musica à BD
+
+            PreparedStatement insertStatement = conn.prepareStatement("select * from musicas where nome=? AND autor=? AND album=? AND duracao=? AND ano=? AND genero=?", Statement.RETURN_GENERATED_KEYS);
+
+            insertStatement.setString(1,  musica.getNome());
+            insertStatement.setString(2,  musica.getAutor().getName());
+            insertStatement.setString(3,  musica.getAlbum());
+            insertStatement.setInt(4,  musica.getDuracao());
+            insertStatement.setInt(5, musica.getAno());
+            insertStatement.setString(6,  musica.getGenero());
+            ResultSet resultSet = insertStatement.executeQuery();
+            if(!resultSet.next()){
+                return null;
+            }
+            String filename = resultSet.getString("ficheiro");
+            insertStatement.close();
+
+            pedido.getMusica().setFilename(filename);
+
+            byte[] file = new byte[0];
+            byte[] buffer = new byte[PKT_SIZE];
+            int nRead;
+
+            File fileToSend = new File(musicDir.getAbsolutePath() + File.separator + pedido.getMusica().getFilename());
+
+            FileInputStream inputStream = new FileInputStream(fileToSend);
+            while((nRead=inputStream.read(buffer))!=-1) {
+                byte[] temp = new byte[file.length + nRead];
+                System.arraycopy(file, 0, temp, 0, file.length);
+                System.arraycopy(buffer, 0, temp, file.length, nRead);
+                file = temp;
+            }
+
+            System.out.println("ola1");
+            return file;
+        } catch (SQLException | FileNotFoundException e) {
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

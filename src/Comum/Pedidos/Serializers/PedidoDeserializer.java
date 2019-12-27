@@ -38,6 +38,14 @@ public class PedidoDeserializer implements JsonDeserializer<Pedido> {
             p.setMusica(musica);
             return p;
         }
+        else if(tipo.equals(TipoPedido.PedidoDownloadFile.toString())){
+            PedidoDownloadFile p = new PedidoDownloadFile();
+            p.setUtilizador(u);
+
+            Song musica = gson.fromJson(jsonObject.get("musica"), Song.class);
+            p.setMusica(musica);
+            return p;
+        }
         else if(tipo.equals(TipoPedido.PedidoMusicas.toString())){
             PedidoMusicas p = new PedidoMusicas();
             p.setUtilizador(u);

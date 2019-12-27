@@ -83,7 +83,6 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                 int read = inputStream.read(bytes);
                 String str = new String(bytes, 0, read);
                 Pedido pedido = gson.fromJson(str, Pedido.class);
-
                 Runnable pedidoRunnable;
 
                 if(pedido instanceof PedidoLogin)
@@ -96,6 +95,8 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                     pedidoRunnable = new GetMusicasRunnable(s, (PedidoMusicas) pedido, server);
                 else if(pedido instanceof PedidoSearch)
                     pedidoRunnable = new SearchRunnable(s, (PedidoSearch) pedido, server);
+                else if(pedido instanceof PedidoDownloadFile)
+                    pedidoRunnable = new DownloadFileRunnable(s, (PedidoDownloadFile) pedido, server);
                 else{
                     System.out.println("[INFO] - [Comunicação]: Recebi um pedido não identificado");
                     continue;

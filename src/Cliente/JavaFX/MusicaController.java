@@ -1,6 +1,7 @@
 package Cliente.JavaFX;
 
 import Cliente.ClientController;
+import Comum.Exceptions.InvalidSongDescriptionException;
 import Comum.Song;
 import javafx.event.ActionEvent;
 import javafx.scene.Group;
@@ -85,10 +86,12 @@ public class MusicaController extends SceneController {
     }
 
     public void handleBtnDownload(ActionEvent actionEvent) {
-
+        try {
+            clientController.downloadFile(song);
+        } catch (InvalidSongDescriptionException e) {
+            e.printStackTrace();
+        }
     }
-
-
 
     public void setSong(Song song) {
         this.song = song;
