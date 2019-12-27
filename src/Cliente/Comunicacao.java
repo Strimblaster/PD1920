@@ -2,6 +2,7 @@ package Cliente;
 
 import Cliente.Interfaces.IComunicacaoCliente;
 import Cliente.Interfaces.IEvent;
+import Cliente.Runnables.DownloadFileRunnable;
 import Cliente.Runnables.UploadFileRunnable;
 import Comum.Exceptions.*;
 import Comum.*;
@@ -121,6 +122,22 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             //Mas não verificamos porque não fala nada disso no enunciado ou seja nunca vão chegar estas exceções aqui
         }
 
+        return null;
+    }
+
+    @Override
+    public byte[] downloadFile(Utilizador utilizador, Song song) throws InvalidSongDescriptionException {
+        PedidoDownloadFile pedidoDownloadFile = new PedidoDownloadFile(utilizador, song);
+        if(musicDir == null) throw new RuntimeException("[Erro] [Comunicação]: musicDir == null ");
+        try {
+            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+            Thread t = new  Thread(new DownloadFileRunnable(tcpSocket, pedidoDownloadFile, event, musicDir));
+            t.start();
+            return null;
+        } catch (IOException e) {
+            System.out.println("Ocorreu um erro no Upload: " + e.getMessage());
+        }
         return null;
     }
 

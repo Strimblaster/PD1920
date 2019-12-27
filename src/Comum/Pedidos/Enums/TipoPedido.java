@@ -5,5 +5,6 @@ public enum TipoPedido {
     PedidoUploadFile,
     PedidoSignUp,
     PedidoMusicas,
+    PedidoDownloadFile,
     PedidoSearch
 }

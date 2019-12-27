@@ -27,7 +27,6 @@ public class MainController extends SceneController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
 

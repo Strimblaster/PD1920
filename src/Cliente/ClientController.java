@@ -12,6 +12,8 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -37,7 +39,24 @@ public class ClientController implements IEvent {
                 sceneController.showAlert(Alert.AlertType.CONFIRMATION, "Sucesso", "Upload de musica", "Upload da musica " + nome + " realizado com sucesso");
             }
         });
+    }
 
+    @Override
+    public void songDownload(byte[] file, File fileToReceive, Song song) {
+        Platform.runLater(new Runnable(){
+            @Override
+            public void run() {
+                try {
+                    FileOutputStream fileOutputStream = new FileOutputStream(musicDirectory.getAbsolutePath()+File.separator+song.getFilename());
+                    fileOutputStream.write(file);
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+                    sceneController.showAlert(Alert.AlertType.CONFIRMATION, "Sucesso", "Download de musica", "Download da musica " + song.getNome() + " realizado com sucesso");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     public void login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
@@ -66,6 +85,10 @@ public class ClientController implements IEvent {
 
     public void uploadFile(Song musica) throws InvalidSongDescriptionException {
         model.uploadFile(musica);
+    }
+
+    public void downloadFile(Song musica) throws InvalidSongDescriptionException {
+        model.downloadFile(musica);
     }
 
     public void setSceneController(SceneController sceneController) {
