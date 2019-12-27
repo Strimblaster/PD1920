@@ -134,19 +134,11 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
 
             enviaPedido(tcpSocket,pedidoDownloadFile);
 
-            Resposta resposta = recebeResposta(tcpSocket);
-
             Thread t = new  Thread(new DownloadFileRunnable(tcpSocket, pedidoDownloadFile, event, musicDir));
             t.start();
             return null;
         } catch (IOException e) {
             System.out.println("Ocorreu um erro no Download: " + e.getMessage());
-        } catch (InvalidPasswordException e) {
-            e.printStackTrace();
-        } catch (InvalidUsernameException e) {
-            e.printStackTrace();
-        } catch (ServerErrorException e) {
-            e.printStackTrace();
         }
         return null;
     }

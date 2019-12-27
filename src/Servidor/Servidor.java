@@ -264,9 +264,9 @@ public class Servidor implements ServerConstants, Constants, IServer {
             byte[] buffer = new byte[PKT_SIZE];
             int nRead;
 
-            System.out.println(musicDir.getAbsolutePath());
-            FileInputStream inputStream = new FileInputStream(musicDir);
-            System.out.println("ola1");
+            File fileToSend = new File(musicDir.getAbsolutePath() + File.separator + pedido.getMusica().getFilename());
+
+            FileInputStream inputStream = new FileInputStream(fileToSend);
             while((nRead=inputStream.read(buffer))!=-1) {
                 byte[] temp = new byte[file.length + nRead];
                 System.arraycopy(file, 0, temp, 0, file.length);
@@ -274,6 +274,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
                 file = temp;
             }
 
+            System.out.println("ola1");
             return file;
         } catch (SQLException | FileNotFoundException e) {
             return null;
