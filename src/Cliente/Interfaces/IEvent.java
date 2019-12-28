@@ -6,5 +6,5 @@ import java.io.File;
 
 public interface IEvent {
     void songUploaded(String nome);
-    void songDownload(byte[] file, File fileToReceive, Song song);
+    void songDownloaded(byte[] file, File fileToReceive, String nomeDaMusica);
 }

@@ -126,7 +126,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     }
 
     @Override
-    public byte[] downloadFile(Utilizador utilizador, Song song) throws InvalidSongDescriptionException {
+    public byte[] downloadFile(Utilizador utilizador, Song song) {
         PedidoDownloadFile pedidoDownloadFile = new PedidoDownloadFile(utilizador, song);
         if(musicDir == null) throw new RuntimeException("[Erro] [Comunicação]: musicDir == null ");
         try {
@@ -139,8 +139,9 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             return null;
         } catch (IOException e) {
             System.out.println("Ocorreu um erro no Download: " + e.getMessage());
+            return null;
         }
-        return null;
+
     }
 
     @Override

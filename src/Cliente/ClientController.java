@@ -24,10 +24,12 @@ public class ClientController implements IEvent {
     private SceneController sceneController;
     private File musicDirectory;
     private String clientRunningPath;
+    private ArrayList<Song> songsBeingDownloaded;
 
     ClientController(String clientDir) throws IOException, InvalidServerException {
         this.clientRunningPath = clientDir;
         this.model = new ClientModel(this);
+        songsBeingDownloaded = new ArrayList<>();
         System.out.println(model.getServer());
     }
 
@@ -42,16 +44,20 @@ public class ClientController implements IEvent {
     }
 
     @Override
-    public void songDownload(byte[] file, File fileToReceive, Song song) {
+    public void songDownloaded(byte[] file, File pathToSave, String nomeDaMusica) {
         Platform.runLater(new Runnable(){
             @Override
             public void run() {
                 try {
-                    FileOutputStream fileOutputStream = new FileOutputStream(musicDirectory.getAbsolutePath()+File.separator+song.getFilename());
+                    //Guarda o ficheiro
+                    FileOutputStream fileOutputStream = new FileOutputStream(pathToSave);
                     fileOutputStream.write(file);
                     fileOutputStream.flush();
                     fileOutputStream.close();
-                    sceneController.showAlert(Alert.AlertType.CONFIRMATION, "Sucesso", "Download de musica", "Download da musica " + song.getNome() + " realizado com sucesso");
+                    //Remover da lista de musicas a ser feito o download
+                    songsBeingDownloaded.removeIf((song)-> song.getNome().equals(nomeDaMusica));
+
+                    sceneController.showAlert(Alert.AlertType.CONFIRMATION, "Sucesso", "Download de musica", "Download da musica " + nomeDaMusica + " realizado com sucesso");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -87,7 +93,10 @@ public class ClientController implements IEvent {
         model.uploadFile(musica);
     }
 
-    public void downloadFile(Song musica) throws InvalidSongDescriptionException {
+    public void downloadFile(Song musica) throws AlreadyDownloadingException {
+        if(songsBeingDownloaded.contains(musica))
+            throw new AlreadyDownloadingException(musica.getNome());
+        songsBeingDownloaded.add(musica);
         model.downloadFile(musica);
     }
 

@@ -30,12 +30,12 @@ public class DownloadFileRunnable extends RunnableBase implements Runnable {
             OutputStream outputStream = cliente.getOutputStream();
 
             byte[] musica = servidor.downloadFile(pedidoDownloadFile.getUtilizador(), pedidoDownloadFile.getMusica());
-
-            outputStream.write(musica);
+            if(musica != null)
+                outputStream.write(musica);
 
             cliente.close();
-        } catch (IOException | InvalidSongDescriptionException e) {
-            System.out.println("[Erro] - [LoginThread]: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("[Erro] - [DownloadThread]: " + e.getMessage());
         }
 
     }

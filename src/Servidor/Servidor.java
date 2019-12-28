@@ -233,30 +233,22 @@ public class Servidor implements ServerConstants, Constants, IServer {
     }
 
     @Override
-    public byte[] downloadFile(Utilizador utilizador, Song musica) throws InvalidSongDescriptionException {
+    public byte[] downloadFile(Utilizador utilizador, Song musica) {
 
         PedidoDownloadFile pedido = new PedidoDownloadFile(utilizador,musica);
 
         try {
-            //Buscar o ID do utilizador que está a receber a musica
-            int id = getIDUtilizador(utilizador);
+            //Procurar a musica na BD
+            PreparedStatement statement = conn.prepareStatement("select * from musicas where nome=?");
+            statement.setString(1,  musica.getNome());
+            ResultSet resultSet = statement.executeQuery();
 
-            //Adicionar a musica à BD
-
-            PreparedStatement insertStatement = conn.prepareStatement("select * from musicas where nome=? AND autor=? AND album=? AND duracao=? AND ano=? AND genero=?", Statement.RETURN_GENERATED_KEYS);
-
-            insertStatement.setString(1,  musica.getNome());
-            insertStatement.setString(2,  musica.getAutor().getName());
-            insertStatement.setString(3,  musica.getAlbum());
-            insertStatement.setInt(4,  musica.getDuracao());
-            insertStatement.setInt(5, musica.getAno());
-            insertStatement.setString(6,  musica.getGenero());
-            ResultSet resultSet = insertStatement.executeQuery();
             if(!resultSet.next()){
                 return null;
             }
+
             String filename = resultSet.getString("ficheiro");
-            insertStatement.close();
+            statement.close();
 
             pedido.getMusica().setFilename(filename);
 
@@ -264,7 +256,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
             byte[] buffer = new byte[PKT_SIZE];
             int nRead;
 
-            File fileToSend = new File(musicDir.getAbsolutePath() + File.separator + pedido.getMusica().getFilename());
+            File fileToSend = new File(musicDir.getAbsolutePath() + File.separator + filename);
 
             FileInputStream inputStream = new FileInputStream(fileToSend);
             while((nRead=inputStream.read(buffer))!=-1) {
@@ -274,11 +266,8 @@ public class Servidor implements ServerConstants, Constants, IServer {
                 file = temp;
             }
 
-            System.out.println("ola1");
             return file;
-        } catch (SQLException | FileNotFoundException e) {
-            return null;
-        } catch (IOException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
         return null;

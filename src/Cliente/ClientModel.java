@@ -54,8 +54,8 @@ class ClientModel implements Constants {
         return comunicacao.uploadFile(utilizador, musica);
     }
 
-    public byte[] downloadFile(Song musica) throws InvalidSongDescriptionException {
-        return comunicacao.downloadFile(utilizador, musica);
+    public void downloadFile(Song musica) {
+        comunicacao.downloadFile(utilizador, musica);
     }
 
     public ArrayList<Song> getMyMusics() {

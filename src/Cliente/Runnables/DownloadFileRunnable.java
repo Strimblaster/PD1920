@@ -28,7 +28,7 @@ public class DownloadFileRunnable implements Runnable {
     public void run() {
         Song song = pedido.getMusica();
         try {
-            File fileToReceive = new File(clientMusicDir.getAbsolutePath()+File.separator+song.getFilename());
+            File pathToSave = new File(clientMusicDir.getAbsolutePath()+File.separator+song.getFilename());
 
             InputStream inputStream = server.getInputStream();
             byte[] file = new byte[0];
@@ -41,8 +41,9 @@ public class DownloadFileRunnable implements Runnable {
                 System.arraycopy(buffer, 0, temp, file.length, nRead);
                 file = temp;
             }
+
             server.close();
-            event.songDownload(file, fileToReceive, song);
+            event.songDownloaded(file, pathToSave, song.getNome());
         } catch (IOException e) {
             e.printStackTrace();
         }
