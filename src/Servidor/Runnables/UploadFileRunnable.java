@@ -15,7 +15,7 @@ import java.net.Socket;
 
 import static Comum.Constants.PKT_SIZE;
 
-public class UploadFileRunnable extends RunnableBase implements Runnable {
+public class UploadFileRunnable extends RunnableBase {
 
     private PedidoUploadFile pedidoUploadFile;
 
@@ -32,13 +32,26 @@ public class UploadFileRunnable extends RunnableBase implements Runnable {
             OutputStream outputStream = cliente.getOutputStream();
 
             Resposta resposta;
+
             try {
-                resposta = servidor.uploadFile(pedidoUploadFile.getUtilizador(), pedidoUploadFile.getMusica());
-            } catch (InvalidSongDescriptionException e) {
+                String path = servidor.uploadFile(pedidoUploadFile.getUtilizador(), pedidoUploadFile.getMusica());
+                if (path != null) {
+                    pedidoUploadFile.getMusica().setFilename(path);
+                    resposta = new Resposta(pedidoUploadFile, true, "OK");
+                }
+                else
+                    resposta = new Resposta(pedidoUploadFile, false, "Erro no servidor");
+
+            }catch (InvalidSongDescriptionException e) {
                 resposta = new Resposta(pedidoUploadFile, false, e.getMessage(), TipoExcecao.InvalidSongDescription, e);
             }
+
             String str = gson.toJson(resposta);
             outputStream.write(str.getBytes());
+            if(!resposta.isSucess()){
+                cliente.close();
+                return;
+            }
 
             byte[] file = new byte[0];
             byte[] buffer = new byte[PKT_SIZE];

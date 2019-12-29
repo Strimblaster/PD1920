@@ -1,9 +1,10 @@
 package Servidor.Runnables;
 
 import Comum.Exceptions.InvalidPasswordException;
+import Comum.Exceptions.InvalidPlaylistNameException;
 import Comum.Exceptions.InvalidUsernameException;
 import Comum.Pedidos.Enums.TipoExcecao;
-import Comum.Pedidos.PedidoLogin;
+import Comum.Pedidos.PedidoNewPlaylist;
 import Comum.Pedidos.Resposta;
 import Comum.Pedidos.Serializers.ExceptionSerializer;
 import Comum.Utilizador;
@@ -15,41 +16,37 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class LoginRunnable extends RunnableBase {
+public class NewPlaylistRunnable extends RunnableBase {
 
-    private PedidoLogin pedidoLogin;
+    PedidoNewPlaylist pedidoNewPlaylist;
 
-    public LoginRunnable(Socket cliente, PedidoLogin pedidoLogin, IServer servidor) {
+    public NewPlaylistRunnable(Socket cliente, PedidoNewPlaylist pedidoNewPlaylist, IServer servidor) {
         super(cliente, servidor);
-        this.pedidoLogin = pedidoLogin;
+        this.pedidoNewPlaylist = pedidoNewPlaylist;
     }
 
     @Override
     public void run() {
-
         Gson gson = new GsonBuilder().registerTypeAdapter(Exception.class, new ExceptionSerializer()).create();
         try {
             OutputStream outputStream = cliente.getOutputStream();
-            Utilizador utilizador = pedidoLogin.getUtilizador();
+            Utilizador utilizador = pedidoNewPlaylist.getUtilizador();
             Resposta resposta = null;
             try {
-                boolean sucess = servidor.login(utilizador.getName(), utilizador.getPassword());
+                boolean sucess = servidor.newPlaylist(utilizador, pedidoNewPlaylist.getNome());
                 if(sucess)
-                    resposta = new Resposta(pedidoLogin, true, "Login concluido");
+                    resposta = new Resposta(pedidoNewPlaylist, true, "Playlist criada");
                 else
-                    resposta = new Resposta(pedidoLogin, false, "Erro no servidor");
-            } catch (InvalidUsernameException e) {
-                resposta = new Resposta(pedidoLogin, false, e.getMessage(), TipoExcecao.InvalidUsername, e);
-            } catch (InvalidPasswordException e) {
-                resposta = new Resposta(pedidoLogin, false, e.getMessage(), TipoExcecao.InvalidPassword, e);
+                    resposta = new Resposta(pedidoNewPlaylist, false, "Erro no servidor");
+            } catch (InvalidPlaylistNameException e) {
+                resposta = new Resposta(pedidoNewPlaylist, false, e.getMessage(), TipoExcecao.InvalidPlaylistNameException, e);
             }
             String str = gson.toJson(resposta);
 
             outputStream.write(str.getBytes());
             cliente.close();
         } catch (IOException e) {
-            System.out.println("[Erro] - [Login]: " + e.getMessage());
+            System.out.println("[Erro] - [NewPlaylist]: " + e.getMessage());
         }
-
     }
 }

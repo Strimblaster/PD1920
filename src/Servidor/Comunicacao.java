@@ -3,6 +3,7 @@ package Servidor;
 import Comum.Constants;
 import Comum.Pedidos.*;
 import Comum.Pedidos.Serializers.PedidoDeserializer;
+import Comum.Playlist;
 import Servidor.Interfaces.*;
 import Servidor.Runnables.*;
 import com.google.gson.Gson;
@@ -85,6 +86,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                 Pedido pedido = gson.fromJson(str, Pedido.class);
                 Runnable pedidoRunnable;
 
+
                 if(pedido instanceof PedidoLogin)
                     pedidoRunnable = new LoginRunnable(s,(PedidoLogin) pedido,server);
                 else if(pedido instanceof PedidoSignUp)
@@ -97,6 +99,12 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                     pedidoRunnable = new SearchRunnable(s, (PedidoSearch) pedido, server);
                 else if(pedido instanceof PedidoDownloadFile)
                     pedidoRunnable = new DownloadFileRunnable(s, (PedidoDownloadFile) pedido, server);
+                else if(pedido instanceof PedidoPlaylists)
+                    pedidoRunnable = new GetPlaylistsRunnable(s, (PedidoPlaylists) pedido, server);
+                else if(pedido instanceof PedidoNewPlaylist)
+                    pedidoRunnable = new NewPlaylistRunnable(s, (PedidoNewPlaylist) pedido, server);
+                else if(pedido instanceof PedidoAddSong)
+                    pedidoRunnable = new AddSongRunnable(s, (PedidoAddSong) pedido, server);
                 else{
                     System.out.println("[INFO] - [Comunicação]: Recebi um pedido não identificado");
                     continue;

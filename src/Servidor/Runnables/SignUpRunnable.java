@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class SignUpRunnable extends RunnableBase implements Runnable {
+public class SignUpRunnable extends RunnableBase {
 
     private PedidoSignUp pedidoSignUp;
 
@@ -33,7 +33,11 @@ public class SignUpRunnable extends RunnableBase implements Runnable {
             Utilizador utilizador = pedidoSignUp.getUtilizador();
             Resposta resposta = null;
             try {
-                resposta = servidor.signUp(utilizador.getName(), utilizador.getPassword());
+                boolean sucess = servidor.signUp(utilizador.getName(), utilizador.getPassword());
+                if(sucess)
+                    resposta = new Resposta(pedidoSignUp, true, "Registo concluido");
+                else
+                    resposta = new Resposta(pedidoSignUp, false, "Erro no servidor");
             } catch (InvalidUsernameException e) {
                 resposta = new Resposta(pedidoSignUp, false, e.getMessage(), TipoExcecao.InvalidUsername, e);
             } catch (InvalidPasswordException e) {
@@ -41,8 +45,6 @@ public class SignUpRunnable extends RunnableBase implements Runnable {
             }
             String str = gson.toJson(resposta);
             byte[] bytes = str.getBytes();
-
-            System.out.println("DEBUG: " + bytes.length + " bytes enviados (Não apagar isto por enquanto pls)");
 
             outputStream.write(bytes);
             cliente.close();

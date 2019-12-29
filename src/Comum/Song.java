@@ -1,13 +1,22 @@
 package Comum;
 
+import com.google.gson.annotations.Expose;
+
 public class Song {
 
+    @Expose
     private String nome;
+    @Expose
     private Utilizador autor;
+    @Expose
     private String album;
+    @Expose
     private int ano;
+    @Expose
     private int duracao;
+    @Expose
     private String genero;
+    @Expose
     private String filename;
 
     public Song(String nome, String album, int ano, int duracao, String genero, String filename) {

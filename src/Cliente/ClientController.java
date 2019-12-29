@@ -5,6 +5,7 @@ import Cliente.JavaFX.SceneController;
 import Comum.Exceptions.*;
 import Comum.FilteredResult;
 import Comum.Pedidos.Resposta;
+import Comum.Playlist;
 import Comum.Song;
 import Comum.Utilizador;
 import com.sun.webkit.network.Util;
@@ -71,8 +72,8 @@ public class ClientController implements IEvent {
         if(password == null) throw new InvalidPasswordException();
         if(password.equals("")) throw new InvalidUsernameException();
 
-        Resposta resposta = model.login(username, password);
-        if(resposta.isSucess()) {
+        boolean sucess = model.login(username, password);
+        if(sucess) {
             setFileDirectory();
             sceneController.setMusicDirectory(musicDirectory);
             model.setFileDir(musicDirectory);
@@ -124,12 +125,19 @@ public class ClientController implements IEvent {
     public Utilizador getUtilizador(){
         return model.getUtilizador();
     }
-
     public ArrayList<Song> getMyMusics() {
         return model.getMyMusics();
     }
-
     public FilteredResult search(boolean songs, boolean playlists, String nome, String album, String genero, int ano, int duracao) {
         return model.search(songs, playlists, nome, album, genero, ano, duracao);
+    }
+    public ArrayList<Playlist> getPlaylists(){
+        return model.getPlaylists();
+    }
+    public boolean newPlaylist(String nome) throws InvalidPlaylistNameException {
+        return model.newPlaylist(nome);
+    }
+    public boolean addSong(Playlist playlist, Song song) throws InvalidPlaylistNameException, InvalidSongDescriptionException {
+        return model.addSong(playlist, song);
     }
 }

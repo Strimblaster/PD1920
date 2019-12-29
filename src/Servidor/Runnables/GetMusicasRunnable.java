@@ -18,7 +18,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class GetMusicasRunnable extends RunnableBase implements Runnable {
+public class GetMusicasRunnable extends RunnableBase {
 
     private PedidoMusicas pedidoMusicas;
 
@@ -39,7 +39,6 @@ public class GetMusicasRunnable extends RunnableBase implements Runnable {
             String str = gson.toJson(songs);
             byte[] bytes = str.getBytes();
 
-            System.out.println("DEBUG: " + bytes.length + " bytes enviados (Não apagar isto por enquanto pls)");
 
             outputStream.write(bytes);
             cliente.close();

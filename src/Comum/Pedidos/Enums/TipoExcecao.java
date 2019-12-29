@@ -5,5 +5,6 @@ public enum TipoExcecao {
     InvalidPassword,
     Exception,
     InvalidServer,
-    InvalidSongDescription
+    InvalidSongDescription,
+    InvalidPlaylistNameException
 }

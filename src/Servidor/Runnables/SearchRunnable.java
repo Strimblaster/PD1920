@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class SearchRunnable extends RunnableBase implements Runnable {
+public class SearchRunnable extends RunnableBase {
 
     PedidoSearch pedidoSearch;
 

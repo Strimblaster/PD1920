@@ -1,6 +1,7 @@
 package Cliente.JavaFX;
 
 import Cliente.ClientController;
+import Comum.Playlist;
 import Comum.Song;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
@@ -11,6 +12,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public abstract class SceneController {
     public ClientController clientController;
@@ -52,7 +54,7 @@ public abstract class SceneController {
 
     }
 
-    public void load(String res, Song song) throws IOException {
+    public void load(String res, Song song, ArrayList<Playlist> playlists) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(res));
         AnchorPane root = null;
         BorderPane root1 = null;
@@ -69,8 +71,10 @@ public abstract class SceneController {
         controller.stage = stage;
         controller.musicDirectory = musicDirectory;
         clientController.setSceneController(controller);
-        if(controller instanceof MusicaController)
-            ((MusicaController)controller).setSong(song);
+        if(controller instanceof MusicaController) {
+            ((MusicaController) controller).setSong(song);
+            ((MusicaController) controller).setPlaylists(playlists);
+        }
         controller.setClientController(clientController);
 
 

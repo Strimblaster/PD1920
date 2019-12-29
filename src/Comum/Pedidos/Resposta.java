@@ -45,16 +45,8 @@ public class Resposta {
         return sucess;
     }
 
-    public void setSucess(boolean sucess) {
-        this.sucess = sucess;
-    }
-
     public String getInfo() {
         return info;
-    }
-
-    public void setInfo(String info) {
-        this.info = info;
     }
 
     public void setException(Exception exception) {

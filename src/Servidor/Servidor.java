@@ -2,21 +2,16 @@ package Servidor;
 
 import Comum.*;
 import Comum.Exceptions.InvalidPasswordException;
+import Comum.Exceptions.InvalidPlaylistNameException;
 import Comum.Exceptions.InvalidSongDescriptionException;
 import Comum.Exceptions.InvalidUsernameException;
 import Comum.Pedidos.*;
-import Comum.Pedidos.Enums.TipoExcecao;
 import Servidor.Interfaces.IServer;
 import Servidor.Interfaces.IEvent;
 import Servidor.Interfaces.ServerConstants;
-import com.google.gson.Gson;
-import com.google.gson.internal.$Gson$Types;
 
 import java.io.*;
 import java.net.*;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -107,10 +102,9 @@ public class Servidor implements ServerConstants, Constants, IServer {
     }
 
     @Override
-    public Resposta login(String username, String password) throws InvalidPasswordException, InvalidUsernameException {
-        PedidoLogin pedido = new PedidoLogin(new Utilizador(username, password));
+    public boolean login(String username, String password) throws InvalidPasswordException, InvalidUsernameException {
         try{
-            Utilizador utilizador = pedido.getUtilizador();
+            Utilizador utilizador = new Utilizador(username, password);
             PreparedStatement s = conn.prepareStatement("SELECT nome,password FROM utilizadores WHERE nome=?");
             s.setString(1, utilizador.getName());
             ResultSet resultSet = s.executeQuery();
@@ -119,30 +113,32 @@ public class Servidor implements ServerConstants, Constants, IServer {
             if(!resultSet.getString("password").equals(password))
                 throw new InvalidPasswordException("Password Incorreta");
 
-            return new Resposta(pedido, true, "Login concluido");
+            return true;
 
         } catch (SQLException e) {
-            return new Resposta(pedido, false, "Erro no servidor", TipoExcecao.Exception, e);
+            e.printStackTrace();
+            return false;
         }
     }
 
     @Override
-    public Resposta signUp(String username, String password) throws InvalidUsernameException {
-        PedidoSignUp pedidoSignUp = new PedidoSignUp(new Utilizador(username, password));
+    public boolean signUp(String username, String password) throws InvalidUsernameException {
+
         try{
-            Utilizador utilizador = pedidoSignUp.getUtilizador();
+            Utilizador utilizador = new Utilizador(username, password);
             PreparedStatement s = conn.prepareStatement("SELECT nome FROM utilizadores WHERE nome=?");
             s.setString(1,utilizador.getName());
             ResultSet resultSetUsername = s.executeQuery();
             if(resultSetUsername.next()){
                 throw new InvalidUsernameException("Username já está registado");
             }
-                s.executeUpdate("INSERT INTO utilizadores(nome, password) VALUES (\'"+utilizador.getName()+"\', \'"+utilizador.getPassword()+"\')");
+            s.executeUpdate("INSERT INTO utilizadores(nome, password) VALUES (\'"+utilizador.getName()+"\', \'"+utilizador.getPassword()+"\')");
 
-            return new Resposta(pedidoSignUp, true, "Registo concluido");
+            return true;
 
         } catch (SQLException e) {
-            return new Resposta(pedidoSignUp, false, "Erro no servidor", TipoExcecao.Exception, e);
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -183,7 +179,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
     }
 
     @Override
-    public Resposta uploadFile(Utilizador utilizador, Song musica) throws InvalidSongDescriptionException {
+    public String uploadFile(Utilizador utilizador, Song musica) throws InvalidSongDescriptionException {
         if(musica.getAlbum() == null) throw new InvalidSongDescriptionException("Nome do Album Invalido");
         if(musica.getAlbum().equals("")) throw new InvalidSongDescriptionException("Nome do Album Invalido");
 
@@ -192,8 +188,6 @@ public class Servidor implements ServerConstants, Constants, IServer {
 
         if(musica.getNome() == null) throw new InvalidSongDescriptionException("Nome de Musica Invalido");
         if(musica.getNome().equals("")) throw new InvalidSongDescriptionException("Nome de Musica Invalido");
-
-        PedidoUploadFile pedido = new PedidoUploadFile(utilizador,musica);
 
         try {
 
@@ -222,12 +216,11 @@ public class Servidor implements ServerConstants, Constants, IServer {
             int id_musica = generatedKeys.getInt(1);
             insertStatement.close();
 
-            pedido.getMusica().setFilename(id_musica + ".mp3");
-
-            return new Resposta(pedido, true, "OK");
+            return id_musica + ".mp3";
 
         } catch (SQLException e) {
-            return new Resposta(pedido, false, "Erro no servidor", TipoExcecao.Exception, e);
+            e.printStackTrace();
+            return null;
         }
 
     }
@@ -286,14 +279,8 @@ public class Servidor implements ServerConstants, Constants, IServer {
             utilizador.resetPassword();
 
             while(resultSet.next()){
-                String nome = resultSet.getString("nome");
-                String album = resultSet.getString("album");
-                String genero = resultSet.getString("nome");
-                String filename = resultSet.getString("ficheiro");
-                int duracao = resultSet.getInt("duracao");
-                int ano = resultSet.getInt("ano");
-
-                arrayList.add(new Song(nome,utilizador, album, ano, duracao, genero, filename));
+                Song song = resultSetToMusica(resultSet);
+                arrayList.add(song);
             }
 
             preparedStatement.close();
@@ -332,6 +319,114 @@ public class Servidor implements ServerConstants, Constants, IServer {
         return new FilteredResult(songsArrayList, playlistsArrayList);
     }
 
+    @Override
+    public boolean newPlaylist(Utilizador utilizador, String nome) throws InvalidPlaylistNameException {
+        if(nome==null) throw new InvalidPlaylistNameException("Nome deve ser preenchido");
+        try{
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * from playlists where nome = ?");
+            preparedStatement.setString(1, nome);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next())
+                throw new InvalidPlaylistNameException();
+            preparedStatement.close();
+            
+            int id = getIDUtilizador(utilizador);
+
+            PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO playlists(nome, criador) VALUES (?,?)");
+            insertStatement.setString(1, nome);
+            insertStatement.setInt(2,id);
+            insertStatement.executeUpdate();
+
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public ArrayList<Playlist> getPlaylists(Utilizador utilizador) {
+        try{
+            int id = getIDUtilizador(utilizador);
+            if(id == -1) throw new SQLException("O utilizador " + utilizador.getName() + " não foi encontrado");
+
+            ArrayList<Playlist> arrayList = new ArrayList<>();
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * from playlists where criador = ?");
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+
+            while(resultSet.next()){
+                ArrayList<Song> songs = new ArrayList<>();
+                String nome = resultSet.getString("nome");
+                int idPlaylist = resultSet.getInt("id");
+
+                PreparedStatement selectMusicasStatement = conn.prepareStatement("SELECT * FROM lt_playlists_musicas where idPlaylists = ?");
+                selectMusicasStatement.setInt(1,idPlaylist);
+                ResultSet resultSetMusicas = selectMusicasStatement.executeQuery();
+
+                while (resultSetMusicas.next()){
+                    int idMusica = resultSetMusicas.getInt("idMusicas");
+                    PreparedStatement statement = conn.prepareStatement("SELECT * FROM musicas where id = ?");
+                    statement.setInt(1,idMusica);
+                    ResultSet resultSet1 = statement.executeQuery();
+                    resultSet1.next();
+                    Song musica = resultSetToMusica(resultSet1);
+                    songs.add(musica);
+                    statement.close();
+                }
+
+                arrayList.add(new Playlist(nome, utilizador, songs));
+                selectMusicasStatement.close();
+            }
+
+            preparedStatement.close();
+            return arrayList;
+
+        }catch (SQLException e){
+            System.out.println("Erro de SQL no getPlaylists: " + e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public boolean addSong(Utilizador utilizador, Playlist playlist, Song song) throws InvalidPlaylistNameException, InvalidSongDescriptionException {
+        try{
+            //Procura a playlist com este nome
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * from playlists where nome = ?");
+            preparedStatement.setString(1, playlist.getNome());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(!resultSet.next())
+                throw new InvalidPlaylistNameException("Playlist não existe");
+
+            int idPlaylist = resultSet.getInt("id");
+            preparedStatement.close();
+
+            //Procura a musica com este nome
+            PreparedStatement preparedStatementMusica = conn.prepareStatement("SELECT * from musicas where nome = ?");
+            preparedStatementMusica.setString(1, song.getNome());
+            ResultSet resultSetMusica = preparedStatementMusica.executeQuery();
+            if(!resultSetMusica.next())
+                throw new InvalidSongDescriptionException("Musica não existe");
+
+            int idMusica = resultSetMusica .getInt("id");
+            preparedStatementMusica .close();
+
+
+
+            PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO lt_playlists_musicas(idMusicas, idPlaylists) VALUES (?,?)");
+            insertStatement.setInt(1,idMusica);
+            insertStatement.setInt(2,idPlaylist);
+            insertStatement.executeUpdate();
+
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
     private int getIDUtilizador(Utilizador utilizador) throws SQLException {
 
         PreparedStatement getIDUtilizadorStatement = conn.prepareStatement("SELECT id from utilizadores where nome = ?");
@@ -344,6 +439,34 @@ public class Servidor implements ServerConstants, Constants, IServer {
         getIDUtilizadorStatement.close();
 
         return id;
+    }
+
+    private Utilizador getUtilizador(int id) throws SQLException {
+
+        PreparedStatement getIDUtilizadorStatement = conn.prepareStatement("SELECT * from utilizadores where id = ?");
+        getIDUtilizadorStatement.setInt(1, id);
+        ResultSet userResultSet = getIDUtilizadorStatement.executeQuery();
+
+        if(!userResultSet.next())
+            return null;
+
+        String nome = userResultSet.getString("nome");
+
+        getIDUtilizadorStatement.close();
+
+        return new Utilizador(nome);
+    }
+
+    private Song resultSetToMusica(ResultSet resultSet) throws SQLException {
+        String nome = resultSet.getString("nome");
+        String album = resultSet.getString("album");
+        String genero = resultSet.getString("nome");
+        String filename = resultSet.getString("ficheiro");
+        int duracao = resultSet.getInt("duracao");
+        int ano = resultSet.getInt("ano");
+        int idAutor = resultSet.getInt("autor");
+
+        return new Song(nome,getUtilizador(idAutor), album, ano, duracao, genero, filename);
     }
 
     @Override

@@ -1,101 +1,52 @@
 package Comum;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.ArrayList;
 
 public class Playlist {
-    private String name;
-    private ArrayList<Song>musicList;
-    private Utilizador owner;
+    @Expose
+    private String nome;
+    @Expose
+    private Utilizador criador;
+    private ArrayList<Song> musicas;
 
-    public Playlist(String name, Utilizador owner) {
-        this.name = name;
-        this.owner = owner;
-        this.musicList = new ArrayList<>();
-    }
-
-    public String getName() {
-        return name;
+    public Playlist(String name, Utilizador owner, ArrayList<Song> musicas) {
+        this.nome = name;
+        this.criador = owner;
+        this.musicas = musicas;
     }
 
-    public Utilizador getOwner() {
-        return owner;
+    public Playlist(Playlist p){
+        this.nome = p.nome;
+        this.musicas = new ArrayList<>(p.getMusicas());
+        this.criador = p.criador;
     }
 
-    public ArrayList<Song> getMusics() {
-        return musicList;
-    }
-    public void addMusic(Song music){
-        this.musicList.add(music);
-    }
-    public void removeMusic(String name){
-        Song toRemove = null;
-        for (Song music:musicList) {
-            if (music.getNome().equals(name)){
-                toRemove = music;
-            }
-        }
-        if(toRemove != null){
-            this.musicList.remove(toRemove);
-        }
-    }
-    public void removeMusic(Song music){
-        if (isMusicInList(music)){
-            this.musicList.remove(music);
-        }
+    public void setMusicas(ArrayList<Song> musicas) {
+        this.musicas = musicas;
     }
 
-    public boolean isMusicInList(Song music){
-        for (Song m: musicList) {
-            if(m.equals(music)){
-                return true;
-            }
-        }
-        return false;
+    public String getNome() {
+        return nome;
     }
 
-    public ArrayList<Song> getMusicsByAuthor(String author) {
-        ArrayList<Song> list = new ArrayList<>();
-        for (Song music : musicList) {
-            if(music.getAutor().equals( author)){
-                list.add(music);
-            }
-        }
-        return list;
+    public Utilizador getCriador() {
+        return criador;
     }
-    public ArrayList<Song> getMusicsByAlbum(String album) {
-        ArrayList<Song> list = new ArrayList<>();
-        for (Song music : musicList) {
-            if(music.getAlbum().equals(album)){
-                list.add(music);
-            }
-        }
-        return list;
+
+    public ArrayList<Song> getMusicas() {
+        return musicas;
     }
-    public ArrayList<Song> getMusicsByYear(int year) {
-        ArrayList<Song> list = new ArrayList<>();
-        for (Song music : musicList) {
-            if(music.getAno() == year){
-                list.add(music);
-            }
-        }
-        return list;
+    public void addMusica(Song music){
+        this.musicas.add(music);
     }
-    public ArrayList<Song> getMusicsByGenre(String genre) {
-        ArrayList<Song> list = new ArrayList<>();
-        for (Song music : musicList) {
-            if(music.getGenero().equals(genre)){
-                list.add(music);
-            }
-        }
-        return list;
-    }
+
+
+
 
     @Override
     public String toString() {
-        return "Playlist{" +
-                "name='" + name + '\'' +
-                ", musicList=" + musicList +
-                ", owner=" + owner +
-                '}';
+        return nome;
     }
 }

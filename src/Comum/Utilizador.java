@@ -1,8 +1,13 @@
 package Comum;
 
+import com.google.gson.annotations.Expose;
+
 public class Utilizador {
+    @Expose
     private int id;
+    @Expose
     private String name;
+    @Expose
     private String password;
 
     public Utilizador(String name, String password) {

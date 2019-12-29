@@ -2,12 +2,15 @@ package Cliente.JavaFX;
 
 import Cliente.ClientController;
 import Comum.Exceptions.AlreadyDownloadingException;
+import Comum.Exceptions.InvalidPlaylistNameException;
 import Comum.Exceptions.InvalidSongDescriptionException;
+import Comum.Playlist;
 import Comum.Song;
 import javafx.event.ActionEvent;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -15,10 +18,12 @@ import javafx.scene.media.MediaView;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MusicaController extends SceneController {
 
     Song song;
+    ArrayList<Playlist> playlists;
 
     public Label lblNomeMusica;
     public Label lblAutor;
@@ -75,6 +80,21 @@ public class MusicaController extends SceneController {
     }
 
     public void handleBtnAdicionarPlaylist(ActionEvent actionEvent) {
+        if(playlists.size() == 0){
+            showAlert("Playlists", "Não tens playlists (refresh)");
+            return;
+        }
+        ChoiceDialog<Playlist> choiceDialog = new ChoiceDialog<>(playlists.get(0), playlists);
+        choiceDialog.setTitle("Adicionar à playlist");
+        choiceDialog.setHeaderText("");
+        choiceDialog.setContentText("Escolha a playlist:");
+        choiceDialog.showAndWait().ifPresent( selected ->{
+            try {
+                clientController.addSong(selected, song);
+            } catch (InvalidPlaylistNameException | InvalidSongDescriptionException e) {
+                showAlert("Adicionar", e.getMessage());
+            }
+        });
     }
 
     public void handleBtnPlay(ActionEvent actionEvent) {
@@ -96,5 +116,8 @@ public class MusicaController extends SceneController {
 
     public void setSong(Song song) {
         this.song = song;
+    }
+    public void setPlaylists(ArrayList<Playlist> playlists) {
+        this.playlists = playlists;
     }
 }

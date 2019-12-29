@@ -15,7 +15,7 @@ import java.net.Socket;
 
 import static Comum.Constants.PKT_SIZE;
 
-public class DownloadFileRunnable extends RunnableBase implements Runnable {
+public class DownloadFileRunnable extends RunnableBase {
 
     private PedidoDownloadFile pedidoDownloadFile;
 

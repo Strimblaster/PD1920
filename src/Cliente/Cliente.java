@@ -40,7 +40,7 @@ public class Cliente extends javafx.application.Application {
 
 
             Scene scene = new Scene(root);
-
+            stage.setTitle("Streaming Service");
             stage.setScene(scene);
             stage.show();
         }

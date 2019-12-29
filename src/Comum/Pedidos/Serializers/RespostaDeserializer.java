@@ -1,9 +1,6 @@
 package Comum.Pedidos.Serializers;
 
-import Comum.Exceptions.InvalidPasswordException;
-import Comum.Exceptions.InvalidServerException;
-import Comum.Exceptions.InvalidSongDescriptionException;
-import Comum.Exceptions.InvalidUsernameException;
+import Comum.Exceptions.*;
 import Comum.Pedidos.*;
 import Comum.Pedidos.Enums.TipoExcecao;
 import com.google.gson.*;
@@ -37,6 +34,8 @@ public class RespostaDeserializer implements JsonDeserializer<Resposta> {
                 exception = new InvalidServerException();
             else if(tipo.equals(TipoExcecao.InvalidSongDescription.toString()))
                 exception = new InvalidSongDescriptionException(temp.getMessage());
+            else if(tipo.equals(TipoExcecao.InvalidPlaylistNameException.toString()))
+                exception = new InvalidPlaylistNameException(temp.getMessage());
             else
                 exception = temp;
 
