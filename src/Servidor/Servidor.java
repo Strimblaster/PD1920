@@ -426,6 +426,33 @@ public class Servidor implements ServerConstants, Constants, IServer {
         return false;
     }
 
+    @Override
+    public boolean editFile(Utilizador utilizador, Song song) {
+        try{
+
+            PreparedStatement ps = conn.prepareStatement("SELECT * from musicas where nome = ? AND id!=?");
+            ps.setString(1, song.getNome());
+            ps.setInt(2, song.getId());
+            ResultSet resultSetMusica = ps.executeQuery();
+            if(resultSetMusica.next())
+                return false;
+
+            PreparedStatement preparedStatementMusica = conn.prepareStatement("UPDATE musicas SET nome = ?, album=?, genero=?, ano=?, duracao=? WHERE id = ?");
+            preparedStatementMusica.setString(1, song.getNome());
+            preparedStatementMusica.setString(2, song.getAlbum());
+            preparedStatementMusica.setString(3, song.getGenero());
+            preparedStatementMusica.setInt(4, song.getAno());
+            preparedStatementMusica.setInt(5, song.getDuracao());
+            preparedStatementMusica.setInt(6, song.getId());
+
+            int ret = preparedStatementMusica.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
     private int getIDUtilizador(Utilizador utilizador) throws SQLException {
 
@@ -465,8 +492,9 @@ public class Servidor implements ServerConstants, Constants, IServer {
         int duracao = resultSet.getInt("duracao");
         int ano = resultSet.getInt("ano");
         int idAutor = resultSet.getInt("autor");
+        int id = resultSet.getInt("id");
 
-        return new Song(nome,getUtilizador(idAutor), album, ano, duracao, genero, filename);
+        return new Song(nome,getUtilizador(idAutor), album, ano, duracao, genero, filename, id);
     }
 
     @Override

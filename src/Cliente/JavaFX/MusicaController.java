@@ -32,9 +32,7 @@ public class MusicaController extends SceneController {
     public Label lblAno;
     public Label lblDuracao;
     public Button btnPlayDownload;
-
-
-
+    public Button btnEdit;
 
     @Override
     public void setClientController(ClientController controllerClient) {
@@ -53,7 +51,6 @@ public class MusicaController extends SceneController {
             return;
         }
 
-
         //Verifica se o ficheiro existe na diretoria
         String[] list = musicDirectory.list((dir, name) -> name.equals(song.getFilename()));
         assert list != null;
@@ -66,8 +63,6 @@ public class MusicaController extends SceneController {
             btnPlayDownload.setText("Download");
             btnPlayDownload.setOnAction(this::handleBtnDownload);
         }
-
-
 
     }
 
@@ -111,6 +106,14 @@ public class MusicaController extends SceneController {
             clientController.downloadFile(song);
         } catch (AlreadyDownloadingException e) {
             showAlert("Download", e.getMessage());
+        }
+    }
+
+    public void handleBtnEditarMusica(ActionEvent actionEvent) {
+        try {
+            load("FXML/EditarMusica.fxml", song, null);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

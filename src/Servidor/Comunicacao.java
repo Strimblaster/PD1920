@@ -105,6 +105,8 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                     pedidoRunnable = new NewPlaylistRunnable(s, (PedidoNewPlaylist) pedido, server);
                 else if(pedido instanceof PedidoAddSong)
                     pedidoRunnable = new AddSongRunnable(s, (PedidoAddSong) pedido, server);
+                else if(pedido instanceof PedidoEditSong)
+                    pedidoRunnable = new EditSongRunnable(s, (PedidoEditSong) pedido, server);
                 else{
                     System.out.println("[INFO] - [Comunicação]: Recebi um pedido não identificado");
                     continue;

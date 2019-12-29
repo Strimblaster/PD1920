@@ -140,4 +140,8 @@ public class ClientController implements IEvent {
     public boolean addSong(Playlist playlist, Song song) throws InvalidPlaylistNameException, InvalidSongDescriptionException {
         return model.addSong(playlist, song);
     }
+
+    public boolean editFile(Song song) {
+        return model.editFile(song);
+    }
 }

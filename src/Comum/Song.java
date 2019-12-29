@@ -18,6 +18,8 @@ public class Song {
     private String genero;
     @Expose
     private String filename;
+    @Expose
+    private int id;
 
     public Song(String nome, String album, int ano, int duracao, String genero, String filename) {
         this.nome = nome;
@@ -26,6 +28,17 @@ public class Song {
         this.duracao = duracao;
         this.genero = genero;
         this.filename = filename;
+    }
+
+    public Song(String nome, Utilizador autor, String album, int ano, int duracao, String genero, String filename, int id) {
+        this.nome = nome;
+        this.album = album;
+        this.ano = ano;
+        this.duracao = duracao;
+        this.genero = genero;
+        this.autor = autor;
+        this.filename = filename;
+        this.id = id;
     }
 
     public Song(String nome, Utilizador autor, String album, int ano, int duracao, String genero, String filename) {
@@ -66,6 +79,10 @@ public class Song {
         return filename;
     }
 
+    public int getId(){
+        return id;
+    }
+
     public void setFilename(String filename) {
         this.filename = filename;
     }
@@ -81,5 +98,25 @@ public class Song {
                 ", genero='" + genero + '\'' +
                 ", filename='" + filename + '\'' +
                 '}';
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setAlbum(String album) {
+        this.album = album;
+    }
+
+    public void setAno(int ano) {
+        this.ano = ano;
+    }
+
+    public void setDuracao(int duracao) {
+        this.duracao = duracao;
+    }
+
+    public void setGenero(String genero) {
+        this.genero = genero;
     }
 }

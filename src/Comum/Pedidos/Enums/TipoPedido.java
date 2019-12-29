@@ -9,5 +9,5 @@ public enum TipoPedido {
     PedidoSearch,
     PedidoPlaylists,
     PedidoNewPlaylist,
-    PedidoAddSong
+    PedidoEditSong, PedidoAddSong
 }

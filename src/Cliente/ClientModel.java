@@ -77,4 +77,8 @@ class ClientModel implements Constants {
     public boolean addSong(Playlist playlist, Song song) throws InvalidPlaylistNameException, InvalidSongDescriptionException {
         return comunicacao.addSong(utilizador, playlist, song);
     }
+
+    public boolean editFile(Song song) {
+        return comunicacao.editFile(utilizador, song);
+    }
 }

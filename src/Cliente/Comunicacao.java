@@ -143,7 +143,6 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             System.out.println("Ocorreu um erro no Download: " + e.getMessage());
             return null;
         }
-
     }
 
     @Override
@@ -259,6 +258,25 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         return false;
     }
 
+    @Override
+    public boolean editFile(Utilizador utilizador, Song song) {
+        PedidoEditSong pedidoEditSong = new PedidoEditSong(utilizador, song);
+        try {
+            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+            enviaPedido(tcpSocket,pedidoEditSong);
+
+            Resposta resposta = recebeResposta(tcpSocket);
+
+            tcpSocket.close();
+            return resposta.isSucess();
+
+        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidPlaylistNameException | InvalidUsernameException | InvalidPasswordException e) {
+            System.out.println("Ocorreu um erro ao editar a musica: " + e.getMessage());
+        }
+        return false;
+    }
+
 
     void enviaPedido(Socket socket, Pedido pedido) throws IOException {
         Gson gson = new Gson();
@@ -282,7 +300,6 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         Gson gson = new GsonBuilder().registerTypeAdapter(Resposta.class, new RespostaDeserializer()).create();
 
         Resposta resposta = gson.fromJson(json, Resposta.class);
-
 
         if(resposta.getException() != null){
             socket.close();
