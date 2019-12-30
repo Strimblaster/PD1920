@@ -6,6 +6,7 @@ import Comum.Exceptions.InvalidPlaylistNameException;
 import Comum.Exceptions.InvalidSongDescriptionException;
 import Comum.Playlist;
 import Comum.Song;
+import Comum.Utilizador;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -31,7 +32,9 @@ public class PlaylistController extends SceneController {
 
     public Label lblNomePlaylist;
     public VBox vBox;
+    public HBox hBox;
     public Button btnEdit;
+    public Utilizador utilizador;
 
     @Override
     public void setClientController(ClientController controllerClient) {
@@ -55,6 +58,10 @@ public class PlaylistController extends SceneController {
 
             vBox.getChildren().add(hBox);
         }
+
+        if(!playlist.getCriador().getName().equals(utilizador.getName())){
+            hBox.getChildren().remove(btnEdit);
+        }
     }
 
     public void handleBtnVoltar(ActionEvent actionEvent) {
@@ -75,6 +82,9 @@ public class PlaylistController extends SceneController {
 
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
+    }
+    public void setUtilizador(Utilizador utilizador) {
+        this.utilizador = utilizador;
     }
 
     public void handlePlay(ActionEvent actionEvent) {

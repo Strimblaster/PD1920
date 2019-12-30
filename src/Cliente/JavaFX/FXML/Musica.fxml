@@ -89,12 +89,12 @@
                   </Label>
                </children>
             </HBox>
-            <HBox alignment="TOP_CENTER" spacing="50.0">
+            <HBox fx:id="hBox" alignment="TOP_CENTER" spacing="50.0">
                <children>
                   <Button mnemonicParsing="false" onAction="#handleBtnVoltar" prefHeight="40.0" prefWidth="110.0" text="Voltar" />
                   <Button mnemonicParsing="false" onAction="#handleBtnAdicionarPlaylist" prefHeight="40.0" prefWidth="139.0" text="Adicionar a Playlist" />
                   <Button fx:id="btnPlayDownload" mnemonicParsing="false" prefHeight="40.0" prefWidth="110.0" text="Play/Download" />
-                  <Button mnemonicParsing="false" onAction="#handleBtnEditarMusica" fx:id="btnEdit" prefHeight="40.0" prefWidth="110.0" text="Editar" />
+                  <Button fx:id="btnEdit" mnemonicParsing="false" onAction="#handleBtnEditarMusica" prefHeight="40.0" prefWidth="110.0" text="Editar" />
                </children>
                <VBox.margin>
                   <Insets left="30.0" right="30.0" top="40.0" />

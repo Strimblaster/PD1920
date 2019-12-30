@@ -6,12 +6,14 @@ import Comum.Exceptions.InvalidPlaylistNameException;
 import Comum.Exceptions.InvalidSongDescriptionException;
 import Comum.Playlist;
 import Comum.Song;
+import Comum.Utilizador;
 import javafx.event.ActionEvent;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
@@ -33,6 +35,8 @@ public class MusicaController extends SceneController {
     public Label lblDuracao;
     public Button btnPlayDownload;
     public Button btnEdit;
+    public Utilizador utilizador;
+    public HBox hBox;
 
     @Override
     public void setClientController(ClientController controllerClient) {
@@ -62,6 +66,10 @@ public class MusicaController extends SceneController {
         else {
             btnPlayDownload.setText("Download");
             btnPlayDownload.setOnAction(this::handleBtnDownload);
+        }
+
+        if(!song.getAutor().getName().equals(utilizador.getName())){
+            hBox.getChildren().remove(btnEdit);
         }
 
     }
@@ -121,5 +129,8 @@ public class MusicaController extends SceneController {
     }
     public void setPlaylists(ArrayList<Playlist> playlists) {
         this.playlists = playlists;
+    }
+    public void setUtilizador(Utilizador utilizador){
+        this.utilizador = utilizador;
     }
 }
