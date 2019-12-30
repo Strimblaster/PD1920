@@ -67,7 +67,7 @@ public class UploadFileRunnable extends RunnableBase {
 
             cliente.close();
         } catch (IOException e) {
-            System.out.println("[Erro] - [LoginThread]: " + e.getMessage());
+            System.out.println("[Erro] - [UploadThread]: " + e.getMessage());
         }
 
     }

@@ -35,11 +35,15 @@ public class DownloadFileRunnable implements Runnable {
             byte[] buffer = new byte[PKT_SIZE];
             int nRead;
 
-            while((nRead=inputStream.read(buffer))!=-1) {
-                byte[] temp = new byte[file.length + nRead];
-                System.arraycopy(file, 0, temp, 0, file.length);
-                System.arraycopy(buffer, 0, temp, file.length, nRead);
-                file = temp;
+            try{
+                while((nRead=inputStream.read(buffer))!=-1) {
+                    byte[] temp = new byte[file.length + nRead];
+                    System.arraycopy(file, 0, temp, 0, file.length);
+                    System.arraycopy(buffer, 0, temp, file.length, nRead);
+                    file = temp;
+                }
+            }catch (IOException e){
+                event.disconnected(pedido, clientMusicDir, null);
             }
 
             server.close();

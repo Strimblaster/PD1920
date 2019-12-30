@@ -533,6 +533,21 @@ public class Servidor implements ServerConstants, Constants, IServer {
         return false;
     }
 
+    @Override
+    public String uploadFileDisconnected(Utilizador utilizador, PedidoUploadFile pedido, File cliMusicDir, String filename) {
+        try {
+            return uploadFile(utilizador, pedido.getMusica());
+        } catch (InvalidSongDescriptionException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public byte[] downloadFileDisconnected(Utilizador utilizador, PedidoDownloadFile pedido, File cliMusicDir) {
+        return downloadFile(utilizador, pedido.getMusica());
+    }
+
 
     private int getIDUtilizador(Utilizador utilizador) throws SQLException {
 

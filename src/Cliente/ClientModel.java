@@ -3,6 +3,9 @@ package Cliente;
 import Cliente.Interfaces.IComunicacaoCliente;
 import Comum.*;
 import Comum.Exceptions.*;
+import Comum.Pedidos.Pedido;
+import Comum.Pedidos.PedidoDownloadFile;
+import Comum.Pedidos.PedidoUploadFile;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -42,7 +45,7 @@ class ClientModel implements Constants {
         return false;
     }
 
-    public void signUp(String username, String password) throws InvalidPasswordException, InvalidUsernameException {
+    public void signUp(String username, String password) throws InvalidPasswordException, InvalidUsernameException, InvalidServerException {
         comunicacao.signUp(username, password);
     }
 
@@ -84,5 +87,21 @@ class ClientModel implements Constants {
 
     public boolean editPlaylist(Playlist playlist) {
         return comunicacao.editPlaylist(utilizador, playlist);
+    }
+
+    public void setServer() throws IOException, InvalidServerException {
+        comunicacao.getServerInfo();
+    }
+
+    public void disconnected(Pedido pedido, File cliMusicDir, String filename){
+        if(pedido instanceof PedidoUploadFile){
+            comunicacao.uploadFileDisconnected(utilizador, (PedidoUploadFile) pedido, cliMusicDir, filename);
+        }
+        else if(pedido instanceof PedidoDownloadFile){
+            comunicacao.downloadFileDisconnected(utilizador, (PedidoDownloadFile) pedido, cliMusicDir);
+        }
+        else {
+            //excecção
+        }
     }
 }

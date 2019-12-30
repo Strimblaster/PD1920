@@ -1,6 +1,7 @@
 package Servidor.Runnables;
 
 import Comum.Exceptions.InvalidPasswordException;
+import Comum.Exceptions.InvalidServerException;
 import Comum.Exceptions.InvalidUsernameException;
 import Comum.Pedidos.Enums.TipoExcecao;
 import Comum.Pedidos.PedidoSignUp;
@@ -42,6 +43,8 @@ public class SignUpRunnable extends RunnableBase {
                 resposta = new Resposta(pedidoSignUp, false, e.getMessage(), TipoExcecao.InvalidUsername, e);
             } catch (InvalidPasswordException e) {
                 resposta = new Resposta(pedidoSignUp, false, e.getMessage(), TipoExcecao.InvalidPassword, e);
+            } catch (InvalidServerException e) {
+                e.printStackTrace();
             }
             String str = gson.toJson(resposta);
             byte[] bytes = str.getBytes();

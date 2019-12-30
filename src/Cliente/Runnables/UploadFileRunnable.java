@@ -44,7 +44,11 @@ public class UploadFileRunnable implements Runnable {
             int nread;
 
             while((nread = fileInputStream.read(bytes)) != -1){
-                outputStream.write(bytes, 0, nread);
+                try{
+                    outputStream.write(bytes, 0, nread);
+                } catch (IOException e){
+                    event.disconnected(pedido, clientMusicDir, filenameMusicID);
+                }
                 fileOutputStream.write(bytes, 0, nread);
 
                 outputStream.flush();

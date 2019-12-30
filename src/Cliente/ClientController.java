@@ -4,6 +4,8 @@ import Cliente.Interfaces.IEvent;
 import Cliente.JavaFX.SceneController;
 import Comum.Exceptions.*;
 import Comum.FilteredResult;
+import Comum.Pedidos.Pedido;
+import Comum.Pedidos.PedidoUploadFile;
 import Comum.Pedidos.Resposta;
 import Comum.Playlist;
 import Comum.Song;
@@ -66,6 +68,18 @@ public class ClientController implements IEvent {
         });
     }
 
+    @Override
+    public void disconnected(Pedido pedido, File cliMusicDir, String filename) {
+        try {
+            model.setServer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidServerException e) {
+            e.printStackTrace();
+        }
+        model.disconnected(pedido, cliMusicDir, filename);
+    }
+
     public void login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
         if(username == null) throw new InvalidUsernameException();
         if(username.equals("")) throw new InvalidUsernameException();
@@ -80,7 +94,7 @@ public class ClientController implements IEvent {
         }
     }
 
-    public void signUp(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
+    public void signUp(String username, String password) throws InvalidUsernameException, InvalidPasswordException, InvalidServerException {
         if(username == null) throw new InvalidUsernameException();
         if(username.equals("")) throw new InvalidUsernameException();
         if(password == null) throw new InvalidPasswordException();
