@@ -311,12 +311,60 @@ public class Servidor implements ServerConstants, Constants, IServer {
                             resultSet.getString("genero"),
                             resultSet.getString("ficheiro")));
             }
+
+            if(playlists){
+                String query = constructQueryPlaylist(nome);
+                System.out.println(query);
+                PreparedStatement preparedStatement = conn.prepareStatement(query);
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                while(resultSet.next()){
+                    String nomePlaylist = resultSet.getString("nome");
+                    ArrayList<Song> musicas = new ArrayList<>();
+                    int idPlaylist = resultSet.getInt("id");
+
+                    PreparedStatement selectMusicasStatement = conn.prepareStatement("SELECT * FROM lt_playlists_musicas where idPlaylists = ?");
+                    selectMusicasStatement.setInt(1,id);
+                    ResultSet resultSetMusicas = selectMusicasStatement.executeQuery();
+
+                    while (resultSetMusicas.next()){
+                        int idMusica = resultSetMusicas.getInt("idMusicas");
+                        PreparedStatement statement = conn.prepareStatement("SELECT * FROM musicas where id = ?");
+                        statement.setInt(1,idMusica);
+                        ResultSet resultSet1 = statement.executeQuery();
+                        resultSet1.next();
+                        Song musica = resultSetToMusica(resultSet1);
+                        musicas.add(musica);
+                        statement.close();
+                    }
+
+                    playlistsArrayList.add(new Playlist(nomePlaylist, utilizador, musicas, idPlaylist));
+                    selectMusicasStatement.close();
+                }
+                preparedStatement.close();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             return new FilteredResult(songsArrayList, playlistsArrayList);
         }
 
         return new FilteredResult(songsArrayList, playlistsArrayList);
+    }
+
+    private String constructQueryPlaylist(String nome) {
+        StringBuilder base = new StringBuilder("SELECT * FROM playlists");
+        StringBuilder condicoes = new StringBuilder();
+        int contador = 0;
+
+        if(validToQueryBuilder(nome)){
+            condicoes.append(" nome = '").append(nome + "'");
+            contador++;
+        }
+        if(contador > 0) {
+            base.append(" WHERE");
+            base.append(condicoes);
+        }
+        return base.toString();
     }
 
     @Override
@@ -430,9 +478,8 @@ public class Servidor implements ServerConstants, Constants, IServer {
     public boolean editFile(Utilizador utilizador, Song song) {
         try{
 
-            PreparedStatement ps = conn.prepareStatement("SELECT * from musicas where nome = ? AND id!=?");
+            PreparedStatement ps = conn.prepareStatement("SELECT * from musicas where nome = ?");
             ps.setString(1, song.getNome());
-            ps.setInt(2, song.getId());
             ResultSet resultSetMusica = ps.executeQuery();
             if(resultSetMusica.next())
                 return false;
@@ -445,7 +492,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
             preparedStatementMusica.setInt(5, song.getDuracao());
             preparedStatementMusica.setInt(6, song.getId());
 
-            int ret = preparedStatementMusica.executeUpdate();
+            preparedStatementMusica.executeUpdate();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -468,7 +515,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
             preparedStatementPlaylist.setString(1, playlist.getNome());
             preparedStatementPlaylist.setInt(2, playlist.getId());
 
-            int ret = preparedStatementPlaylist.executeUpdate();
+            preparedStatementPlaylist.executeUpdate();
 
             ArrayList<Song> songs = playlist.getMusicas();
             for(Song song : songs){

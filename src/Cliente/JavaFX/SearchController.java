@@ -2,12 +2,14 @@ package Cliente.JavaFX;
 
 import Cliente.ClientController;
 import Comum.FilteredResult;
+import Comum.Playlist;
 import Comum.Song;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -36,8 +38,6 @@ public class SearchController extends SceneController {
         super.setClientController(controllerClient);
         clear();
     }
-
-
 
     public void handleUpdate(ActionEvent actionEvent) {
         clear();
@@ -70,6 +70,16 @@ public class SearchController extends SceneController {
                 ((Label)children.get(4)).setText(song.getDuracao()+"");
 
                 musicasList.getChildren().add(row);
+            }
+
+            for (Playlist playlist: result.playlists) {
+
+                HBox row = new FXMLLoader(getClass().getResource("FXML/PlaylistRow.fxml")).load();
+                ObservableList<Node> children = row.getChildren();
+                ((Label)children.get(0)).setText(playlist.getNome());
+                ((Label)children.get(1)).setText(playlist.getCriador().getName());
+
+                playlistsList.getChildren().add(row);
             }
         } catch (IOException e) {
             e.printStackTrace();
