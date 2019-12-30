@@ -1,12 +1,7 @@
 package Servidor.Runnables;
 
 import Cliente.Interfaces.IEvent;
-import Comum.Exceptions.InvalidPasswordException;
-import Comum.Exceptions.InvalidPlaylistNameException;
-import Comum.Exceptions.InvalidSongDescriptionException;
-import Comum.Exceptions.InvalidUsernameException;
-import Comum.Pedidos.Enums.TipoExcecao;
-import Comum.Pedidos.PedidoAddSong;
+import Comum.Pedidos.PedidoEditPlaylist;
 import Comum.Pedidos.PedidoEditSong;
 import Comum.Pedidos.Resposta;
 import Comum.Pedidos.Serializers.ExceptionSerializer;
@@ -19,13 +14,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class EditSongRunnable extends RunnableBase implements Runnable {
+public class EditPlaylistRunnable extends RunnableBase implements Runnable {
 
-    PedidoEditSong pedidoEditSong;
+    PedidoEditPlaylist pedidoEditPlaylist;
 
-    public EditSongRunnable(Socket cliente, PedidoEditSong pedidoEditSong, IServer servidor) {
+    public EditPlaylistRunnable(Socket cliente, PedidoEditPlaylist pedidoEditPlaylist, IServer servidor) {
         super(cliente, servidor);
-        this.pedidoEditSong = pedidoEditSong;
+        this.pedidoEditPlaylist = pedidoEditPlaylist;
     }
 
     @Override
@@ -34,21 +29,21 @@ public class EditSongRunnable extends RunnableBase implements Runnable {
         Gson gson = new GsonBuilder().registerTypeAdapter(Exception.class, new ExceptionSerializer()).create();
         try {
             OutputStream outputStream = cliente.getOutputStream();
-            Utilizador utilizador = pedidoEditSong.getUtilizador();
+            Utilizador utilizador = pedidoEditPlaylist.getUtilizador();
             Resposta resposta;
             boolean sucess;
 
-            sucess = servidor.editFile(utilizador, pedidoEditSong.getMusica());
+            sucess = servidor.editPlaylist(utilizador, pedidoEditPlaylist.getPlaylist());
             if(sucess)
-                resposta = new Resposta(pedidoEditSong, true, "Musica alterada");
+                resposta = new Resposta(pedidoEditPlaylist, true, "Playlist alterada");
             else
-                resposta = new Resposta(pedidoEditSong, false, "Erro no servidor");
+                resposta = new Resposta(pedidoEditPlaylist, false, "Erro no servidor");
 
             String str = gson.toJson(resposta);
             outputStream.write(str.getBytes());
             cliente.close();
         } catch (IOException e) {
-            System.out.println("[Erro] - [EditSong]: " + e.getMessage());
+            System.out.println("[Erro] - [EditPlaylist]: " + e.getMessage());
         }
     }
 }

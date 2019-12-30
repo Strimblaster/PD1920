@@ -376,7 +376,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
                     statement.close();
                 }
 
-                arrayList.add(new Playlist(nome, utilizador, songs));
+                arrayList.add(new Playlist(nome, utilizador, songs, idPlaylist));
                 selectMusicasStatement.close();
             }
 
@@ -446,6 +446,39 @@ public class Servidor implements ServerConstants, Constants, IServer {
             preparedStatementMusica.setInt(6, song.getId());
 
             int ret = preparedStatementMusica.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean editPlaylist(Utilizador utilizador, Playlist playlist) {
+        try{
+
+            PreparedStatement ps = conn.prepareStatement("SELECT * from playlists where nome = ? AND id!=?");
+            ps.setString(1, playlist.getNome());
+            ps.setInt(2, playlist.getId());
+            ResultSet resultSetPlaylist = ps.executeQuery();
+            if(resultSetPlaylist.next())
+                return false;
+
+            PreparedStatement preparedStatementPlaylist = conn.prepareStatement("UPDATE playlists SET nome = ? WHERE id = ?");
+            preparedStatementPlaylist.setString(1, playlist.getNome());
+            preparedStatementPlaylist.setInt(2, playlist.getId());
+
+            int ret = preparedStatementPlaylist.executeUpdate();
+
+            ArrayList<Song> songs = playlist.getMusicas();
+            for(Song song : songs){
+                PreparedStatement preparedStatementMusicas = conn.prepareStatement("DELETE FROM lt_playlists_musicas WHERE idMusicas = ? AND idPlaylists = ?");
+                preparedStatementMusicas.setInt(1, song.getId());
+                preparedStatementMusicas.setInt(2, playlist.getId());
+
+                int ret2 = preparedStatementMusicas.executeUpdate();
+            }
+
             return true;
         } catch (SQLException e) {
             e.printStackTrace();

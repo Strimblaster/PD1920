@@ -54,7 +54,7 @@ public abstract class SceneController {
 
     }
 
-    public void load(String res, Song song, ArrayList<Playlist> playlists) throws IOException {
+    public void load(String res, Song song, ArrayList<Playlist> playlists, Playlist playlist) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(res));
         AnchorPane root = null;
         BorderPane root1 = null;
@@ -75,8 +75,14 @@ public abstract class SceneController {
             ((MusicaController) controller).setSong(song);
             ((MusicaController) controller).setPlaylists(playlists);
         }
-        else if(controller instanceof EditController){
-            ((EditController) controller).setSong(song);
+        else if(controller instanceof EditMusicController){
+            ((EditMusicController) controller).setSong(song);
+        }
+        else if(controller instanceof PlaylistController){
+            ((PlaylistController) controller).setPlaylist(playlist);
+        }
+        else if(controller instanceof EditPlaylistController){
+            ((EditPlaylistController) controller).setPlaylist(playlist);
         }
         controller.setClientController(clientController);
 

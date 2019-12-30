@@ -63,7 +63,7 @@ public class MainController extends SceneController {
 
             btn.setOnAction(evt->{
                 try {
-                    load("FXML/Musica.fxml", song, playlists);
+                    load("FXML/Musica.fxml", song, playlists, null);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -79,8 +79,11 @@ public class MainController extends SceneController {
             btn.setMaxWidth(Double.MAX_VALUE);
 
             btn.setOnAction(evt->{
-
-                System.out.println(playlist.getNome() + " " + playlist.getMusicas());
+                try {
+                    load("FXML/Playlist.fxml", null, null, playlist);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             });
 
             vboxMyPlaylists.getChildren().add(btn);

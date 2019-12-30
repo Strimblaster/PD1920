@@ -81,4 +81,8 @@ class ClientModel implements Constants {
     public boolean editFile(Song song) {
         return comunicacao.editFile(utilizador, song);
     }
+
+    public boolean editPlaylist(Playlist playlist) {
+        return comunicacao.editPlaylist(utilizador, playlist);
+    }
 }

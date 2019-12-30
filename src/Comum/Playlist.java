@@ -10,11 +10,14 @@ public class Playlist {
     @Expose
     private Utilizador criador;
     private ArrayList<Song> musicas;
+    @Expose
+    private int id;
 
-    public Playlist(String name, Utilizador owner, ArrayList<Song> musicas) {
+    public Playlist(String name, Utilizador owner, ArrayList<Song> musicas, int id) {
         this.nome = name;
         this.criador = owner;
         this.musicas = musicas;
+        this.id = id;
     }
 
     public Playlist(Playlist p){
@@ -42,11 +45,17 @@ public class Playlist {
         this.musicas.add(music);
     }
 
-
+    public int getId(){
+        return id;
+    }
 
 
     @Override
     public String toString() {
         return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome=nome;
     }
 }

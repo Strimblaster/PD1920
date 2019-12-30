@@ -86,6 +86,14 @@ public class PedidoDeserializer implements JsonDeserializer<Pedido> {
             p.setMusica(musica);
             return p;
         }
+        else if(tipo.equals(TipoPedido.PedidoEditPlaylist.toString())){
+            PedidoEditPlaylist p = new PedidoEditPlaylist();
+            p.setUtilizador(u);
+
+            Playlist playlist = gson.fromJson(jsonObject.get("playlist"), Playlist.class);
+            p.setPlaylist(playlist);
+            return p;
+        }
         else if(tipo.equals(TipoPedido.PedidoAddSong.toString())){
             JsonElement playlistElement = jsonObject.get("playlist");
             if(playlistElement == null) throw new JsonParseException("Deserializar PedidoAddSong: playlist == null");

@@ -111,7 +111,7 @@ public class MusicaController extends SceneController {
 
     public void handleBtnEditarMusica(ActionEvent actionEvent) {
         try {
-            load("FXML/EditarMusica.fxml", song, null);
+            load("FXML/EditarMusica.fxml", song, null, null);
         } catch (IOException e) {
             e.printStackTrace();
         }

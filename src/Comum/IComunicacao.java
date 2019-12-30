@@ -19,4 +19,5 @@ public interface IComunicacao {
     boolean addSong(Utilizador utilizador, Playlist playlist, Song song) throws InvalidPlaylistNameException, InvalidSongDescriptionException;
 
     boolean editFile(Utilizador utilizador, Song song);
+    boolean editPlaylist(Utilizador utilizador, Playlist playlist);
 }

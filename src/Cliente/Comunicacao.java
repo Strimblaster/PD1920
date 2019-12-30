@@ -277,6 +277,25 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         return false;
     }
 
+    @Override
+    public boolean editPlaylist(Utilizador utilizador, Playlist playlist) {
+        PedidoEditPlaylist pedidoEditPlaylist = new PedidoEditPlaylist(utilizador, playlist);
+        try {
+            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+            enviaPedido(tcpSocket,pedidoEditPlaylist);
+
+            Resposta resposta = recebeResposta(tcpSocket);
+
+            tcpSocket.close();
+            return resposta.isSucess();
+
+        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidPlaylistNameException | InvalidUsernameException | InvalidPasswordException e) {
+            System.out.println("Ocorreu um erro ao editar a playlist: " + e.getMessage());
+        }
+        return false;
+    }
+
 
     void enviaPedido(Socket socket, Pedido pedido) throws IOException {
         Gson gson = new Gson();

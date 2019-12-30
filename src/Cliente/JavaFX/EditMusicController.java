@@ -16,7 +16,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-public class EditController extends SceneController {
+public class EditMusicController extends SceneController {
 
     public TextField nome;
     public TextField album;

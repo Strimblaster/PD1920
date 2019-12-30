@@ -144,4 +144,8 @@ public class ClientController implements IEvent {
     public boolean editFile(Song song) {
         return model.editFile(song);
     }
+
+    public boolean editPlaylist(Playlist playlist) {
+        return model.editPlaylist(playlist);
+    }
 }
