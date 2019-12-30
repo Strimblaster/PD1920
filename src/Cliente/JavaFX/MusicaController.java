@@ -93,12 +93,11 @@ public class MusicaController extends SceneController {
     }
 
     public void handleBtnPlay(ActionEvent actionEvent) {
-        Media hit = new Media(new File(musicDirectory.getAbsolutePath() + File.separator + song.getFilename()).toURI().toString() );
-        MediaPlayer mediaPlayer = new MediaPlayer(hit);
-        MediaView mediaView = new MediaView(mediaPlayer);
-        Scene scene = new Scene(new Group(mediaView));
-        stage.setScene(scene);
-        mediaPlayer.play();
+        try {
+            load("FXML/MediaPlayer.fxml", song, null, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void handleBtnDownload(ActionEvent actionEvent) {

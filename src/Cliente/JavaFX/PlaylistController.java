@@ -76,4 +76,12 @@ public class PlaylistController extends SceneController {
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
     }
+
+    public void handlePlay(ActionEvent actionEvent) {
+        try {
+            load("FXML/MediaPlayer.fxml", null, null, playlist);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

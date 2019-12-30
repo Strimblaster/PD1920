@@ -533,7 +533,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
     @Override
     public void setID(int id) {
         this.id = id;
-        DBName = "Servidor"+id;
+        DBName = "Servidors"+id;
 
         createServerDirectory(id);
 

@@ -84,6 +84,13 @@ public abstract class SceneController {
         else if(controller instanceof EditPlaylistController){
             ((EditPlaylistController) controller).setPlaylist(playlist);
         }
+        else if(controller instanceof MusicMediaPlayer){
+            MusicMediaPlayer player = (MusicMediaPlayer) controller;
+            if(playlist != null)
+                player.setPlaylist(playlist);
+            else
+                player.setSong(song);
+        }
         controller.setClientController(clientController);
 
 
