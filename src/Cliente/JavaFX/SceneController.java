@@ -74,12 +74,15 @@ public abstract class SceneController {
         if(controller instanceof MusicaController) {
             ((MusicaController) controller).setSong(song);
             ((MusicaController) controller).setPlaylists(playlists);
+            ((MusicaController) controller).setUtilizador(clientController.getUtilizador());
+
         }
         else if(controller instanceof EditMusicController){
             ((EditMusicController) controller).setSong(song);
         }
         else if(controller instanceof PlaylistController){
             ((PlaylistController) controller).setPlaylist(playlist);
+            ((PlaylistController) controller).setUtilizador(clientController.getUtilizador());
         }
         else if(controller instanceof EditPlaylistController){
             ((EditPlaylistController) controller).setPlaylist(playlist);
