@@ -69,7 +69,7 @@ public class EditMusicController extends SceneController {
 
     public void handleBtnVoltar(ActionEvent actionEvent) {
         try {
-            load("FXML/Musica.fxml");
+            load("FXML/Musica.fxml", song, null, null);
         } catch (IOException e) {
             e.printStackTrace();
         }
