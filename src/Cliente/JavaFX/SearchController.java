@@ -27,9 +27,7 @@ public class SearchController extends SceneController {
     public TextField filterAno;
     public TextField filterNome;
     public TextField filterDuracao;
-    public HBox basePlaylistRow;
     public VBox playlistsList;
-    public HBox baseSongRow;
     public VBox musicasList;
 
 
@@ -37,6 +35,7 @@ public class SearchController extends SceneController {
     public void setClientController(ClientController controllerClient) {
         super.setClientController(controllerClient);
         clear();
+
     }
 
     public void handleUpdate(ActionEvent actionEvent) {
@@ -69,6 +68,14 @@ public class SearchController extends SceneController {
                 ((Label)children.get(3)).setText(song.getAno()+"");
                 ((Label)children.get(4)).setText(song.getDuracao()+"");
 
+                row.setOnMouseClicked(mouseEvent -> {
+                    try {
+                        load("FXML/Musica.fxml", song, null, null);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+
                 musicasList.getChildren().add(row);
             }
 
@@ -79,6 +86,13 @@ public class SearchController extends SceneController {
                 ((Label)children.get(0)).setText(playlist.getNome());
                 ((Label)children.get(1)).setText(playlist.getCriador().getName());
 
+                row.setOnMouseClicked(mouseEvent -> {
+                    try {
+                        load("FXML/Playlist.fxml", null, null, playlist);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
                 playlistsList.getChildren().add(row);
             }
         } catch (IOException e) {

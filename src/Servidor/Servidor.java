@@ -228,8 +228,6 @@ public class Servidor implements ServerConstants, Constants, IServer {
     @Override
     public byte[] downloadFile(Utilizador utilizador, Song musica) {
 
-        PedidoDownloadFile pedido = new PedidoDownloadFile(utilizador,musica);
-
         try {
             //Procurar a musica na BD
             PreparedStatement statement = conn.prepareStatement("select * from musicas where nome=?");
@@ -243,7 +241,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
             String filename = resultSet.getString("ficheiro");
             statement.close();
 
-            pedido.getMusica().setFilename(filename);
+            musica.setFilename(filename);
 
             byte[] file = new byte[0];
             byte[] buffer = new byte[PKT_SIZE];
@@ -302,14 +300,9 @@ public class Servidor implements ServerConstants, Constants, IServer {
                 System.out.println(query);
                 PreparedStatement preparedStatement = conn.prepareStatement(query);
                 ResultSet resultSet = preparedStatement.executeQuery();
-                while (resultSet.next())
-                    songsArrayList.add(new Song(
-                            resultSet.getString("nome"),
-                            resultSet.getString("album"),
-                            resultSet.getInt("ano"),
-                            resultSet.getInt("duracao"),
-                            resultSet.getString("genero"),
-                            resultSet.getString("ficheiro")));
+                while (resultSet.next()){
+                    songsArrayList.add(resultSetToMusica(resultSet));
+                }
             }
 
             if(playlists){
@@ -320,12 +313,15 @@ public class Servidor implements ServerConstants, Constants, IServer {
 
                 while(resultSet.next()){
                     String nomePlaylist = resultSet.getString("nome");
+                    String nomeCriador = resultSet.getString("criador");
                     ArrayList<Song> musicas = new ArrayList<>();
                     int idPlaylist = resultSet.getInt("id");
 
                     PreparedStatement selectMusicasStatement = conn.prepareStatement("SELECT * FROM lt_playlists_musicas where idPlaylists = ?");
-                    selectMusicasStatement.setInt(1,id);
+                    selectMusicasStatement.setInt(1, idPlaylist);
                     ResultSet resultSetMusicas = selectMusicasStatement.executeQuery();
+
+
 
                     while (resultSetMusicas.next()){
                         int idMusica = resultSetMusicas.getInt("idMusicas");
@@ -334,11 +330,17 @@ public class Servidor implements ServerConstants, Constants, IServer {
                         ResultSet resultSet1 = statement.executeQuery();
                         resultSet1.next();
                         Song musica = resultSetToMusica(resultSet1);
+                        System.out.println(musica.getNome());
                         musicas.add(musica);
                         statement.close();
                     }
 
-                    playlistsArrayList.add(new Playlist(nomePlaylist, utilizador, musicas, idPlaylist));
+                    PreparedStatement owner = conn.prepareStatement("SELECT * FROM utilizadores where nome = ?");
+                    owner.setString(1, nomeCriador);
+                    ResultSet resultOwner = owner.executeQuery();
+                    resultOwner.next();
+                    Utilizador user = resultSetToUtilizador(resultOwner);
+                    playlistsArrayList.add(new Playlist(nomePlaylist, user, musicas, idPlaylist));
                     selectMusicasStatement.close();
                 }
                 preparedStatement.close();
@@ -349,6 +351,13 @@ public class Servidor implements ServerConstants, Constants, IServer {
         }
 
         return new FilteredResult(songsArrayList, playlistsArrayList);
+    }
+
+    private Utilizador resultSetToUtilizador(ResultSet resultOwner) throws SQLException {
+        int id = resultOwner.getInt("id");
+        String nome = resultOwner.getString("nome");
+
+        return new Utilizador(id, nome);
     }
 
     private String constructQueryPlaylist(String nome) {

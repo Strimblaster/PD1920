@@ -1,6 +1,7 @@
 package Cliente.JavaFX;
 
 import Comum.Exceptions.InvalidPasswordException;
+import Comum.Exceptions.InvalidServerException;
 import Comum.Exceptions.InvalidUsernameException;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
@@ -34,7 +35,7 @@ public class MenuController extends SceneController {
         try {
             clientController.signUp(txtUsername.getText(), txtPassword.getText());
             load("FXML/Inicio.fxml");
-        } catch (InvalidUsernameException | InvalidPasswordException | IOException e) {
+        } catch (InvalidUsernameException | InvalidPasswordException | IOException | InvalidServerException e) {
             showAlert(Alert.AlertType.ERROR, "Erro", "Sign Up", e.getMessage());
         }
     }

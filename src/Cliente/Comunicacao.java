@@ -68,26 +68,36 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
 
-            enviaPedido(tcpSocket,pedidoLogin);
+            try{
+                enviaPedido(tcpSocket,pedidoLogin);
+            }catch (IOException e){
+                getServerInfo();
+                return login(username, password);
+            }
 
             Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return resposta.isSucess();
 
-        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidPlaylistNameException e) {
+        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidPlaylistNameException | InvalidServerException e) {
             System.out.println("Ocorreu um erro no login: " + e.getMessage());
         }
         return false;
     }
 
     @Override
-    public boolean signUp(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
+    public boolean signUp(String username, String password) throws InvalidUsernameException, InvalidPasswordException, InvalidServerException {
         PedidoSignUp pedidoSignUp = new PedidoSignUp(new Utilizador(username, password));
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
 
-            enviaPedido(tcpSocket,pedidoSignUp);
+            try{
+                enviaPedido(tcpSocket,pedidoSignUp);
+            }catch (IOException e){
+                getServerInfo();
+                return login(username, password);
+            }
 
             Resposta resposta = recebeResposta(tcpSocket);
 
@@ -108,16 +118,21 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
 
             //Envia pedido para saber se os parametros da Musica são validos
-            enviaPedido(tcpSocket,pedidoUploadFile);
+            try{
+                enviaPedido(tcpSocket,pedidoUploadFile);
+            }catch (IOException e){
+                getServerInfo();
+                return uploadFile(utilizador, song);
+            }
 
             //Recebe resposta do pedido
             Resposta resposta = recebeResposta(tcpSocket);
 
-            Thread t = new  Thread(new UploadFileRunnable(tcpSocket, pedidoUploadFile, event, musicDir, ((PedidoUploadFile)resposta.getPedido()).getMusica().getFilename()));
+            Thread t = new  Thread(new UploadFileRunnable(tcpSocket, pedidoUploadFile, event, musicDir, ((PedidoUploadFile)resposta.getPedido()).getMusica().getFilename(), this));
             t.start();
             return null;
 
-        } catch (IOException | ServerErrorException | InvalidPlaylistNameException e) {
+        } catch (IOException | ServerErrorException | InvalidPlaylistNameException | InvalidServerException e) {
             System.out.println("Ocorreu um erro no Upload: " + e.getMessage());
         } catch (InvalidUsernameException | InvalidPasswordException ignored) {
             //Mandamos sempre o Username e password para verificar se é mesmo o utilizador
@@ -134,12 +149,17 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
 
-            enviaPedido(tcpSocket,pedidoDownloadFile);
+            try{
+                enviaPedido(tcpSocket,pedidoDownloadFile);
+            }catch (IOException e){
+                getServerInfo();
+                return downloadFile(utilizador, song);
+            }
 
-            Thread t = new  Thread(new DownloadFileRunnable(tcpSocket, pedidoDownloadFile, event, musicDir));
+            Thread t = new  Thread(new DownloadFileRunnable(tcpSocket, pedidoDownloadFile, event, musicDir, this));
             t.start();
             return null;
-        } catch (IOException e) {
+        } catch (IOException | InvalidServerException e) {
             System.out.println("Ocorreu um erro no Download: " + e.getMessage());
             return null;
         }
@@ -154,7 +174,12 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             byte[] buffer = new byte[PKT_SIZE];
             Gson gson = new Gson();
 
-            enviaPedido(tcpSocket,pedidoMusicas);
+            try{
+                enviaPedido(tcpSocket,pedidoMusicas);
+            }catch (IOException e){
+                getServerInfo();
+                return getMusicas(utilizador);
+            }
 
             int nread = inputStream.read(buffer);
             System.out.println("[DEBUG] - Recebi " + nread + " bytes");
@@ -167,7 +192,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             tcpSocket.close();
             return songs;
 
-        } catch (IOException e) {
+        } catch (IOException | InvalidServerException e) {
             System.out.println("Ocorreu um erro no signUp: " + e.getMessage());
         }
         return null;
@@ -179,14 +204,19 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
 
-            enviaPedido(tcpSocket,pedidoSearch);
+            try{
+                enviaPedido(tcpSocket,pedidoSearch);
+            }catch (IOException e){
+                getServerInfo();
+                return search(utilizador, songs, playlists, nome, album, genero, ano, duracao);
+            }
 
             Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return ((PedidoSearch)resposta.getPedido()).getFilteredResult();
 
-        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidUsernameException | InvalidPasswordException | InvalidPlaylistNameException e) {
+        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidUsernameException | InvalidPasswordException | InvalidPlaylistNameException | InvalidServerException e) {
             System.out.println("Ocorreu um erro no pedido de Search: " + e.getMessage());
         }
         return null;
@@ -198,14 +228,19 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
 
-            enviaPedido(tcpSocket,pedidoNewPlaylist);
+            try{
+                enviaPedido(tcpSocket,pedidoNewPlaylist);
+            }catch (IOException e){
+                getServerInfo();
+                return newPlaylist(utilizador, nome);
+            }
 
             Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return resposta.isSucess();
 
-        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidUsernameException | InvalidPasswordException e) {
+        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidUsernameException | InvalidPasswordException | InvalidServerException e) {
             System.out.println("Ocorreu um erro ao criar playlist: " + e.getMessage());
         }
         return false;
@@ -219,7 +254,12 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
             InputStream inputStream = tcpSocket.getInputStream();
 
-            enviaPedido(tcpSocket,pedidoPlaylists);
+            try{
+                enviaPedido(tcpSocket,pedidoPlaylists);
+            }catch (IOException e){
+                getServerInfo();
+                return getPlaylists(utilizador);
+            }
 
             byte[] buffer = new byte[PKT_SIZE];
             int nread = inputStream.read(buffer);
@@ -233,7 +273,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             tcpSocket.close();
             return playlists;
 
-        } catch (IOException e) {
+        } catch (IOException | InvalidServerException e) {
             System.out.println("Ocorreu um erro ao criar playlist: " + e.getMessage());
         }
         return null;
@@ -245,14 +285,19 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
 
-            enviaPedido(tcpSocket,pedidoAddSong);
+            try{
+                enviaPedido(tcpSocket,pedidoAddSong);
+            }catch (IOException e){
+                getServerInfo();
+                return addSong(utilizador, playlist, song);
+            }
 
             Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return resposta.isSucess();
 
-        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidPlaylistNameException | InvalidUsernameException | InvalidPasswordException e) {
+        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidPlaylistNameException | InvalidUsernameException | InvalidPasswordException | InvalidServerException e) {
             System.out.println("Ocorreu um erro ao addicionar uma musica: " + e.getMessage());
         }
         return false;
@@ -264,14 +309,19 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
 
-            enviaPedido(tcpSocket,pedidoEditSong);
+            try{
+                enviaPedido(tcpSocket,pedidoEditSong);
+            }catch (IOException e){
+                getServerInfo();
+                return editFile(utilizador, song);
+            }
 
             Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return resposta.isSucess();
 
-        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidPlaylistNameException | InvalidUsernameException | InvalidPasswordException e) {
+        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidPlaylistNameException | InvalidUsernameException | InvalidPasswordException | InvalidServerException e) {
             System.out.println("Ocorreu um erro ao editar a musica: " + e.getMessage());
         }
         return false;
@@ -283,26 +333,61 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         try {
             Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
 
-            enviaPedido(tcpSocket,pedidoEditPlaylist);
-
+            try{
+                enviaPedido(tcpSocket,pedidoEditPlaylist);
+            }catch (IOException e){
+                getServerInfo();
+                return editPlaylist(utilizador, playlist);
+            }
             Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return resposta.isSucess();
 
-        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidPlaylistNameException | InvalidUsernameException | InvalidPasswordException e) {
+        } catch (IOException | InvalidSongDescriptionException | ServerErrorException | InvalidPlaylistNameException | InvalidUsernameException | InvalidPasswordException | InvalidServerException e) {
             System.out.println("Ocorreu um erro ao editar a playlist: " + e.getMessage());
         }
         return false;
     }
 
+    public void disconnected(Pedido pedido) {
+
+        PedidoDisconnect pedidoDisconnected = new PedidoDisconnect(pedido.getUtilizador(), pedido);
+        try {
+            getServerInfo();
+            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+            enviaPedido(tcpSocket, pedidoDisconnected);
+
+            Resposta resposta = recebeResposta(tcpSocket);
+
+            if(resposta.isSucess()) {
+                if (pedido instanceof PedidoUploadFile) {
+                    String filenameToSave = ((PedidoUploadFile) resposta.getPedido()).getMusica().getFilename();
+                    new Thread(new UploadFileRunnable(tcpSocket, (PedidoUploadFile) pedido, event, musicDir, filenameToSave, this)).start();
+                }
+                if (pedido instanceof PedidoDownloadFile)
+                    new Thread(new DownloadFileRunnable(tcpSocket, (PedidoDownloadFile) pedido, event, musicDir, this)).start();
+            }else{
+                System.out.println("Erro . Servidor recusou pedido de disconnect");
+            }
+        } catch (IOException | InvalidServerException e) {
+            System.out.println("Ocorreu um erro no Disconnected: " + e.getMessage());
+        } catch (InvalidPlaylistNameException | ServerErrorException | InvalidUsernameException | InvalidPasswordException | InvalidSongDescriptionException e) {
+            e.printStackTrace();
+        }
+    }
 
     void enviaPedido(Socket socket, Pedido pedido) throws IOException {
         Gson gson = new Gson();
         OutputStream outputStream = socket.getOutputStream();
         String json = gson.toJson(pedido);
 
-        outputStream.write(json.getBytes());
+        try{
+            outputStream.write(json.getBytes());
+        } catch (IOException e){
+            throw new IOException();
+        }
         outputStream.flush();
     }
 
