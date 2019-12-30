@@ -228,8 +228,6 @@ public class Servidor implements ServerConstants, Constants, IServer {
     @Override
     public byte[] downloadFile(Utilizador utilizador, Song musica) {
 
-        PedidoDownloadFile pedido = new PedidoDownloadFile(utilizador,musica);
-
         try {
             //Procurar a musica na BD
             PreparedStatement statement = conn.prepareStatement("select * from musicas where nome=?");
@@ -243,7 +241,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
             String filename = resultSet.getString("ficheiro");
             statement.close();
 
-            pedido.getMusica().setFilename(filename);
+            musica.setFilename(filename);
 
             byte[] file = new byte[0];
             byte[] buffer = new byte[PKT_SIZE];
