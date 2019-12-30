@@ -25,7 +25,5 @@ public interface IComunicacao {
     boolean editFile(Utilizador utilizador, Song song);
     boolean editPlaylist(Utilizador utilizador, Playlist playlist);
 
-    String uploadFileDisconnected(Utilizador utilizador, PedidoUploadFile pedido, File cliMusicDir, String filename);
-    byte [] downloadFileDisconnected(Utilizador utilizador, PedidoDownloadFile pedido, File cliMusicDir);
 
 }

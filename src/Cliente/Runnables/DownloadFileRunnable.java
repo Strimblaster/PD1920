@@ -1,5 +1,6 @@
 package Cliente.Runnables;
 
+import Cliente.Comunicacao;
 import Cliente.Interfaces.IEvent;
 import Comum.Pedidos.PedidoDownloadFile;
 import Comum.Pedidos.PedidoUploadFile;
@@ -16,12 +17,14 @@ public class DownloadFileRunnable implements Runnable {
     private PedidoDownloadFile pedido;
     private IEvent event;
     private File clientMusicDir;
+    private Comunicacao comunicacao;
 
-    public DownloadFileRunnable(Socket server, PedidoDownloadFile pedido, IEvent event, File clientMusicDir) {
+    public DownloadFileRunnable(Socket server, PedidoDownloadFile pedido, IEvent event, File clientMusicDir, Comunicacao comunicacao) {
         this.server = server;
         this.pedido = pedido;
         this.event = event;
         this.clientMusicDir = clientMusicDir;
+        this.comunicacao = comunicacao;
     }
 
     @Override
@@ -43,7 +46,7 @@ public class DownloadFileRunnable implements Runnable {
                     file = temp;
                 }
             }catch (IOException e){
-                event.disconnected(pedido, clientMusicDir, null);
+                comunicacao.disconnected(pedido);
             }
 
             server.close();

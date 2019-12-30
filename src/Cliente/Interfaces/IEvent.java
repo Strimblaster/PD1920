@@ -10,5 +10,4 @@ public interface IEvent {
     void songUploaded(String nome);
     void songDownloaded(byte[] file, File fileToReceive, String nomeDaMusica);
 
-    void disconnected(Pedido pedido, File cliMusicDir, String filename);
 }

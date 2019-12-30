@@ -89,19 +89,4 @@ class ClientModel implements Constants {
         return comunicacao.editPlaylist(utilizador, playlist);
     }
 
-    public void setServer() throws IOException, InvalidServerException {
-        comunicacao.getServerInfo();
-    }
-
-    public void disconnected(Pedido pedido, File cliMusicDir, String filename){
-        if(pedido instanceof PedidoUploadFile){
-            comunicacao.uploadFileDisconnected(utilizador, (PedidoUploadFile) pedido, cliMusicDir, filename);
-        }
-        else if(pedido instanceof PedidoDownloadFile){
-            comunicacao.downloadFileDisconnected(utilizador, (PedidoDownloadFile) pedido, cliMusicDir);
-        }
-        else {
-            //excecção
-        }
-    }
 }

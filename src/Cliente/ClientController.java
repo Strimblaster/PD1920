@@ -68,18 +68,6 @@ public class ClientController implements IEvent {
         });
     }
 
-    @Override
-    public void disconnected(Pedido pedido, File cliMusicDir, String filename) {
-        try {
-            model.setServer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InvalidServerException e) {
-            e.printStackTrace();
-        }
-        model.disconnected(pedido, cliMusicDir, filename);
-    }
-
     public void login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
         if(username == null) throw new InvalidUsernameException();
         if(username.equals("")) throw new InvalidUsernameException();

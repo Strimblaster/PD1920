@@ -55,7 +55,6 @@ public class PedidoDeserializer implements JsonDeserializer<Pedido> {
             Pedido pedido = gson.fromJson(jsonObject.get("pedido"), Pedido.class);
             p.setPedido(pedido);
 
-            //aqui depois não será preciso ir buscar a musica do pedido???
             return p;
         }
         else if(tipo.equals(TipoPedido.PedidoMusicas.toString())){

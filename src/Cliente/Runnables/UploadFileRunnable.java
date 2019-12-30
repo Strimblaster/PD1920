@@ -1,5 +1,6 @@
 package Cliente.Runnables;
 
+import Cliente.Comunicacao;
 import Cliente.Interfaces.IEvent;
 import Comum.Pedidos.PedidoUploadFile;
 import Comum.Song;
@@ -16,13 +17,15 @@ public class UploadFileRunnable implements Runnable {
     private IEvent event;
     private File clientMusicDir;
     private String filenameMusicID;  //Para guardar o ficheiro na pasta do cliente com o id da musica
+    private Comunicacao comunicacao;
 
-    public UploadFileRunnable(Socket server, PedidoUploadFile pedido, IEvent event, File clientMusicDir, String filename) {
+    public UploadFileRunnable(Socket server, PedidoUploadFile pedido, IEvent event, File clientMusicDir, String filename, Comunicacao comunicacao) {
         this.server = server;
         this.pedido = pedido;
         this.event = event;
         this.clientMusicDir = clientMusicDir;
         this.filenameMusicID = filename;
+        this.comunicacao = comunicacao;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class UploadFileRunnable implements Runnable {
                 try{
                     outputStream.write(bytes, 0, nread);
                 } catch (IOException e){
-                    event.disconnected(pedido, clientMusicDir, filenameMusicID);
+                    comunicacao.disconnected(pedido);
                 }
                 fileOutputStream.write(bytes, 0, nread);
 

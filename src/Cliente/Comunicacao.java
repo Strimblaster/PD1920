@@ -72,7 +72,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
                 enviaPedido(tcpSocket,pedidoLogin);
             }catch (IOException e){
                 getServerInfo();
-                login(username, password);
+                return login(username, password);
             }
 
             Resposta resposta = recebeResposta(tcpSocket);
@@ -96,7 +96,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
                 enviaPedido(tcpSocket,pedidoSignUp);
             }catch (IOException e){
                 getServerInfo();
-                login(username, password);
+                return login(username, password);
             }
 
             Resposta resposta = recebeResposta(tcpSocket);
@@ -122,13 +122,13 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
                 enviaPedido(tcpSocket,pedidoUploadFile);
             }catch (IOException e){
                 getServerInfo();
-                uploadFile(utilizador, song);
+                return uploadFile(utilizador, song);
             }
 
             //Recebe resposta do pedido
             Resposta resposta = recebeResposta(tcpSocket);
 
-            Thread t = new  Thread(new UploadFileRunnable(tcpSocket, pedidoUploadFile, event, musicDir, ((PedidoUploadFile)resposta.getPedido()).getMusica().getFilename()));
+            Thread t = new  Thread(new UploadFileRunnable(tcpSocket, pedidoUploadFile, event, musicDir, ((PedidoUploadFile)resposta.getPedido()).getMusica().getFilename(), this));
             t.start();
             return null;
 
@@ -153,10 +153,10 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
                 enviaPedido(tcpSocket,pedidoDownloadFile);
             }catch (IOException e){
                 getServerInfo();
-                downloadFile(utilizador, song);
+                return downloadFile(utilizador, song);
             }
 
-            Thread t = new  Thread(new DownloadFileRunnable(tcpSocket, pedidoDownloadFile, event, musicDir));
+            Thread t = new  Thread(new DownloadFileRunnable(tcpSocket, pedidoDownloadFile, event, musicDir, this));
             t.start();
             return null;
         } catch (IOException | InvalidServerException e) {
@@ -178,7 +178,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
                 enviaPedido(tcpSocket,pedidoMusicas);
             }catch (IOException e){
                 getServerInfo();
-                getMusicas(utilizador);
+                return getMusicas(utilizador);
             }
 
             int nread = inputStream.read(buffer);
@@ -208,7 +208,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
                 enviaPedido(tcpSocket,pedidoSearch);
             }catch (IOException e){
                 getServerInfo();
-                search(utilizador, songs, playlists, nome, album, genero, ano, duracao);
+                return search(utilizador, songs, playlists, nome, album, genero, ano, duracao);
             }
 
             Resposta resposta = recebeResposta(tcpSocket);
@@ -232,7 +232,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
                 enviaPedido(tcpSocket,pedidoNewPlaylist);
             }catch (IOException e){
                 getServerInfo();
-                newPlaylist(utilizador, nome);
+                return newPlaylist(utilizador, nome);
             }
 
             Resposta resposta = recebeResposta(tcpSocket);
@@ -258,7 +258,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
                 enviaPedido(tcpSocket,pedidoPlaylists);
             }catch (IOException e){
                 getServerInfo();
-                getPlaylists(utilizador);
+                return getPlaylists(utilizador);
             }
 
             byte[] buffer = new byte[PKT_SIZE];
@@ -289,7 +289,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
                 enviaPedido(tcpSocket,pedidoAddSong);
             }catch (IOException e){
                 getServerInfo();
-                addSong(utilizador, playlist, song);
+                return addSong(utilizador, playlist, song);
             }
 
             Resposta resposta = recebeResposta(tcpSocket);
@@ -313,7 +313,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
                 enviaPedido(tcpSocket,pedidoEditSong);
             }catch (IOException e){
                 getServerInfo();
-                editFile(utilizador, song);
+                return editFile(utilizador, song);
             }
 
             Resposta resposta = recebeResposta(tcpSocket);
@@ -337,7 +337,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
                 enviaPedido(tcpSocket,pedidoEditPlaylist);
             }catch (IOException e){
                 getServerInfo();
-                editPlaylist(utilizador, playlist);
+                return editPlaylist(utilizador, playlist);
             }
             Resposta resposta = recebeResposta(tcpSocket);
 
@@ -348,6 +348,34 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
             System.out.println("Ocorreu um erro ao editar a playlist: " + e.getMessage());
         }
         return false;
+    }
+
+    public void disconnected(Pedido pedido) {
+
+        PedidoDisconnect pedidoDisconnected = new PedidoDisconnect(pedido.getUtilizador(), pedido);
+        try {
+            getServerInfo();
+            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+            enviaPedido(tcpSocket, pedidoDisconnected);
+
+            Resposta resposta = recebeResposta(tcpSocket);
+
+            if(resposta.isSucess()) {
+                if (pedido instanceof PedidoUploadFile) {
+                    String filenameToSave = ((PedidoUploadFile) resposta.getPedido()).getMusica().getFilename();
+                    new Thread(new UploadFileRunnable(tcpSocket, (PedidoUploadFile) pedido, event, musicDir, filenameToSave, this)).start();
+                }
+                if (pedido instanceof PedidoDownloadFile)
+                    new Thread(new DownloadFileRunnable(tcpSocket, (PedidoDownloadFile) pedido, event, musicDir, this)).start();
+            }else{
+                System.out.println("Erro . Servidor recusou pedido de disconnect");
+            }
+        } catch (IOException | InvalidServerException e) {
+            System.out.println("Ocorreu um erro no Disconnected: " + e.getMessage());
+        } catch (InvalidPlaylistNameException | ServerErrorException | InvalidUsernameException | InvalidPasswordException | InvalidSongDescriptionException e) {
+            e.printStackTrace();
+        }
     }
 
     void enviaPedido(Socket socket, Pedido pedido) throws IOException {
@@ -401,39 +429,4 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
 
     }
 
-    @Override
-    public String uploadFileDisconnected(Utilizador utilizador, PedidoUploadFile pedido, File cliMusicDir, String filename) {
-        PedidoDisconnect pedidoDisconnected = new PedidoDisconnect(utilizador, pedido);
-        try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-
-            enviaPedido(tcpSocket,pedidoDisconnected);
-
-            Thread t = new  Thread(new UploadFileRunnable(tcpSocket, pedido, event, cliMusicDir, filename));
-            t.start();
-            return null;
-
-        } catch (IOException e) {
-            System.out.println("Ocorreu um erro no Upload: " + e.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public byte[] downloadFileDisconnected(Utilizador utilizador, PedidoDownloadFile pedido, File cliMusicDir) {
-        PedidoDisconnect pedidoDisconnected = new PedidoDisconnect(utilizador, pedido);
-        try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-
-            enviaPedido(tcpSocket,pedidoDisconnected);
-
-            Thread t = new  Thread(new DownloadFileRunnable(tcpSocket, pedido, event, cliMusicDir));
-            t.start();
-            return null;
-
-        } catch (IOException e) {
-            System.out.println("Ocorreu um erro no Upload: " + e.getMessage());
-        }
-        return null;
-    }
 }
