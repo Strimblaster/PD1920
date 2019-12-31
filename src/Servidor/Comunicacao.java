@@ -3,21 +3,31 @@ package Servidor;
 import Comum.Constants;
 import Comum.Pedidos.*;
 import Comum.Pedidos.Serializers.PedidoDeserializer;
-import Comum.Playlist;
+import Comum.ServerInfo;
 import Servidor.Interfaces.*;
 import Servidor.Runnables.*;
+import Servidor.Threads.MulticastListenerThread;
+import Servidor.Threads.PingThread;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.*;
+import java.util.ArrayList;
 
 public class Comunicacao extends Thread implements IEvent, Constants, ServerConstants {
+
+    public final ArrayList<ServerInfo> servidores;
     private ServerSocket serverSocket;
     private DatagramSocket datagramSocket;
+    private MulticastSocket multicastSocket;
     private IServer server;
-    private Thread pingThread;
+    public ServerInfo myServerInfo;
+
+
 
 
 
@@ -25,8 +35,9 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
         serverSocket = new ServerSocket(0);
         datagramSocket = new DatagramSocket();
         datagramSocket.setSoTimeout(TIMEOUT_5s);
-
+        servidores = new ArrayList<>();
         server = servidor;
+        multicastSocket = new MulticastSocket(MULTICAST_PORT);
         servidor.setListener(this);
     }
 
@@ -39,13 +50,20 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
         datagramSocket.send(p);
         datagramSocket.receive(p);
         id = Integer.parseInt(new String(p.getData(), 0, p.getLength()));
+        p = new DatagramPacket(new byte[PKT_SIZE], PKT_SIZE);
+        datagramSocket.receive(p);
+        String json = new String(p.getData(), 0, p.getLength());
 
-        //multicast
-//        dsSocket.receive(p);
-//        Gson gson = new Gson();
-//        String arrayList = new String(p.getData(), 0, p.getLength());
-//
-//        this.servidores = gson.fromJson(arrayList, ArrayList.class);
+        Type listType = new TypeToken<ArrayList<ServerInfo>>(){}.getType();
+        ArrayList<ServerInfo> servers = new Gson().fromJson(json, listType);
+        servers.forEach( serverInfo -> {
+            if(serverInfo.getId() == id)
+                myServerInfo = serverInfo;
+        });
+        synchronized (servidores){
+            servidores.clear();
+            servidores.addAll(servers);
+        }
 
         return id;
     }
@@ -53,8 +71,8 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
 
     @Override
     public void serverReady() {
-        pingThread = new Thread(new PingRunnable(datagramSocket));
-        pingThread.start();
+        new PingThread(datagramSocket, this).start();
+        new MulticastListenerThread(multicastSocket, server, servidores, myServerInfo).start();
         start();
     }
 
@@ -69,6 +87,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
             serverSocket.close();
         } catch (IOException ignored) { }
         datagramSocket.close();
+        multicastSocket.close();
     }
 
     @Override

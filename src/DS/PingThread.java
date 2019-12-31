@@ -2,6 +2,7 @@ package DS;
 
 import Comum.Constants;
 import Comum.ServerInfo;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 public class PingThread extends Thread implements Constants {
 
     DS ds;
-    DatagramPacket datagramPacket;
 
 
     public PingThread(DS ds) {
@@ -21,12 +21,10 @@ public class PingThread extends Thread implements Constants {
 
     @Override
     public void run() {
-        while (true) {
+        try {
+            while (true) {
 
-            try {
                 Thread.sleep(PING_SLEEP_MS);
-                String string = "Estas on?";
-                byte[] resp = string.getBytes();
 
                 ArrayList<ServerInfo> listaServidores = new ArrayList<>(ds.servidoresUDP);
 
@@ -34,25 +32,33 @@ public class PingThread extends Thread implements Constants {
 
                 for (ServerInfo server: listaServidores) {
                     try{
-                        datagramPacket = new DatagramPacket(resp, resp.length, server.getIp(), server.getPort());
+                        String json;
+                        synchronized (ds.servidoresUDP) {
+                            json = new Gson().toJson(ds.servidoresUDP);
+                        }
+                        byte[] resp = json.getBytes();
+                        DatagramPacket datagramPacket = new DatagramPacket(resp, resp.length, server.getIp(), server.getPort());
+
                         ds.servidorPingDatagramSocket.send(datagramPacket);
 
                         ds.servidorPingDatagramSocket.receive(datagramPacket);
+                        server.incrementPingCount();
 
                     } catch (IOException e) {
-                        ds.servidoresUDP.remove(server);
+                        synchronized (ds.servidoresUDP) {
+                            ds.servidoresUDP.remove(server);
+                        }
                         for(ServerInfo s: ds.servidoresTCP)
                             if(s.getId() == server.getId()){
                                 ds.servidoresTCP.remove(s);
                                 break;
                             }
-                        System.out.println("[INFO] - [ThreadPings]: " + server.toString() + " não respondeu ao ping! Foi removido da lista de servidores.");
+                        System.out.println("[INFO] - [PingThread]: " + server.toString() + " não respondeu ao ping! Foi removido da lista de servidores.");
                     }
                 }
-
-            } catch (IOException | InterruptedException e) {
-                System.out.println("[Erro] [ServidorThread] - Erro: " + e.getMessage());
             }
-        }
+        } catch (IOException | InterruptedException e) {
+        System.out.println("[PingThread] - Estou a encerrar...");
+    }
     }
 }

@@ -29,78 +29,6 @@ public class Servidor implements ServerConstants, Constants, IServer {
         this.conn = DriverManager.getConnection(DB_URL, USER, PASS);
     }
 
-    public void setListener(IEvent listener) {
-        this.listener = listener;
-    }
-
-    public static void main(String[] args){
-        try {
-            System.out.println("[INFO] Servidor a arrancar...");
-            Servidor servidor = new Servidor();
-            new Comunicacao(servidor);
-
-            servidor.requestID();
-
-            System.out.println("[INFO] Atribuido o ID: "+ servidor.id);
-
-            System.out.println("[INFO] A criar a base de dados...");
-            servidor.createDatabase();
-
-            System.out.println("[INFO] Servidor pronto");
-            servidor.ready();
-
-
-            Scanner sc = new Scanner(System.in);
-
-            while(true){
-                String s = sc.next();
-                System.out.println(s);
-                if(s.equals("sair")) break;
-            }
-            servidor.exit();
-
-        } catch (SocketException e) {
-            System.out.println("[ERRO] Houve um problema com o Socket:\n"+ e.getMessage());
-        } catch (SQLException e) {
-            System.out.println("[ERRO] Houve com a base de dados:\n"+ e.getMessage());
-        } catch (IOException e) {
-            System.out.println("[ERRO] Houve um erro de IO:\n"+ e.getMessage());
-        }
-    }
-
-    private void exit() throws SQLException {
-        conn.close();
-        listener.serverExit();
-    }
-
-    private void ready() {
-        listener.serverReady();
-    }
-
-    private void requestID() throws IOException {
-        listener.needID();
-    }
-
-    private void createDatabase() throws SQLException {
-        ResultSet resultSet = conn.getMetaData().getCatalogs();
-
-        //Verifica se a DB já existe e apaga
-        while (resultSet.next()) {
-            if (resultSet.getString(1).equals(DBName)) {
-                Statement s = conn.createStatement();
-                s.execute("DROP DATABASE " + DBName);
-                s.close();
-            }
-        }
-        resultSet.close();
-
-        //Cria DB
-        Statement s = conn.createStatement();
-        s.execute(DB_CREATE_1 + DBName + DB_CREATE_2 + DBName + DB_CREATE_3);
-        s.close();
-
-    }
-
     @Override
     public boolean login(String username, String password) throws InvalidPasswordException, InvalidUsernameException {
         try{
@@ -141,7 +69,6 @@ public class Servidor implements ServerConstants, Constants, IServer {
             return false;
         }
     }
-
 
     @Override
     public void addNewSong(Song musica, byte[] file) {
@@ -667,4 +594,77 @@ public class Servidor implements ServerConstants, Constants, IServer {
         return !s.equals("");
     }
     boolean validToQueryBuilder(int i){ return i!=-1;}
+
+
+    public void setListener(IEvent listener) {
+        this.listener = listener;
+    }
+
+    public static void main(String[] args){
+        try {
+            System.out.println("[INFO] Servidor a arrancar...");
+            Servidor servidor = new Servidor();
+            new Comunicacao(servidor);
+
+            servidor.requestID();
+
+            System.out.println("[INFO] Atribuido o ID: "+ servidor.id);
+
+            System.out.println("[INFO] A criar a base de dados...");
+            servidor.createDatabase();
+
+            System.out.println("[INFO] Servidor pronto");
+            servidor.ready();
+
+
+            Scanner sc = new Scanner(System.in);
+
+            while(true){
+                String s = sc.next();
+                System.out.println(s);
+                if(s.equals("sair")) break;
+            }
+            servidor.exit();
+
+        } catch (SocketException e) {
+            System.out.println("[ERRO] Houve um problema com o Socket:\n"+ e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("[ERRO] Houve com a base de dados:\n"+ e.getMessage());
+        } catch (IOException e) {
+            System.out.println("[ERRO] Houve um erro de IO:\n"+ e.getMessage());
+        }
+    }
+
+    private void exit() throws SQLException {
+        conn.close();
+        listener.serverExit();
+    }
+
+    private void ready() {
+        listener.serverReady();
+    }
+
+    private void requestID() throws IOException {
+        listener.needID();
+    }
+
+    private void createDatabase() throws SQLException {
+        ResultSet resultSet = conn.getMetaData().getCatalogs();
+
+        //Verifica se a DB já existe e apaga
+        while (resultSet.next()) {
+            if (resultSet.getString(1).equals(DBName)) {
+                Statement s = conn.createStatement();
+                s.execute("DROP DATABASE " + DBName);
+                s.close();
+            }
+        }
+        resultSet.close();
+
+        //Cria DB
+        Statement s = conn.createStatement();
+        s.execute(DB_CREATE_1 + DBName + DB_CREATE_2 + DBName + DB_CREATE_3);
+        s.close();
+
+    }
 }
