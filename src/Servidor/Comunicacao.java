@@ -1,25 +1,24 @@
 package Servidor;
 
-import Comum.Constants;
+import Comum.*;
 import Comum.Pedidos.*;
 import Comum.Pedidos.Serializers.PedidoDeserializer;
-import Comum.ServerInfo;
-import Comum.Utilizador;
 import Servidor.Interfaces.*;
 import Servidor.Runnables.*;
 import Servidor.Threads.MulticastListenerThread;
 import Servidor.Threads.PingThread;
+import Servidor.Utils.MulticastConfirmationMessage;
 import Servidor.Utils.MulticastMessage;
-import Servidor.Utils.TipoMensagemMulticast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.internal.$Gson$Types;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Base64;
 
 public class Comunicacao extends Thread implements IEvent, Constants, ServerConstants {
 
@@ -27,12 +26,10 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
     private ServerSocket serverSocket;
     private DatagramSocket datagramSocket;
     private MulticastSocket multicastSocket;
+    private MulticastSocket multicastSocketConfirmation;
     private IServer server;
     public ServerInfo myServerInfo;
     private InetAddress multicastAddr;
-
-
-
 
 
     public Comunicacao(Servidor servidor) throws IOException {
@@ -41,7 +38,18 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
         datagramSocket.setSoTimeout(TIMEOUT_5s);
         servidores = new ArrayList<>();
         server = servidor;
+
+
+        multicastAddr = InetAddress.getByName(MULTICAST_ADDR);
+        InetAddress multicastAddrConfirmation = InetAddress.getByName(MULTICAST_ADDR_CONFIRMATION);
+
         multicastSocket = new MulticastSocket(MULTICAST_PORT);
+        multicastSocketConfirmation = new MulticastSocket(MULTICAST_PORT_CONFIRMATION);
+
+        multicastSocket.joinGroup(multicastAddr);
+        multicastSocketConfirmation.joinGroup(multicastAddrConfirmation);
+
+
         multicastAddr = InetAddress.getByName(MULTICAST_ADDR);
         servidor.setListener(this);
     }
@@ -133,7 +141,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
     @Override
     public void serverReady() {
         new PingThread(datagramSocket, this).start();
-        new MulticastListenerThread(multicastSocket, server, servidores, myServerInfo).start();
+        new MulticastListenerThread(multicastSocket, datagramSocket, server, servidores, myServerInfo).start();
         start();
     }
 
@@ -148,20 +156,93 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
             serverSocket.close();
         } catch (IOException ignored) { }
         datagramSocket.close();
+
         multicastSocket.close();
+        multicastSocketConfirmation.close();
     }
 
     @Override
     public void newUser(String username, String password) {
-        MulticastMessage message = new MulticastMessage(myServerInfo, new PedidoSignUp(new Utilizador(username, password)), null, TipoMensagemMulticast.Update);
+        MulticastMessage message = new MulticastMessage(myServerInfo, new PedidoSignUp(new Utilizador(username, password)), null);
+
+        sendMulticastMessage(message);
+    }
+
+    @Override
+    public void newPlaylist(Utilizador utilizador, String nomePlaylist) {
+        MulticastMessage message = new MulticastMessage(myServerInfo, new PedidoNewPlaylist(utilizador, nomePlaylist));
+
+        sendMulticastMessage(message);
+    }
+
+    @Override
+    public void newSong(Utilizador utilizador, Song song) {
+        MulticastMessage message = new MulticastMessage(myServerInfo, new PedidoUploadFile(utilizador, song), null);
+
+        sendMulticastMessage(message);
+    }
+
+    @Override
+    public void newSongFile(Utilizador utilizador, Song song, byte[] file) {
+        MulticastMessage message = new MulticastMessage(myServerInfo, new PedidoUploadFile(utilizador, song));
+        int nread;
+        byte[] b = new byte[PKT_SIZE/2];
+        byte[] encodedFile = Base64.getEncoder().encode(file);
+
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(encodedFile);
+        while((nread = byteArrayInputStream.read(b, 0, b.length)) != -1){
+            message.setFile(new String(b, 0, nread));
+            sendMulticastMessage(message);
+        }
+
+        message.setFile(null);
+        sendMulticastMessage(message);
+    }
+
+    @Override
+    public void newSongPlaylist(Utilizador utilizador, Playlist playlist, Song song) {
+
+    }
+
+
+    private synchronized void sendMulticastMessage(MulticastMessage message) {
         String json = new Gson().toJson(message);
         byte[] bytes = json.getBytes();
 
         DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length, multicastAddr, MULTICAST_PORT);
         try {
-            multicastSocket.send(datagramPacket);
+            System.out.println("Enviei: " + json);
+            datagramSocket.send(datagramPacket);
+            int i = 0;
+            while (i != servidores.size()-1) {
+                DatagramPacket packet = new DatagramPacket(new byte[PKT_SIZE], PKT_SIZE);
+                multicastSocketConfirmation.receive(packet);
+                String jsonConfirmation = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+                MulticastConfirmationMessage confirmationMessage = new Gson().fromJson(jsonConfirmation, MulticastConfirmationMessage.class);
+
+                System.out.println("Recebi Confirmação: " + jsonConfirmation);
+                if(!checkMessage(confirmationMessage)) continue;
+                i++;
+
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    private boolean checkMessage(MulticastConfirmationMessage message) {
+
+        ServerInfo receiver = message.getReceiver();
+
+        //Verifica se fui eu que mandei a mensagem
+        if(message.getSender().getId() == myServerInfo.getId()) return false;
+
+        //Verifica se é para mim
+        if(receiver != null)
+            if(receiver.getId() != myServerInfo.getId())
+                return false;
+        return true;
+    }
+
 }

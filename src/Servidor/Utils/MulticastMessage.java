@@ -9,30 +9,34 @@ public class MulticastMessage {
 
     private ServerInfo sender;
     private ServerInfo receiver; //null se for para todos
-    @Expose
-    private TipoMensagemMulticast tipoMensagem;
+
 
     private Pedido pedido;
     @Expose
-    String file;
+    String encodedfile;
 
-    public MulticastMessage(ServerInfo sender, ServerInfo receiver, Pedido pedido, String file, TipoMensagemMulticast tipoMensagem) {
+    public MulticastMessage(ServerInfo sender, ServerInfo receiver, Pedido pedido, String file) {
         this.sender = sender;
         this.receiver = receiver;
         this.pedido = pedido;
-        this.tipoMensagem = tipoMensagem;
+        this.encodedfile = file;
     }
 
-    public MulticastMessage(ServerInfo sender, Pedido pedido, String file, TipoMensagemMulticast tipoMensagem) {
+    public MulticastMessage(ServerInfo sender, Pedido pedido, String file) {
         this.sender = sender;
         this.pedido = pedido;
-        this.tipoMensagem = tipoMensagem;
+        this.encodedfile = file;
         receiver = null;
     }
 
-    public MulticastMessage(ServerInfo sender, TipoMensagemMulticast tipoMensagem) {
+    public MulticastMessage(ServerInfo sender, Pedido pedido) {
         this.sender = sender;
-        this.tipoMensagem = tipoMensagem;
+        this.pedido = pedido;
+        receiver = null;
+    }
+
+    public MulticastMessage(ServerInfo sender) {
+        this.sender = sender;
         receiver = null;
     }
 
@@ -44,16 +48,12 @@ public class MulticastMessage {
         this.receiver = receiver;
     }
 
-    public void setTipoMensagem(TipoMensagemMulticast tipoMensagem) {
-        this.tipoMensagem = tipoMensagem;
-    }
-
     public void setPedido(Pedido pedido) {
         this.pedido = pedido;
     }
 
     public void setFile(String file) {
-        this.file = file;
+        this.encodedfile = file;
     }
 
     public ServerInfo getSender() {
@@ -64,15 +64,11 @@ public class MulticastMessage {
         return receiver;
     }
 
-    public TipoMensagemMulticast getTipoMensagem() {
-        return tipoMensagem;
-    }
-
     public Pedido getPedido() {
         return pedido;
     }
 
     public String getFile() {
-        return file;
+        return encodedfile;
     }
 }

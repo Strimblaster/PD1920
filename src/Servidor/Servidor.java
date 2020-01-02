@@ -5,7 +5,6 @@ import Comum.Exceptions.InvalidPasswordException;
 import Comum.Exceptions.InvalidPlaylistNameException;
 import Comum.Exceptions.InvalidSongDescriptionException;
 import Comum.Exceptions.InvalidUsernameException;
-import Comum.Pedidos.*;
 import Servidor.Interfaces.IServer;
 import Servidor.Interfaces.IEvent;
 import Servidor.Interfaces.ServerConstants;
@@ -73,33 +72,18 @@ public class Servidor implements ServerConstants, Constants, IServer {
     }
 
     @Override
-    public void addNewSong(Song musica, byte[] file) {
-
+    public void saveSongFile_Full(Utilizador utilizador, Song musica, byte[] file) {
         try {
-
             //Vai buscar o ID da musica para saber o nome do ficheiro
-            PreparedStatement getIDStatment = conn.prepareStatement("SELECT id FROM musicas WHERE nome = ?");
-            getIDStatment.setString(1,musica.getNome());
-            ResultSet resultSet = getIDStatment.executeQuery();
-            if(!resultSet.next())
-                throw new SQLException("Algo correu mal, o nome da musica não existe");
-            int id = resultSet.getInt("id");
-            getIDStatment.close();
+            int id = getSongIDByName(musica);
 
             //Guarda o ficheiro na pasta do servidor
-            FileOutputStream fileOutputStream = new FileOutputStream(musicDir.getAbsolutePath() + File.separator + id + ".mp3");
-            fileOutputStream.write(file);
-            fileOutputStream.flush();
-            fileOutputStream.close();
+            saveFile(file, id);
 
             //Altera a Row da musica na tabela para ter o nome do ficheiro
-            PreparedStatement preparedStatement = conn.prepareStatement("UPDATE musicas SET ficheiro = ? WHERE id = ?");
-            preparedStatement.setString(1, id+".mp3");
-            preparedStatement.setInt(2, id);
-            preparedStatement.executeUpdate();
-            preparedStatement.close();
+            insertSongFilename(id);
 
-            //Falta mandar o evento para a comunicação aqui para atualizar todos os servidores
+            listener.newSongFile(utilizador, musica, file);
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();
@@ -132,18 +116,10 @@ public class Servidor implements ServerConstants, Constants, IServer {
             int id = getIDUtilizador(utilizador);
 
             //Adicionar a musica à BD
-            PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO musicas(nome, autor, album, duracao, ano, genero) VALUES (?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-            insertStatement.setString(1,  musica.getNome());
-            insertStatement.setInt(2,  id);
-            insertStatement.setString(3,  musica.getAlbum());
-            insertStatement.setInt(4,  musica.getDuracao());
-            insertStatement.setInt(5,  musica.getAno());
-            insertStatement.setString(6,  musica.getGenero());
-            insertStatement.executeUpdate();
-            ResultSet generatedKeys = insertStatement.getGeneratedKeys();
-            generatedKeys.next();
-            int id_musica = generatedKeys.getInt(1);
-            insertStatement.close();
+            int id_musica = insertNewSong(musica, id);
+            utilizador.setId(id);
+            musica.setAutor(utilizador);
+            listener.newSong(utilizador, musica);
 
             return id_musica + ".mp3";
 
@@ -226,7 +202,6 @@ public class Servidor implements ServerConstants, Constants, IServer {
         try {
             if(songs){
                 String query = constructQuerySongs(nome, album, genero, ano, duracao);
-                System.out.println(query);
                 PreparedStatement preparedStatement = conn.prepareStatement(query);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()){
@@ -236,7 +211,6 @@ public class Servidor implements ServerConstants, Constants, IServer {
 
             if(playlists){
                 String query = constructQueryPlaylist(nome);
-                System.out.println(query);
                 PreparedStatement preparedStatement = conn.prepareStatement(query);
                 ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -259,7 +233,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
                         ResultSet resultSet1 = statement.executeQuery();
                         resultSet1.next();
                         Song musica = resultSetToMusica(resultSet1);
-                        System.out.println(musica.getNome());
+
                         musicas.add(musica);
                         statement.close();
                     }
@@ -316,12 +290,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
                 throw new InvalidPlaylistNameException();
             preparedStatement.close();
             
-            int id = getIDUtilizador(utilizador);
-
-            PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO playlists(nome, criador) VALUES (?,?)");
-            insertStatement.setString(1, nome);
-            insertStatement.setInt(2,id);
-            insertStatement.executeUpdate();
+            insertPlaylist(utilizador, nome);
 
             return true;
         } catch (SQLException e) {
@@ -461,7 +430,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
                 preparedStatementMusicas.setInt(1, song.getId());
                 preparedStatementMusicas.setInt(2, playlist.getId());
 
-                int ret2 = preparedStatementMusicas.executeUpdate();
+                preparedStatementMusicas.executeUpdate();
             }
 
             return true;
@@ -630,10 +599,14 @@ public class Servidor implements ServerConstants, Constants, IServer {
 
         } catch (SocketException e) {
             System.out.println("[ERRO] Houve um problema com o Socket:\n"+ e.getMessage());
+            e.printStackTrace();
         } catch (SQLException e) {
             System.out.println("[ERRO] Houve com a base de dados:\n"+ e.getMessage());
+            e.printStackTrace();
         } catch (IOException e) {
             System.out.println("[ERRO] Houve um erro de IO:\n"+ e.getMessage());
+            e.printStackTrace();
+
         }
     }
 
@@ -678,4 +651,87 @@ public class Servidor implements ServerConstants, Constants, IServer {
         statement.executeUpdate();
         statement.close();
     }
+
+    @Override
+    public void insertPlaylist(Utilizador utilizador, String nomePlaylist) throws SQLException {
+        int id = getIDUtilizador(utilizador);
+
+        PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO playlists(nome, criador) VALUES (?,?)");
+        insertStatement.setString(1, nomePlaylist);
+        insertStatement.setInt(2,id);
+        insertStatement.executeUpdate();
+    }
+
+    @Override
+    public void saveSongFile_Partial(Song musica, byte[] file) {
+        try {
+            int id;
+            //Vai buscar o ID da musica para saber o nome do ficheiro
+            try {
+                id = getSongIDByName(musica);
+            } catch (SQLException e) {
+                insertNewSong(musica, musica.getAutor().getId());
+                return;
+            }
+
+            if(file != null) {
+                //Guarda o ficheiro na pasta do servidor
+                saveFile(file, id);
+            } else {
+                //Altera a Row da musica na tabela para ter o nome do ficheiro
+                insertSongFilename(id);
+            }
+
+
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private int getSongIDByName(Song musica) throws SQLException {
+        PreparedStatement getIDStatment = conn.prepareStatement("SELECT id FROM musicas WHERE nome = ?");
+        getIDStatment.setString(1,musica.getNome());
+        ResultSet resultSet = getIDStatment.executeQuery();
+        if(!resultSet.next())
+            throw new SQLException("Algo correu mal, o nome da musica não existe");
+        int id = resultSet.getInt("id");
+        getIDStatment.close();
+        return id;
+    }
+
+    private void saveFile(byte[] file, int id) throws IOException {
+        FileOutputStream fileOutputStream = new FileOutputStream(musicDir.getAbsolutePath() + File.separator + id + ".mp3", true);
+        fileOutputStream.write(file);
+        fileOutputStream.flush();
+        fileOutputStream.close();
+    }
+
+    private void insertSongFilename(int id) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement("UPDATE musicas SET ficheiro = ? WHERE id = ?");
+        preparedStatement.setString(1, id + ".mp3");
+        preparedStatement.setInt(2, id);
+        preparedStatement.executeUpdate();
+        preparedStatement.close();
+    }
+
+    private int insertNewSong(Song musica, int idAutor) throws SQLException {
+        PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO musicas(nome, autor, album, duracao, ano, genero) VALUES (?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+        insertStatement.setString(1,  musica.getNome());
+        insertStatement.setInt(2,  idAutor);
+        insertStatement.setString(3,  musica.getAlbum());
+        insertStatement.setInt(4,  musica.getDuracao());
+        insertStatement.setInt(5,  musica.getAno());
+        insertStatement.setString(6,  musica.getGenero());
+        insertStatement.executeUpdate();
+
+        ResultSet generatedKeys = insertStatement.getGeneratedKeys();
+        generatedKeys.next();
+
+        int id_musica = generatedKeys.getInt(1);
+        insertStatement.close();
+
+        return id_musica;
+    }
+
 }

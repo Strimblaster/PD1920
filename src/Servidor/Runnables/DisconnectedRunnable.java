@@ -1,7 +1,5 @@
 package Servidor.Runnables;
 
-import Comum.Exceptions.InvalidSongDescriptionException;
-import Comum.Pedidos.Enums.TipoExcecao;
 import Comum.Pedidos.*;
 import Comum.Pedidos.Serializers.ExceptionSerializer;
 import Servidor.Interfaces.IServer;
@@ -26,7 +24,7 @@ public class DisconnectedRunnable extends RunnableBase {
 
     @Override
     public void run() {
-        if(pedido instanceof PedidoUploadFile){
+        /*if(pedido instanceof PedidoUploadFile){
 
             Gson gson = new GsonBuilder().registerTypeAdapter(Exception.class, new ExceptionSerializer()).create();
             try {
@@ -42,7 +40,7 @@ public class DisconnectedRunnable extends RunnableBase {
                     System.arraycopy(buffer, 0, temp, file.length, nRead);
                     file = temp;
                 }
-                servidor.addNewSong(((PedidoUploadFile) pedido).getMusica(), file);
+                servidor.saveSongFile(((PedidoUploadFile) pedido).getMusica(), file);
 
                 cliente.close();
             } catch (IOException e) {
@@ -62,6 +60,6 @@ public class DisconnectedRunnable extends RunnableBase {
             } catch (IOException e) {
                 System.out.println("[Erro] - [DownloadThread]: " + e.getMessage());
             }
-        }
+        }*/
     }
 }
