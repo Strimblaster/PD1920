@@ -27,7 +27,6 @@ public class ClienteThread extends Thread implements Constants {
 
                     int nextServer = ds.getProximoServidor();
 
-
                     if(ds.getTotalServidores() > 0) {
                         ServerInfo serverInfo = ds.servidoresTCP.get(nextServer);
                         Gson gson = new Gson();
@@ -37,13 +36,11 @@ public class ClienteThread extends Thread implements Constants {
                         datagramPacket.setData(jsonBytes);
                         datagramPacket.setLength(jsonBytes.length);
                     }else{
-                        //Isto tá meio manhoso mas funfa
                         datagramPacket.setData("".getBytes());
                         datagramPacket.setLength("".getBytes().length);
                     }
 
                     ds.clienteDatagramSocket.send(datagramPacket);
-                    ds.incrementaProximoServidor();
 
                 } catch (SocketException e) {
                     return;

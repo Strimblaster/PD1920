@@ -9,6 +9,6 @@ public interface IEvent {
 
     void serverExit();
 
-    // void newMusic(Music x); multicast
+    void newUser(String username, String password);
 
 }

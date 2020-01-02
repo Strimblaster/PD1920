@@ -4,10 +4,13 @@ import Comum.Constants;
 import Comum.Pedidos.*;
 import Comum.Pedidos.Serializers.PedidoDeserializer;
 import Comum.ServerInfo;
+import Comum.Utilizador;
 import Servidor.Interfaces.*;
 import Servidor.Runnables.*;
 import Servidor.Threads.MulticastListenerThread;
 import Servidor.Threads.PingThread;
+import Servidor.Utils.MulticastMessage;
+import Servidor.Utils.TipoMensagemMulticast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -26,6 +29,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
     private MulticastSocket multicastSocket;
     private IServer server;
     public ServerInfo myServerInfo;
+    private InetAddress multicastAddr;
 
 
 
@@ -38,6 +42,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
         servidores = new ArrayList<>();
         server = servidor;
         multicastSocket = new MulticastSocket(MULTICAST_PORT);
+        multicastAddr = InetAddress.getByName(MULTICAST_ADDR);
         servidor.setListener(this);
     }
 
@@ -66,28 +71,6 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
         }
 
         return id;
-    }
-
-
-    @Override
-    public void serverReady() {
-        new PingThread(datagramSocket, this).start();
-        new MulticastListenerThread(multicastSocket, server, servidores, myServerInfo).start();
-        start();
-    }
-
-    @Override
-    public void needID() throws IOException {
-        server.setID(requestServerID());
-    }
-
-    @Override
-    public void serverExit() {
-        try {
-            serverSocket.close();
-        } catch (IOException ignored) { }
-        datagramSocket.close();
-        multicastSocket.close();
     }
 
     @Override
@@ -145,5 +128,40 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void serverReady() {
+        new PingThread(datagramSocket, this).start();
+        new MulticastListenerThread(multicastSocket, server, servidores, myServerInfo).start();
+        start();
+    }
+
+    @Override
+    public void needID() throws IOException {
+        server.setID(requestServerID());
+    }
+
+    @Override
+    public void serverExit() {
+        try {
+            serverSocket.close();
+        } catch (IOException ignored) { }
+        datagramSocket.close();
+        multicastSocket.close();
+    }
+
+    @Override
+    public void newUser(String username, String password) {
+        MulticastMessage message = new MulticastMessage(myServerInfo, new PedidoSignUp(new Utilizador(username, password)), null, TipoMensagemMulticast.Update);
+        String json = new Gson().toJson(message);
+        byte[] bytes = json.getBytes();
+
+        DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length, multicastAddr, MULTICAST_PORT);
+        try {
+            multicastSocket.send(datagramPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

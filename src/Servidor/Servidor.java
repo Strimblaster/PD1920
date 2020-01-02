@@ -60,8 +60,10 @@ public class Servidor implements ServerConstants, Constants, IServer {
             if(resultSetUsername.next()){
                 throw new InvalidUsernameException("Username já está registado");
             }
-            s.executeUpdate("INSERT INTO utilizadores(nome, password) VALUES (\'"+utilizador.getName()+"\', \'"+utilizador.getPassword()+"\')");
+            insertUser(utilizador);
 
+            listener.newUser(username,password);
+            s.close();
             return true;
 
         } catch (SQLException e) {
@@ -666,5 +668,14 @@ public class Servidor implements ServerConstants, Constants, IServer {
         s.execute(DB_CREATE_1 + DBName + DB_CREATE_2 + DBName + DB_CREATE_3);
         s.close();
 
+    }
+
+    @Override
+    public void insertUser(Utilizador utilizador) throws SQLException {
+        PreparedStatement statement = conn.prepareStatement("INSERT INTO utilizadores(nome, password) VALUES (?, ?)");
+        statement.setString(1, utilizador.getName());
+        statement.setString(2, utilizador.getPassword());
+        statement.executeUpdate();
+        statement.close();
     }
 }
