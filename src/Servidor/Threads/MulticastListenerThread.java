@@ -27,7 +27,6 @@ public class MulticastListenerThread extends Thread implements ServerConstants {
     ArrayList<ServerInfo> servidores;
     ServerInfo myServerInfo;
     InetAddress multicastGroupAddr;
-    InetAddress multicastGroupAddrConfirmation;
 
 
     public MulticastListenerThread(MulticastSocket socket, DatagramSocket datagramSocket, IServer server, ArrayList<ServerInfo> servidores, ServerInfo myServerInfo) {
@@ -43,7 +42,6 @@ public class MulticastListenerThread extends Thread implements ServerConstants {
         Gson gsonMulticastMsg = new GsonBuilder().registerTypeAdapter(MulticastMessage.class, new MulticastMessageDeserializer()).create();
         try {
             multicastGroupAddr = InetAddress.getByName(MULTICAST_ADDR);
-            multicastGroupAddrConfirmation = InetAddress.getByName(MULTICAST_ADDR_CONFIRMATION);
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Não consegui juntar-me ao grupo de multicast");
@@ -89,11 +87,12 @@ public class MulticastListenerThread extends Thread implements ServerConstants {
 
                 }
 
-                MulticastConfirmationMessage confirmationMessage = new MulticastConfirmationMessage(myServerInfo, message.getSender(), true);
+                MulticastConfirmationMessage confirmationMessage = new MulticastConfirmationMessage(myServerInfo, true);
                 String toJson = new Gson().toJson(confirmationMessage);
                 byte[] bytes = toJson.getBytes();
                 System.out.println("Enviei confirmação: " + toJson);
-                DatagramPacket packet = new DatagramPacket(bytes, bytes.length, multicastGroupAddrConfirmation, MULTICAST_PORT_CONFIRMATION);
+                System.out.println("Enviei para: " + datagramPacket.getAddress() + " " + datagramPacket.getPort());
+                DatagramPacket packet = new DatagramPacket(bytes, bytes.length, datagramPacket.getAddress(), datagramPacket.getPort());
                 datagramSocket.send(packet);
             }
         } catch (IOException e) {

@@ -24,9 +24,9 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
 
     public final ArrayList<ServerInfo> servidores;
     private ServerSocket serverSocket;
-    private DatagramSocket datagramSocket;
+    private DatagramSocket datagramSocketDS;
+    private DatagramSocket datagramSocketMulticast;
     private MulticastSocket multicastSocket;
-    private MulticastSocket multicastSocketConfirmation;
     private IServer server;
     public ServerInfo myServerInfo;
     private InetAddress multicastAddr;
@@ -34,20 +34,17 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
 
     public Comunicacao(Servidor servidor) throws IOException {
         serverSocket = new ServerSocket(0);
-        datagramSocket = new DatagramSocket();
-        datagramSocket.setSoTimeout(TIMEOUT_5s);
+        datagramSocketDS = new DatagramSocket();
+        datagramSocketDS.setSoTimeout(TIMEOUT_5s);
+        datagramSocketMulticast = new DatagramSocket();
         servidores = new ArrayList<>();
         server = servidor;
 
 
         multicastAddr = InetAddress.getByName(MULTICAST_ADDR);
-        InetAddress multicastAddrConfirmation = InetAddress.getByName(MULTICAST_ADDR_CONFIRMATION);
 
         multicastSocket = new MulticastSocket(MULTICAST_PORT);
-        multicastSocketConfirmation = new MulticastSocket(MULTICAST_PORT_CONFIRMATION);
-
         multicastSocket.joinGroup(multicastAddr);
-        multicastSocketConfirmation.joinGroup(multicastAddrConfirmation);
 
 
         multicastAddr = InetAddress.getByName(MULTICAST_ADDR);
@@ -60,11 +57,11 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
         int id;
 
         DatagramPacket p = new DatagramPacket(b, b.length, InetAddress.getByName(IP_DS), SERVER_PORT_DS);
-        datagramSocket.send(p);
-        datagramSocket.receive(p);
+        datagramSocketDS.send(p);
+        datagramSocketDS.receive(p);
         id = Integer.parseInt(new String(p.getData(), 0, p.getLength()));
         p = new DatagramPacket(new byte[PKT_SIZE], PKT_SIZE);
-        datagramSocket.receive(p);
+        datagramSocketDS.receive(p);
         String json = new String(p.getData(), 0, p.getLength());
 
         Type listType = new TypeToken<ArrayList<ServerInfo>>(){}.getType();
@@ -77,7 +74,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
             servidores.clear();
             servidores.addAll(servers);
         }
-
+        myServerInfo.setPort(datagramSocketMulticast.getLocalPort());
         return id;
     }
 
@@ -140,8 +137,8 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
 
     @Override
     public void serverReady() {
-        new PingThread(datagramSocket, this).start();
-        new MulticastListenerThread(multicastSocket, datagramSocket, server, servidores, myServerInfo).start();
+        new PingThread(datagramSocketDS, this).start();
+        new MulticastListenerThread(multicastSocket, datagramSocketMulticast, server, servidores, myServerInfo).start();
         start();
     }
 
@@ -155,10 +152,9 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
         try {
             serverSocket.close();
         } catch (IOException ignored) { }
-        datagramSocket.close();
+        datagramSocketDS.close();
 
         multicastSocket.close();
-        multicastSocketConfirmation.close();
     }
 
     @Override
@@ -205,44 +201,30 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
     }
 
 
-    private synchronized void sendMulticastMessage(MulticastMessage message) {
+    private void sendMulticastMessage(MulticastMessage message) {
         String json = new Gson().toJson(message);
         byte[] bytes = json.getBytes();
 
         DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length, multicastAddr, MULTICAST_PORT);
         try {
             System.out.println("Enviei: " + json);
-            datagramSocket.send(datagramPacket);
+            System.out.println("Enviei para: " + datagramPacket.getAddress() + " " + datagramPacket.getPort());
+            datagramSocketMulticast.send(datagramPacket);
             int i = 0;
             while (i != servidores.size()-1) {
                 DatagramPacket packet = new DatagramPacket(new byte[PKT_SIZE], PKT_SIZE);
-                multicastSocketConfirmation.receive(packet);
+                datagramSocketMulticast.receive(packet);
                 String jsonConfirmation = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
                 MulticastConfirmationMessage confirmationMessage = new Gson().fromJson(jsonConfirmation, MulticastConfirmationMessage.class);
 
                 System.out.println("Recebi Confirmação: " + jsonConfirmation);
-                if(!checkMessage(confirmationMessage)) continue;
+                if(!confirmationMessage.isSucess()) continue;
                 i++;
-
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private boolean checkMessage(MulticastConfirmationMessage message) {
-
-        ServerInfo receiver = message.getReceiver();
-
-        //Verifica se fui eu que mandei a mensagem
-        if(message.getSender().getId() == myServerInfo.getId()) return false;
-
-        //Verifica se é para mim
-        if(receiver != null)
-            if(receiver.getId() != myServerInfo.getId())
-                return false;
-        return true;
     }
 
 }

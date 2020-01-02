@@ -9,9 +9,7 @@ public interface ServerConstants extends Constants {
     String PASS = "PDcancro";
 
     String MULTICAST_ADDR = "239.111.111.111";
-    String MULTICAST_ADDR_CONFIRMATION = "239.222.222.222";
-    int MULTICAST_PORT =  3033;
-    int MULTICAST_PORT_CONFIRMATION =  3034;
+    int MULTICAST_PORT =  8000;
 
 
     String DB_CREATE_1 =
