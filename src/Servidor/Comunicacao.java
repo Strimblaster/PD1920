@@ -214,7 +214,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
             while (i != servidores.size()-1) {
                 DatagramPacket packet = new DatagramPacket(new byte[PKT_SIZE], PKT_SIZE);
                 datagramSocketMulticast.receive(packet);
-                String jsonConfirmation = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+                String jsonConfirmation = new String(packet.getData(), 0, packet.getLength());
                 MulticastConfirmationMessage confirmationMessage = new Gson().fromJson(jsonConfirmation, MulticastConfirmationMessage.class);
 
                 System.out.println("Recebi Confirmação: " + jsonConfirmation);
