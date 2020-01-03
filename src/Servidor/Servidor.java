@@ -230,7 +230,7 @@ public class Servidor implements ServerConstants, Constants, Observable {
 
                 while(resultSet.next()){
                     String nomePlaylist = resultSet.getString("nome");
-                    String nomeCriador = resultSet.getString("criador");
+                    int idCriador = resultSet.getInt("criador");
                     ArrayList<Song> musicas = new ArrayList<>();
                     int idPlaylist = resultSet.getInt("id");
 
@@ -253,7 +253,7 @@ public class Servidor implements ServerConstants, Constants, Observable {
                     }
 
                     PreparedStatement owner = conn.prepareStatement("SELECT * FROM utilizadores where nome = ?");
-                    owner.setString(1, nomeCriador);
+                    owner.setString(1, getUtilizador(idCriador).getName());
                     ResultSet resultOwner = owner.executeQuery();
                     resultOwner.next();
                     Utilizador user = resultSetToUtilizador(resultOwner);
@@ -479,7 +479,7 @@ public class Servidor implements ServerConstants, Constants, Observable {
         ResultSet userResultSet = getIDUtilizadorStatement.executeQuery();
 
         if(!userResultSet.next())
-            return null;
+            throw new SQLException("Não existe utilizador com id " + id);
 
         String nome = userResultSet.getString("nome");
 

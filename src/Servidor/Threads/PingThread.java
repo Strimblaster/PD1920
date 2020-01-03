@@ -52,7 +52,9 @@ public class PingThread extends Thread implements Constants {
 
                 datagramSocket.send(datagramPacket);
 
-            } catch (IOException e) {
+            } catch (SocketException ignored) {
+
+            }catch (IOException e) {
                 System.out.printf("[INFO] - [PingThread]: A sair...");
                 return;
             }

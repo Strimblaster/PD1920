@@ -43,7 +43,6 @@ public class Comunicacao extends Thread implements Listener, Constants, ServerCo
         serverSocket = new ServerSocket(0);
         this.ip_DS = ip_DS;
         datagramSocketDS = new DatagramSocket();
-        datagramSocketDS.setSoTimeout(TIMEOUT_5s);
         datagramSocketMulticast = new DatagramSocket();
         datagramSocketSync = new DatagramSocket();
         servidores = new ArrayList<>();
