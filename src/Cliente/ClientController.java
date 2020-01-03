@@ -24,12 +24,13 @@ public class ClientController implements Listener {
     private String clientRunningPath;
     private ArrayList<Song> songsBeingDownloaded;
 
-    ClientController(String clientDir) throws IOException, InvalidServerException {
+    ClientController(String clientDir, String ip, int port) throws IOException, InvalidServerException {
         this.clientRunningPath = clientDir;
-        this.model = new ClientModel(this);
+        this.model = new ClientModel(this, ip, port);
         songsBeingDownloaded = new ArrayList<>();
         System.out.println(model.getServer());
     }
+
 
     @Override
     public void songUploaded(String nome) {

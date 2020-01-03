@@ -13,23 +13,28 @@ import java.net.SocketTimeoutException;
 import static javafx.application.Platform.exit;
 
 public class Cliente extends javafx.application.Application {
-    private ClientController clientController ;
+    private static ClientController clientController ;
 
-    public Cliente() throws IOException {
+    public static void main(String[] args) throws IOException {
         try {
-            clientController = new ClientController(System.getProperty("user.dir"));
-        } catch (InvalidServerException | SocketTimeoutException e){
+            if(args.length == 0)
+                clientController = new ClientController(System.getProperty("user.dir"), null, -1);
+            else if (args.length == 2)
+                clientController = new ClientController(System.getProperty("user.dir"), args[0], Integer.parseInt(args[1]));
+            else
+                System.out.println("cliente.jar ip port");
+
+        } catch (InvalidServerException | SocketTimeoutException | NumberFormatException e){
             System.out.println(e.getMessage());
             exit();
         }
-    }
 
-    public static void main(String[] args){
         launch(args);
     }
 
     @Override
-    public void start(Stage stage){
+    public void start(Stage stage) {
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("JavaFX/FXML/Inicio.fxml"));
             BorderPane root =  loader.load();

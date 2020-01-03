@@ -14,8 +14,8 @@ class ClientModel implements Constants {
     private Utilizador utilizador;
     private Observable comunicacao;
 
-    public ClientModel(ClientController clientController) throws IOException, InvalidServerException {
-        comunicacao = new Comunicacao(clientController);
+    public ClientModel(ClientController clientController, String ip, int port) throws IOException, InvalidServerException {
+        comunicacao = new Comunicacao(clientController, ip, port);
         this.server = comunicacao.getServerInfo();
 
     }
