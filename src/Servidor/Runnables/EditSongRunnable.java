@@ -1,17 +1,10 @@
 package Servidor.Runnables;
 
-import Cliente.Interfaces.IEvent;
-import Comum.Exceptions.InvalidPasswordException;
-import Comum.Exceptions.InvalidPlaylistNameException;
-import Comum.Exceptions.InvalidSongDescriptionException;
-import Comum.Exceptions.InvalidUsernameException;
-import Comum.Pedidos.Enums.TipoExcecao;
-import Comum.Pedidos.PedidoAddSong;
 import Comum.Pedidos.PedidoEditSong;
 import Comum.Pedidos.Resposta;
 import Comum.Pedidos.Serializers.ExceptionSerializer;
 import Comum.Utilizador;
-import Servidor.Interfaces.IServer;
+import Servidor.Interfaces.Observable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -23,7 +16,7 @@ public class EditSongRunnable extends RunnableBase implements Runnable {
 
     PedidoEditSong pedidoEditSong;
 
-    public EditSongRunnable(Socket cliente, PedidoEditSong pedidoEditSong, IServer servidor) {
+    public EditSongRunnable(Socket cliente, PedidoEditSong pedidoEditSong, Observable servidor) {
         super(cliente, servidor);
         this.pedidoEditSong = pedidoEditSong;
     }

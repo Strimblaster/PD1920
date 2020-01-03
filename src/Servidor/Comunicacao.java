@@ -15,7 +15,6 @@ import Servidor.Utils.ThreadMode;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-import com.google.gson.internal.$Gson$Types;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.*;
@@ -25,7 +24,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
 
-public class Comunicacao extends Thread implements IEvent, Constants, ServerConstants {
+public class Comunicacao extends Thread implements Listener, Constants, ServerConstants {
 
     public final ArrayList<ServerInfo> servidores;
     private ServerSocket serverSocket;
@@ -33,7 +32,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
     private DatagramSocket datagramSocketMulticast;
     private DatagramSocket datagramSocketSync;
     private MulticastSocket multicastSocket;
-    private IServer server;
+    private Observable server;
     public ServerInfo myServerInfo;
     private InetAddress multicastAddr;
 

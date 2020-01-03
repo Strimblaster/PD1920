@@ -1,13 +1,12 @@
 package Cliente;
 
-import Cliente.Interfaces.IComunicacaoCliente;
-import Cliente.Interfaces.IEvent;
+import Cliente.Interfaces.Observable;
+import Cliente.Interfaces.Listener;
 import Cliente.Runnables.DownloadFileRunnable;
 import Cliente.Runnables.UploadFileRunnable;
 import Comum.Exceptions.*;
 import Comum.*;
 import Comum.Pedidos.*;
-import Comum.Pedidos.Serializers.ExceptionSerializer;
 import Comum.Pedidos.Serializers.PlaylistDeserializer;
 import Comum.Pedidos.Serializers.RespostaDeserializer;
 import com.google.gson.Gson;
@@ -19,13 +18,13 @@ import java.lang.reflect.Type;
 import java.net.*;
 import java.util.ArrayList;
 
-public class Comunicacao implements IComunicacaoCliente, Constants {
+public class Comunicacao implements Observable, Constants {
 
     ServerInfo serverInfo;
-    IEvent event;
+    Listener event;
     File musicDir;
 
-    public Comunicacao(IEvent clientController) {
+    public Comunicacao(Listener clientController) {
         this.event = clientController;
     }
 

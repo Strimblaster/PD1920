@@ -1,7 +1,7 @@
 package Cliente.Runnables;
 
 import Cliente.Comunicacao;
-import Cliente.Interfaces.IEvent;
+import Cliente.Interfaces.Listener;
 import Comum.Pedidos.PedidoUploadFile;
 import Comum.Song;
 
@@ -14,12 +14,12 @@ public class UploadFileRunnable implements Runnable {
 
     private Socket server;
     private PedidoUploadFile pedido;
-    private IEvent event;
+    private Listener event;
     private File clientMusicDir;
     private String filenameMusicID;  //Para guardar o ficheiro na pasta do cliente com o id da musica
     private Comunicacao comunicacao;
 
-    public UploadFileRunnable(Socket server, PedidoUploadFile pedido, IEvent event, File clientMusicDir, String filename, Comunicacao comunicacao) {
+    public UploadFileRunnable(Socket server, PedidoUploadFile pedido, Listener event, File clientMusicDir, String filename, Comunicacao comunicacao) {
         this.server = server;
         this.pedido = pedido;
         this.event = event;

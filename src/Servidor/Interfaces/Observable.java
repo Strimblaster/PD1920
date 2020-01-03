@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public interface IServer extends IComunicacao {
+public interface Observable extends IComunicacao {
 
     void setID(int id);
     void saveSongFile_Full(Utilizador utilizador, Song musica, byte[] file);

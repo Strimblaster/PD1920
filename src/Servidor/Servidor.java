@@ -9,8 +9,8 @@ import Comum.Pedidos.PedidoAddSong;
 import Comum.Pedidos.PedidoNewPlaylist;
 import Comum.Pedidos.PedidoSignUp;
 import Comum.Pedidos.PedidoUploadFile;
-import Servidor.Interfaces.IServer;
-import Servidor.Interfaces.IEvent;
+import Servidor.Interfaces.Observable;
+import Servidor.Interfaces.Listener;
 import Servidor.Interfaces.ServerConstants;
 import Servidor.Utils.PedidoSync;
 
@@ -21,12 +21,12 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Scanner;
 
-public class Servidor implements ServerConstants, Constants, IServer {
+public class Servidor implements ServerConstants, Constants, Observable {
 
     private Connection conn;
     private String DBName;
     private int id;
-    private IEvent listener;
+    private Listener listener;
     private File musicDir;
 
 
@@ -593,7 +593,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
     boolean validToQueryBuilder(int i){ return i!=-1;}
 
 
-    public void setListener(IEvent listener) {
+    public void setListener(Listener listener) {
         this.listener = listener;
     }
 

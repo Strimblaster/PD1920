@@ -7,7 +7,7 @@ import Comum.ServerInfo;
 import java.io.File;
 import java.io.IOException;
 
-public interface IComunicacaoCliente extends IComunicacao {
+public interface Observable extends IComunicacao {
 
     ServerInfo getServerInfo() throws IOException, InvalidServerException;
     void setMusicDir(File dir);

@@ -7,7 +7,7 @@ import Comum.Pedidos.PedidoLogin;
 import Comum.Pedidos.Resposta;
 import Comum.Pedidos.Serializers.ExceptionSerializer;
 import Comum.Utilizador;
-import Servidor.Interfaces.IServer;
+import Servidor.Interfaces.Observable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -19,7 +19,7 @@ public class LoginRunnable extends RunnableBase {
 
     private PedidoLogin pedidoLogin;
 
-    public LoginRunnable(Socket cliente, PedidoLogin pedidoLogin, IServer servidor) {
+    public LoginRunnable(Socket cliente, PedidoLogin pedidoLogin, Observable servidor) {
         super(cliente, servidor);
         this.pedidoLogin = pedidoLogin;
     }

@@ -1,14 +1,12 @@
 package Servidor.Runnables;
 
-import Comum.Exceptions.InvalidPasswordException;
 import Comum.Exceptions.InvalidPlaylistNameException;
-import Comum.Exceptions.InvalidUsernameException;
 import Comum.Pedidos.Enums.TipoExcecao;
 import Comum.Pedidos.PedidoNewPlaylist;
 import Comum.Pedidos.Resposta;
 import Comum.Pedidos.Serializers.ExceptionSerializer;
 import Comum.Utilizador;
-import Servidor.Interfaces.IServer;
+import Servidor.Interfaces.Observable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -20,7 +18,7 @@ public class NewPlaylistRunnable extends RunnableBase {
 
     PedidoNewPlaylist pedidoNewPlaylist;
 
-    public NewPlaylistRunnable(Socket cliente, PedidoNewPlaylist pedidoNewPlaylist, IServer servidor) {
+    public NewPlaylistRunnable(Socket cliente, PedidoNewPlaylist pedidoNewPlaylist, Observable servidor) {
         super(cliente, servidor);
         this.pedidoNewPlaylist = pedidoNewPlaylist;
     }

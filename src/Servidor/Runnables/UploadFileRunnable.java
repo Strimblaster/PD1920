@@ -4,7 +4,7 @@ import Comum.Exceptions.InvalidSongDescriptionException;
 import Comum.Pedidos.Enums.TipoExcecao;
 import Comum.Pedidos.*;
 import Comum.Pedidos.Serializers.ExceptionSerializer;
-import Servidor.Interfaces.IServer;
+import Servidor.Interfaces.Observable;
 import Servidor.Utils.ThreadMode;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,7 +21,7 @@ public class UploadFileRunnable extends RunnableBase {
     private final ThreadMode threadMode;
     private PedidoUploadFile pedidoUploadFile;
 
-    public UploadFileRunnable(Socket cliente, PedidoUploadFile pedidoUploadFile, IServer servidor, ThreadMode disconnect) {
+    public UploadFileRunnable(Socket cliente, PedidoUploadFile pedidoUploadFile, Observable servidor, ThreadMode disconnect) {
         super(cliente, servidor);
         this.pedidoUploadFile = pedidoUploadFile;
         this.threadMode = disconnect;
