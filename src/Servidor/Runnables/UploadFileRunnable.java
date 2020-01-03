@@ -5,6 +5,7 @@ import Comum.Pedidos.Enums.TipoExcecao;
 import Comum.Pedidos.*;
 import Comum.Pedidos.Serializers.ExceptionSerializer;
 import Servidor.Interfaces.IServer;
+import Servidor.Utils.ThreadMode;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -17,11 +18,13 @@ import static Comum.Constants.PKT_SIZE;
 
 public class UploadFileRunnable extends RunnableBase {
 
+    private final ThreadMode threadMode;
     private PedidoUploadFile pedidoUploadFile;
 
-    public UploadFileRunnable(Socket cliente, PedidoUploadFile pedidoUploadFile, IServer servidor) {
+    public UploadFileRunnable(Socket cliente, PedidoUploadFile pedidoUploadFile, IServer servidor, ThreadMode disconnect) {
         super(cliente, servidor);
         this.pedidoUploadFile = pedidoUploadFile;
+        this.threadMode = disconnect;
     }
 
     @Override
@@ -33,17 +36,25 @@ public class UploadFileRunnable extends RunnableBase {
 
             Resposta resposta;
 
-            try {
-                String path = servidor.uploadFile(pedidoUploadFile.getUtilizador(), pedidoUploadFile.getMusica());
-                if (path != null) {
-                    pedidoUploadFile.getMusica().setFilename(path);
-                    resposta = new Resposta(pedidoUploadFile, true, "OK");
-                }
-                else
-                    resposta = new Resposta(pedidoUploadFile, false, "Erro no servidor");
+            if(threadMode == ThreadMode.Normal){
+                try {
+                    String path = servidor.uploadFile(pedidoUploadFile.getUtilizador(), pedidoUploadFile.getMusica());
+                    if (path != null) {
+                        pedidoUploadFile.getMusica().setFilename(path);
+                        resposta = new Resposta(pedidoUploadFile, true, "OK");
+                    }
+                    else
+                        resposta = new Resposta(pedidoUploadFile, false, "Erro no servidor");
 
-            }catch (InvalidSongDescriptionException e) {
-                resposta = new Resposta(pedidoUploadFile, false, e.getMessage(), TipoExcecao.InvalidSongDescription, e);
+                }catch (InvalidSongDescriptionException e) {
+                    resposta = new Resposta(pedidoUploadFile, false, e.getMessage(), TipoExcecao.InvalidSongDescription, e);
+                }
+            } else{
+                String path = servidor.checkSong(pedidoUploadFile.getMusica());
+                if(path == null)
+                    resposta = new Resposta(pedidoUploadFile, false, "A musica não existe no servidor");
+                else
+                    resposta = new Resposta(pedidoUploadFile, true, "OK");
             }
 
             String str = gson.toJson(resposta);

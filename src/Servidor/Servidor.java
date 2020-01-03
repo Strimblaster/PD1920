@@ -722,6 +722,17 @@ public class Servidor implements ServerConstants, Constants, IServer {
     }
 
     @Override
+    public String checkSong(Song musica) {
+        try {
+            int songIDByName = getSongIDByName(musica);
+            Song song = getMusicaByID(songIDByName);
+            return song.getId() + ".mp3";
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    @Override
     public void saveSongFile_Partial(Song musica, byte[] file) {
         try {
             int id;

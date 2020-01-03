@@ -8,7 +8,7 @@ public interface Constants {
     int CLIENT_PORT_DS = 5001;
     int SERVER_PORT_DS_PING = 5002;
     int PING_SLEEP_MS = 3000;
-    int PING_TIMEOUT_MS = 1000;
+    int PING_TIMEOUT_MS = 10000;
 
     int PKT_SIZE = 40000;
     int PKT_ENCODER = 25000;
