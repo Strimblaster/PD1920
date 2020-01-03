@@ -66,16 +66,19 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     public boolean login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
         PedidoLogin pedidoLogin = new PedidoLogin(new Utilizador(username, password));
         try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-
+            Socket tcpSocket;
+            Resposta resposta;
             try{
+                tcpSocket= new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+
                 enviaPedido(tcpSocket,pedidoLogin);
+
+                resposta = recebeResposta(tcpSocket);
             }catch (IOException e){
                 getServerInfo();
                 return login(username, password);
             }
-
-            Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return resposta.isSucess();
@@ -90,16 +93,19 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     public boolean signUp(String username, String password) throws InvalidUsernameException, InvalidPasswordException, InvalidServerException {
         PedidoSignUp pedidoSignUp = new PedidoSignUp(new Utilizador(username, password));
         try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-
+            Socket tcpSocket;
+            Resposta resposta;
             try{
+                 tcpSocket= new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+
                 enviaPedido(tcpSocket,pedidoSignUp);
+
+                resposta = recebeResposta(tcpSocket);
             }catch (IOException e){
                 getServerInfo();
-                return login(username, password);
+                return signUp(username, password);
             }
-
-            Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return resposta.isSucess();
@@ -115,18 +121,18 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         PedidoUploadFile pedidoUploadFile = new PedidoUploadFile(utilizador, song);
         if(musicDir == null) throw new RuntimeException("[Erro] [Comunicação]: musicDir == null ");
         try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-
-            //Envia pedido para saber se os parametros da Musica são validos
+            Socket tcpSocket;
+            Resposta resposta;
             try{
-                enviaPedido(tcpSocket,pedidoUploadFile);
+                tcpSocket= new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+                enviaPedido(tcpSocket, pedidoUploadFile);
+
+                resposta = recebeResposta(tcpSocket);
             }catch (IOException e){
                 getServerInfo();
-                return uploadFile(utilizador, song);
+                return uploadFile(utilizador,song);
             }
-
-            //Recebe resposta do pedido
-            Resposta resposta = recebeResposta(tcpSocket);
 
             Thread t = new  Thread(new UploadFileRunnable(tcpSocket, pedidoUploadFile, event, musicDir, ((PedidoUploadFile)resposta.getPedido()).getMusica().getFilename(), this));
             t.start();
@@ -147,14 +153,17 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         PedidoDownloadFile pedidoDownloadFile = new PedidoDownloadFile(utilizador, song);
         if(musicDir == null) throw new RuntimeException("[Erro] [Comunicação]: musicDir == null ");
         try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-
+            Socket tcpSocket;
             try{
-                enviaPedido(tcpSocket,pedidoDownloadFile);
+                tcpSocket= new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+                enviaPedido(tcpSocket, pedidoDownloadFile);
+
             }catch (IOException e){
                 getServerInfo();
-                return downloadFile(utilizador, song);
+                return downloadFile(utilizador,song);
             }
+
 
             Thread t = new  Thread(new DownloadFileRunnable(tcpSocket, pedidoDownloadFile, event, musicDir, this));
             t.start();
@@ -169,19 +178,22 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     public ArrayList<Song> getMusicas(Utilizador utilizador) {
         PedidoMusicas pedidoMusicas = new PedidoMusicas(utilizador);
         try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-            InputStream inputStream = tcpSocket.getInputStream();
             byte[] buffer = new byte[PKT_SIZE];
             Gson gson = new Gson();
-
+            Socket tcpSocket;
+            int nread;
             try{
+                tcpSocket= new Socket(serverInfo.getIp(), serverInfo.getPort());
+                InputStream inputStream = tcpSocket.getInputStream();
+
                 enviaPedido(tcpSocket,pedidoMusicas);
+
+                nread = inputStream.read(buffer);
             }catch (IOException e){
                 getServerInfo();
                 return getMusicas(utilizador);
             }
 
-            int nread = inputStream.read(buffer);
             System.out.println("[DEBUG] - Recebi " + nread + " bytes");
             String json = new String(buffer, 0 , nread);
 
@@ -202,16 +214,19 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     public FilteredResult search(Utilizador utilizador, boolean songs, boolean playlists, String nome, String album, String genero, int ano, int duracao) {
         PedidoSearch pedidoSearch = new PedidoSearch(utilizador, songs, playlists, nome, album, genero, ano, duracao);
         try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-
+            Socket tcpSocket;
+            Resposta resposta;
             try{
+                tcpSocket= new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+
                 enviaPedido(tcpSocket,pedidoSearch);
+
+                resposta = recebeResposta(tcpSocket);
             }catch (IOException e){
                 getServerInfo();
                 return search(utilizador, songs, playlists, nome, album, genero, ano, duracao);
             }
-
-            Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return ((PedidoSearch)resposta.getPedido()).getFilteredResult();
@@ -226,16 +241,19 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     public boolean newPlaylist(Utilizador utilizador, String nome) throws InvalidPlaylistNameException {
         PedidoNewPlaylist pedidoNewPlaylist = new PedidoNewPlaylist(utilizador,nome);
         try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-
+            Socket tcpSocket;
+            Resposta resposta;
             try{
+                tcpSocket= new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+
                 enviaPedido(tcpSocket,pedidoNewPlaylist);
+
+                resposta = recebeResposta(tcpSocket);
             }catch (IOException e){
                 getServerInfo();
                 return newPlaylist(utilizador, nome);
             }
-
-            Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return resposta.isSucess();
@@ -251,18 +269,21 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
         PedidoPlaylists pedidoPlaylists = new PedidoPlaylists(utilizador);
         Gson gson = new GsonBuilder().registerTypeAdapter(Playlist.class, new PlaylistDeserializer()).create();
         try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-            InputStream inputStream = tcpSocket.getInputStream();
-
+            byte[] buffer = new byte[PKT_SIZE];
+            Socket tcpSocket;
+            int nread;
             try{
+                tcpSocket= new Socket(serverInfo.getIp(), serverInfo.getPort());
+                InputStream inputStream = tcpSocket.getInputStream();
+
                 enviaPedido(tcpSocket,pedidoPlaylists);
+
+                nread = inputStream.read(buffer);
             }catch (IOException e){
                 getServerInfo();
                 return getPlaylists(utilizador);
             }
 
-            byte[] buffer = new byte[PKT_SIZE];
-            int nread = inputStream.read(buffer);
             System.out.println("[DEBUG] - Recebi " + nread + " bytes");
             String json = new String(buffer, 0 , nread);
 
@@ -283,16 +304,19 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     public boolean addSong(Utilizador utilizador, Playlist playlist, Song song) {
         PedidoAddSong pedidoAddSong = new PedidoAddSong(utilizador, song, playlist);
         try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-
+            Socket tcpSocket;
+            Resposta resposta;
             try{
+                tcpSocket= new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+
                 enviaPedido(tcpSocket,pedidoAddSong);
+
+                resposta = recebeResposta(tcpSocket);
             }catch (IOException e){
                 getServerInfo();
                 return addSong(utilizador, playlist, song);
             }
-
-            Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return resposta.isSucess();
@@ -307,16 +331,19 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     public boolean editFile(Utilizador utilizador, Song song) {
         PedidoEditSong pedidoEditSong = new PedidoEditSong(utilizador, song);
         try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-
+            Socket tcpSocket;
+            Resposta resposta;
             try{
+                tcpSocket= new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+
                 enviaPedido(tcpSocket,pedidoEditSong);
+
+                resposta = recebeResposta(tcpSocket);
             }catch (IOException e){
                 getServerInfo();
                 return editFile(utilizador, song);
             }
-
-            Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return resposta.isSucess();
@@ -331,15 +358,19 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
     public boolean editPlaylist(Utilizador utilizador, Playlist playlist) {
         PedidoEditPlaylist pedidoEditPlaylist = new PedidoEditPlaylist(utilizador, playlist);
         try {
-            Socket tcpSocket = new Socket(serverInfo.getIp(), serverInfo.getPort());
-
+            Socket tcpSocket;
+            Resposta resposta;
             try{
+                tcpSocket= new Socket(serverInfo.getIp(), serverInfo.getPort());
+
+
                 enviaPedido(tcpSocket,pedidoEditPlaylist);
+
+                resposta = recebeResposta(tcpSocket);
             }catch (IOException e){
                 getServerInfo();
                 return editPlaylist(utilizador, playlist);
             }
-            Resposta resposta = recebeResposta(tcpSocket);
 
             tcpSocket.close();
             return resposta.isSucess();

@@ -162,8 +162,12 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
             String json = new String(datagramPacket.getData(), 0 ,datagramPacket.getLength());
             PedidoSync pedidoSync = gsonPedidoSync.fromJson(json, PedidoSync.class);
             Pedido pedido = pedidoSync.getPedido();
-            if(pedido == null)
+            if(pedido == null) {
+                packetSend.setAddress(datagramPacket.getAddress());
+                packetSend.setPort(datagramPacket.getPort());
+                datagramSocketSync.send(packetSend);
                 break;
+            }
             try {
                 if (pedido instanceof PedidoSignUp)
                     server.insertUser(pedido.getUtilizador());
@@ -271,6 +275,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
 
         DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length, multicastAddr, MULTICAST_PORT);
         try {
+            datagramSocketMulticast.setSoTimeout(10000);
             datagramSocketMulticast.send(datagramPacket);
             int i = 0;
             while (i != servidores.size()-1) {
@@ -283,8 +288,10 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                 i++;
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        }catch (SocketException ex) {
+            System.out.println("Houve um servidor que não respondeu ao multicast");
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
