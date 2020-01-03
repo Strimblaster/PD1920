@@ -100,7 +100,7 @@ public class MulticastListenerThread extends Thread implements ServerConstants {
                 datagramSocket.send(packet);
             }
         } catch (IOException e) {
-            System.out.println("MulticastListenerThread - Tou a sair...");
+            System.out.println("[INFO] - [MulticastListenerThread]: Tou a sair...");
         }
     }
 

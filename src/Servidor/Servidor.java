@@ -613,6 +613,7 @@ public class Servidor implements ServerConstants, Constants, Observable {
             System.out.println("[INFO] Servidor a arrancar...");
             Servidor servidor;
             InetAddress ip_DS = InetAddress.getByName(IP_DS);
+            Scanner sc = new Scanner(System.in);
 
             if(args.length == 2) {
                 servidor = new Servidor(args[1]);
@@ -640,15 +641,14 @@ public class Servidor implements ServerConstants, Constants, Observable {
             servidor.ready();
 
 
-            Scanner sc = new Scanner(System.in);
-
             while(true){
                 String s = sc.next();
                 if(s.equals("sair")) break;
             }
             servidor.exit();
 
-        } catch (NumberFormatException e) {
+        } catch (IllegalStateException e){
+        }catch (NumberFormatException e) {
             System.out.println("Usage:\nServer.jar ip port db\nServer.jar ip port\nServer.jar db\nServer.jar");
         } catch (SocketException e) {
             System.out.println("[ERRO] Houve um problema com o Socket:\n"+ e.getMessage());

@@ -23,6 +23,7 @@ import java.net.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Scanner;
 
 public class Comunicacao extends Thread implements Listener, Constants, ServerConstants {
 
@@ -149,8 +150,8 @@ public class Comunicacao extends Thread implements Listener, Constants, ServerCo
 
                 new Thread(pedidoRunnable).start();
             }
-        }catch (SocketException ignored){
-
+        }catch (SocketException s){
+            System.out.println("[INFO] - [Comunicação]: A sair...");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -223,6 +224,7 @@ public class Comunicacao extends Thread implements Listener, Constants, ServerCo
         datagramSocketMulticast.close();
         multicastSocket.close();
         datagramSocketSync.close();
+        System.exit(0);
     }
 
     @Override
