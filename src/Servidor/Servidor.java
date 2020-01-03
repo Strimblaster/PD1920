@@ -5,14 +5,20 @@ import Comum.Exceptions.InvalidPasswordException;
 import Comum.Exceptions.InvalidPlaylistNameException;
 import Comum.Exceptions.InvalidSongDescriptionException;
 import Comum.Exceptions.InvalidUsernameException;
+import Comum.Pedidos.PedidoAddSong;
+import Comum.Pedidos.PedidoNewPlaylist;
+import Comum.Pedidos.PedidoSignUp;
+import Comum.Pedidos.PedidoUploadFile;
 import Servidor.Interfaces.IServer;
 import Servidor.Interfaces.IEvent;
 import Servidor.Interfaces.ServerConstants;
+import Servidor.Utils.PedidoSync;
 
 import java.io.*;
 import java.net.*;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Scanner;
 
 public class Servidor implements ServerConstants, Constants, IServer {
@@ -291,7 +297,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
             preparedStatement.close();
             
             insertPlaylist(utilizador, nome);
-
+            listener.newPlaylist(utilizador, nome);
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -374,12 +380,15 @@ public class Servidor implements ServerConstants, Constants, IServer {
             insertStatement.setInt(2,idPlaylist);
             insertStatement.executeUpdate();
 
+            listener.newSongPlaylist(utilizador, playlist, song);
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
+
+
 
     @Override
     public boolean editFile(Utilizador utilizador, Song song) {
@@ -468,7 +477,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
 
         getIDUtilizadorStatement.close();
 
-        return new Utilizador(nome);
+        return new Utilizador(id,nome);
     }
 
     private Song resultSetToMusica(ResultSet resultSet) throws SQLException {
@@ -480,6 +489,23 @@ public class Servidor implements ServerConstants, Constants, IServer {
         int ano = resultSet.getInt("ano");
         int idAutor = resultSet.getInt("autor");
         int id = resultSet.getInt("id");
+
+        return new Song(nome,getUtilizador(idAutor), album, ano, duracao, genero, filename, id);
+    }
+
+    private Song getMusicaByID(int id) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement("SELECT * from musicas where id = ?");
+        preparedStatement.setInt(1, id);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        resultSet.next();
+        String nome = resultSet.getString("nome");
+        String album = resultSet.getString("album");
+        String genero = resultSet.getString("nome");
+        String filename = resultSet.getString("ficheiro");
+        int duracao = resultSet.getInt("duracao");
+        int ano = resultSet.getInt("ano");
+        int idAutor = resultSet.getInt("autor");
+        preparedStatement.close();
 
         return new Song(nome,getUtilizador(idAutor), album, ano, duracao, genero, filename, id);
     }
@@ -615,7 +641,7 @@ public class Servidor implements ServerConstants, Constants, IServer {
         listener.serverExit();
     }
 
-    private void ready() {
+    private void ready() throws IOException {
         listener.serverReady();
     }
 
@@ -660,6 +686,39 @@ public class Servidor implements ServerConstants, Constants, IServer {
         insertStatement.setString(1, nomePlaylist);
         insertStatement.setInt(2,id);
         insertStatement.executeUpdate();
+    }
+
+    @Override
+    public void insertSong(Utilizador utilizador, Playlist playlist, Song song) {
+            try{
+                //Procura a playlist com este nome
+                PreparedStatement preparedStatement = conn.prepareStatement("SELECT * from playlists where nome = ?");
+                preparedStatement.setString(1, playlist.getNome());
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if(!resultSet.next());
+
+                int idPlaylist = resultSet.getInt("id");
+                preparedStatement.close();
+
+                //Procura a musica com este nome
+                PreparedStatement preparedStatementMusica = conn.prepareStatement("SELECT * from musicas where nome = ?");
+                preparedStatementMusica.setString(1, song.getNome());
+                ResultSet resultSetMusica = preparedStatementMusica.executeQuery();
+                if(!resultSetMusica.next());
+
+                int idMusica = resultSetMusica .getInt("id");
+                preparedStatementMusica .close();
+
+
+
+                PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO lt_playlists_musicas(idMusicas, idPlaylists) VALUES (?,?)");
+                insertStatement.setInt(1,idMusica);
+                insertStatement.setInt(2,idPlaylist);
+                insertStatement.executeUpdate();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
     }
 
     @Override
@@ -732,6 +791,87 @@ public class Servidor implements ServerConstants, Constants, IServer {
         insertStatement.close();
 
         return id_musica;
+    }
+
+    @Override
+    public void sync(ServerInfo serverInfo) {
+        try {
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM utilizadores");
+            ResultSet resultSet = statement.executeQuery();
+            while(resultSet.next()){
+                String nome = resultSet.getString("nome");
+                String password = resultSet.getString("password");
+
+                listener.sendPedidoSync(new PedidoSync(new PedidoSignUp(new Utilizador(nome,password)), null), serverInfo);
+            }
+            statement.close();
+            System.out.println("Users sincronizados");
+
+            statement = conn.prepareStatement("SELECT * FROM musicas");
+            resultSet = statement.executeQuery();
+            while(resultSet.next()){
+                Song song = resultSetToMusica(resultSet);
+
+                PedidoSync pedidoSync = new PedidoSync(new PedidoUploadFile(song.getAutor(), song), null);
+                listener.sendPedidoSync(pedidoSync, serverInfo);
+                if(song.getFilename() != null) {
+                    int nread;
+                    byte[] b = new byte[PKT_ENCODER];
+                    byte[] file = getFile(song.getFilename());
+                    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(file);
+                    while ((nread = byteArrayInputStream.read(b, 0, b.length)) != -1) {
+                        ByteArrayInputStream buff = new ByteArrayInputStream(b, 0, nread);
+                        String encodedFile = Base64.getEncoder().encodeToString(buff.readAllBytes());
+                        pedidoSync.setFile(encodedFile);
+                        listener.sendPedidoSync(pedidoSync, serverInfo);
+                    }
+                    pedidoSync = new PedidoSync(new PedidoUploadFile(song.getAutor(), song), null);
+                    listener.sendPedidoSync(pedidoSync, serverInfo);
+                }
+            }
+            statement.close();
+            System.out.println("Musicas sincronizadas");
+
+            statement = conn.prepareStatement("SELECT * FROM playlists");
+            resultSet = statement.executeQuery();
+            while(resultSet.next()){
+                String nome = resultSet.getString("nome");
+                int criador = resultSet.getInt("criador");
+                int idPlaylist = resultSet.getInt("id");
+                Utilizador utilizador = getUtilizador(criador);
+
+                listener.sendPedidoSync(new PedidoSync(new PedidoNewPlaylist(utilizador,nome), null), serverInfo);
+
+                PreparedStatement musicasStatement = conn.prepareStatement("SELECT * FROM lt_playlists_musicas WHERE id = ?");
+                musicasStatement.setInt(1, idPlaylist);
+                ResultSet resultSetMusicas = musicasStatement.executeQuery();
+                while(resultSetMusicas.next()){
+                    int idMusica = resultSetMusicas.getInt("idMusicas");
+                    Song song = getMusicaByID(idMusica);
+
+                    listener.sendPedidoSync(new PedidoSync(new PedidoAddSong(utilizador, song, new Playlist(nome)), null), serverInfo);
+                }
+                resultSetMusicas.close();
+            }
+            statement.close();
+
+            System.out.println("Playlists sincronizadas");
+
+
+
+
+            listener.sendPedidoSync(new PedidoSync(), serverInfo);
+
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private byte[] getFile(String filename) throws IOException {
+        FileInputStream fileInputStream = new FileInputStream(musicDir.getAbsoluteFile() + File.separator + filename);
+        byte[] b = fileInputStream.readAllBytes();
+        fileInputStream.close();
+        return b;
     }
 
 }

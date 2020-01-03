@@ -1,10 +1,8 @@
 package Servidor.Threads;
 
-import Comum.Pedidos.Pedido;
-import Comum.Pedidos.PedidoNewPlaylist;
-import Comum.Pedidos.PedidoSignUp;
-import Comum.Pedidos.PedidoUploadFile;
+import Comum.Pedidos.*;
 import Comum.ServerInfo;
+import Servidor.Comunicacao;
 import Servidor.Interfaces.IServer;
 import Servidor.Interfaces.ServerConstants;
 import Servidor.Utils.MulticastConfirmationMessage;
@@ -27,14 +25,16 @@ public class MulticastListenerThread extends Thread implements ServerConstants {
     ArrayList<ServerInfo> servidores;
     ServerInfo myServerInfo;
     InetAddress multicastGroupAddr;
+    Comunicacao comunicacao;
 
 
-    public MulticastListenerThread(MulticastSocket socket, DatagramSocket datagramSocket, IServer server, ArrayList<ServerInfo> servidores, ServerInfo myServerInfo) {
+    public MulticastListenerThread(MulticastSocket socket, DatagramSocket datagramSocket, IServer server, ArrayList<ServerInfo> servidores, ServerInfo myServerInfo, Comunicacao comunicacao) {
         this.socketReceive = socket;
         this.server = server;
         this.servidores = servidores;
         this.myServerInfo = myServerInfo;
         this.datagramSocket = datagramSocket;
+        this.comunicacao = comunicacao;
     }
 
     @Override
@@ -69,8 +69,12 @@ public class MulticastListenerThread extends Thread implements ServerConstants {
 
                 Pedido pedido = message.getPedido();
 
-                System.out.println("Recebi: " + json);
+                if(pedido == null){
+                    if(comunicacao.checkPrimary())
+                        server.sync(new ServerInfo(datagramPacket.getAddress(), datagramPacket.getPort(), -1));
+                }
 
+                MulticastConfirmationMessage confirmationMessage;
                 try {
                     if (pedido instanceof PedidoSignUp)
                         server.insertUser(pedido.getUtilizador());
@@ -81,22 +85,21 @@ public class MulticastListenerThread extends Thread implements ServerConstants {
                     }
                     else if (pedido instanceof PedidoNewPlaylist)
                         server.insertPlaylist(pedido.getUtilizador(), ((PedidoNewPlaylist) pedido).getNome());
-
-
-                }catch (Exception ignored){
-
+                    else if (pedido instanceof PedidoAddSong) {
+                        PedidoAddSong pedidoAddSong = (PedidoAddSong) pedido;
+                        server.insertSong(pedidoAddSong.getUtilizador(), pedidoAddSong.getPlaylist(), pedidoAddSong.getSong());
+                    }
+                }catch (Exception i){
+                    i.printStackTrace();
                 }
 
-                MulticastConfirmationMessage confirmationMessage = new MulticastConfirmationMessage(myServerInfo, true);
+                confirmationMessage = new MulticastConfirmationMessage(myServerInfo, true);
                 String toJson = new Gson().toJson(confirmationMessage);
                 byte[] bytes = toJson.getBytes();
-                System.out.println("Enviei confirmação: " + toJson);
-                System.out.println("Enviei para: " + datagramPacket.getAddress() + " " + datagramPacket.getPort());
                 DatagramPacket packet = new DatagramPacket(bytes, bytes.length, datagramPacket.getAddress(), datagramPacket.getPort());
                 datagramSocket.send(packet);
             }
         } catch (IOException e) {
-
             System.out.println("MulticastListenerThread - Tou a sair...");
         }
     }

@@ -3,12 +3,14 @@ package Servidor;
 import Comum.*;
 import Comum.Pedidos.*;
 import Comum.Pedidos.Serializers.PedidoDeserializer;
+import Comum.Pedidos.Serializers.PedidoSyncDeserializer;
 import Servidor.Interfaces.*;
 import Servidor.Runnables.*;
 import Servidor.Threads.MulticastListenerThread;
 import Servidor.Threads.PingThread;
 import Servidor.Utils.MulticastConfirmationMessage;
 import Servidor.Utils.MulticastMessage;
+import Servidor.Utils.PedidoSync;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.$Gson$Types;
@@ -17,6 +19,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.net.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
 
@@ -26,6 +29,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
     private ServerSocket serverSocket;
     private DatagramSocket datagramSocketDS;
     private DatagramSocket datagramSocketMulticast;
+    private DatagramSocket datagramSocketSync;
     private MulticastSocket multicastSocket;
     private IServer server;
     public ServerInfo myServerInfo;
@@ -37,6 +41,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
         datagramSocketDS = new DatagramSocket();
         datagramSocketDS.setSoTimeout(TIMEOUT_5s);
         datagramSocketMulticast = new DatagramSocket();
+        datagramSocketSync = new DatagramSocket();
         servidores = new ArrayList<>();
         server = servidor;
 
@@ -136,10 +141,51 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
     }
 
     @Override
-    public void serverReady() {
+    public void serverReady() throws IOException {
         new PingThread(datagramSocketDS, this).start();
-        new MulticastListenerThread(multicastSocket, datagramSocketMulticast, server, servidores, myServerInfo).start();
+        if(servidores.size() > 1)
+            syncDB();
+        new MulticastListenerThread(multicastSocket, datagramSocketMulticast, server, servidores, myServerInfo, this).start();
         start();
+    }
+
+    private void syncDB() throws IOException {
+        MulticastMessage multicastMessage = new MulticastMessage(myServerInfo);
+        byte[] bytes = new Gson().toJson(multicastMessage).getBytes();
+        DatagramPacket packetSend = new DatagramPacket(bytes, bytes.length, multicastAddr, MULTICAST_PORT);
+        datagramSocketSync.send(packetSend);
+
+        Gson gsonPedidoSync = new GsonBuilder().registerTypeAdapter(PedidoSync.class, new PedidoSyncDeserializer()).create();
+        while(true) {
+            DatagramPacket datagramPacket = new DatagramPacket(new byte[PKT_SIZE], PKT_SIZE);
+            datagramSocketSync.receive(datagramPacket);
+            String json = new String(datagramPacket.getData(), 0 ,datagramPacket.getLength());
+            PedidoSync pedidoSync = gsonPedidoSync.fromJson(json, PedidoSync.class);
+            Pedido pedido = pedidoSync.getPedido();
+            if(pedido == null)
+                break;
+            try {
+                if (pedido instanceof PedidoSignUp)
+                    server.insertUser(pedido.getUtilizador());
+                else if (pedido instanceof PedidoUploadFile) {
+                    byte[] file = null;
+                    if(pedidoSync.getFile() != null) file = Base64.getDecoder().decode(pedidoSync.getFile());
+                    server.saveSongFile_Partial(((PedidoUploadFile) pedido).getMusica(), file);
+                }
+                else if (pedido instanceof PedidoNewPlaylist)
+                    server.insertPlaylist(pedido.getUtilizador(), ((PedidoNewPlaylist) pedido).getNome());
+                else if (pedido instanceof PedidoAddSong) {
+                    PedidoAddSong pedidoAddSong = (PedidoAddSong) pedido;
+                    server.insertSong(pedidoAddSong.getUtilizador(), pedidoAddSong.getPlaylist(), pedidoAddSong.getSong());
+                }
+                packetSend.setAddress(datagramPacket.getAddress());
+                packetSend.setPort(datagramPacket.getPort());
+
+                datagramSocketSync.send(packetSend);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -153,8 +199,9 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
             serverSocket.close();
         } catch (IOException ignored) { }
         datagramSocketDS.close();
-
+        datagramSocketMulticast.close();
         multicastSocket.close();
+        datagramSocketSync.close();
     }
 
     @Override
@@ -179,36 +226,51 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
     }
 
     @Override
+    public void sendPedidoSync(PedidoSync pedidoSync, ServerInfo serverInfo) {
+        byte[] bytes = new Gson().toJson(pedidoSync).getBytes();
+        DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length, serverInfo.getIp(), serverInfo.getPort());
+        try {
+            datagramSocketSync.send(datagramPacket);
+            datagramSocketSync.receive(datagramPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
     public void newSongFile(Utilizador utilizador, Song song, byte[] file) {
         MulticastMessage message = new MulticastMessage(myServerInfo, new PedidoUploadFile(utilizador, song));
         int nread;
-        byte[] b = new byte[PKT_SIZE/2];
-        byte[] encodedFile = Base64.getEncoder().encode(file);
+        byte[] b = new byte[PKT_ENCODER];
 
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(encodedFile);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(file);
         while((nread = byteArrayInputStream.read(b, 0, b.length)) != -1){
-            message.setFile(new String(b, 0, nread));
+            ByteArrayInputStream buff = new ByteArrayInputStream(b, 0, nread);
+            String encodedFile = Base64.getEncoder().encodeToString(buff.readAllBytes());
+            message.setFile(encodedFile);
             sendMulticastMessage(message);
         }
 
         message.setFile(null);
         sendMulticastMessage(message);
+        System.out.println("Musica " + song.getNome() + " sincronizada");
     }
 
     @Override
     public void newSongPlaylist(Utilizador utilizador, Playlist playlist, Song song) {
+        MulticastMessage message = new MulticastMessage(myServerInfo, new PedidoAddSong(utilizador, song, playlist), null);
 
+        sendMulticastMessage(message);
     }
 
 
-    private void sendMulticastMessage(MulticastMessage message) {
+    private synchronized void sendMulticastMessage(MulticastMessage message) {
         String json = new Gson().toJson(message);
         byte[] bytes = json.getBytes();
 
         DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length, multicastAddr, MULTICAST_PORT);
         try {
-            System.out.println("Enviei: " + json);
-            System.out.println("Enviei para: " + datagramPacket.getAddress() + " " + datagramPacket.getPort());
             datagramSocketMulticast.send(datagramPacket);
             int i = 0;
             while (i != servidores.size()-1) {
@@ -217,7 +279,6 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                 String jsonConfirmation = new String(packet.getData(), 0, packet.getLength());
                 MulticastConfirmationMessage confirmationMessage = new Gson().fromJson(jsonConfirmation, MulticastConfirmationMessage.class);
 
-                System.out.println("Recebi Confirmação: " + jsonConfirmation);
                 if(!confirmationMessage.isSucess()) continue;
                 i++;
             }
@@ -227,4 +288,15 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
         }
     }
 
+    public boolean checkPrimary() {
+        int myid = myServerInfo.getId();
+        ServerInfo maisVelho = new ServerInfo(null,-1,-1);
+        synchronized (servidores) {
+            for (ServerInfo server : servidores) {
+                if (server.getPingCount() >= maisVelho.getPingCount())
+                    maisVelho = server;
+            }
+        }
+        return maisVelho.getId() == myid;
+    }
 }

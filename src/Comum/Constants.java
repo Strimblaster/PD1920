@@ -10,7 +10,8 @@ public interface Constants {
     int PING_SLEEP_MS = 3000;
     int PING_TIMEOUT_MS = 1000;
 
-    int PKT_SIZE = 10000;
+    int PKT_SIZE = 40000;
+    int PKT_ENCODER = 25000;
     int TIMEOUT_5s = 5000;
     int TIMEOUT_2s = 2000;
 

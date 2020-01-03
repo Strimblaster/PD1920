@@ -88,6 +88,8 @@ public class PlaylistController extends SceneController {
     }
 
     public void handlePlay(ActionEvent actionEvent) {
+        if(playlist == null) return;
+        if(playlist.getMusicas().size() == 0) return;
         try {
             load("FXML/MediaPlayer.fxml", null, null, playlist);
         } catch (IOException e) {

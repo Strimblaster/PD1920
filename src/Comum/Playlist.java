@@ -26,6 +26,11 @@ public class Playlist {
         this.criador = p.criador;
     }
 
+    public Playlist(String nome){
+        this.nome = nome;
+    }
+
+
     public void setMusicas(ArrayList<Song> musicas) {
         this.musicas = musicas;
     }
