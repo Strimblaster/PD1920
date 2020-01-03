@@ -28,17 +28,37 @@ import java.util.ArrayList;
 public class PlaylistController extends SceneController {
 
     Playlist playlist;
+    ArrayList<Song> musicasDownload;
     ArrayList<Song> songs;
 
     public Label lblNomePlaylist;
     public VBox vBox;
     public HBox hBox;
     public Button btnEdit;
+    public Button btnPlayDownload;
     public Utilizador utilizador;
 
     @Override
     public void setClientController(ClientController controllerClient) {
         super.setClientController(controllerClient);
+
+        musicasDownload = new ArrayList<>();
+        for(Song s : playlist.getMusicas()){
+            String[] list = musicDirectory.list((dir, name) -> name.equals(s.getFilename()));
+            assert list != null;
+            if(list.length == 0) {
+                musicasDownload.add(s);
+            }
+        }
+
+        if(musicasDownload.size() > 0) {
+            btnPlayDownload.setText("Download");
+            btnPlayDownload.setOnAction(this::handleDownload);
+        }
+        else {
+            btnPlayDownload.setText("Play");
+            btnPlayDownload.setOnAction(this::handlePlay);
+        }
 
         lblNomePlaylist.setText(playlist.getNome());
         songs = playlist.getMusicas();
@@ -62,6 +82,7 @@ public class PlaylistController extends SceneController {
         if(!playlist.getCriador().getName().equals(utilizador.getName())){
             hBox.getChildren().remove(btnEdit);
         }
+
     }
 
     public void handleBtnVoltar(ActionEvent actionEvent) {
@@ -94,6 +115,16 @@ public class PlaylistController extends SceneController {
             load("FXML/MediaPlayer.fxml", null, null, playlist);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void handleDownload(ActionEvent actionEvent) {
+        try {
+            for(Song song : musicasDownload){
+                clientController.downloadFile(song);
+            }
+        } catch (AlreadyDownloadingException e) {
+            showAlert("Download", e.getMessage());
         }
     }
 }

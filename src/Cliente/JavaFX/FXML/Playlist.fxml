@@ -28,7 +28,7 @@
                <children>
                   <Button mnemonicParsing="false" onAction="#handleBtnVoltar" prefHeight="40.0" prefWidth="110.0" text="Voltar" />
                   <Button fx:id="btnEdit" mnemonicParsing="false" onAction="#handleBtnEditarPlaylist" prefHeight="40.0" prefWidth="110.0" text="Editar" />
-                  <Button mnemonicParsing="false" onAction="#handlePlay" prefHeight="40.0" prefWidth="110.0" text="Play" />
+                  <Button fx:id="btnPlayDownload" mnemonicParsing="false" prefHeight="40.0" prefWidth="110.0" text="Play" />
                </children>
             </HBox>
          </children>
