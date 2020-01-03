@@ -1,11 +1,15 @@
 package Servidor.Interfaces;
 
 
-public interface ServerConstants {
-    String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+import Comum.Constants;
+
+public interface ServerConstants extends Constants {
     String DB_URL = "jdbc:mysql://34.77.114.162/?autoReconnect=true&useSSL=false&allowMultiQueries=true";
     String USER = "PD";
     String PASS = "PDcancro";
+
+    String MULTICAST_ADDR = "239.111.111.111";
+    int MULTICAST_PORT =  8000;
 
 
     String DB_CREATE_1 =

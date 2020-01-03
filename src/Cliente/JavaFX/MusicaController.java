@@ -83,7 +83,7 @@ public class MusicaController extends SceneController {
     }
 
     public void handleBtnAdicionarPlaylist(ActionEvent actionEvent) {
-        if(playlists.size() == 0){
+        if(playlists == null){
             showAlert("Playlists", "Não tens playlists (refresh)");
             return;
         }

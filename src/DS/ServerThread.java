@@ -42,7 +42,9 @@ public class ServerThread extends Thread implements Constants {
 
 
                 //Adiciona à lista de servidores o IP e porta UDP
-                ds.servidoresUDP.add(new ServerInfo(datagramPacket.getAddress(), datagramPacket.getPort(), id));
+                synchronized (ds.servidoresUDP) {
+                    ds.servidoresUDP.add(new ServerInfo(datagramPacket.getAddress(), datagramPacket.getPort(), id));
+                }
 
 
                 //Envia de volta o ID que o servidor vai ser
@@ -51,19 +53,14 @@ public class ServerThread extends Thread implements Constants {
                 datagramPacket.setData(resp);
                 datagramPacket.setLength(resp.length);
 
-                System.out.println("[INFO] - [ThreadServer]: O servidor " + serverInfoTCP.getIp().toString() + " está disponivel na porta " + serverInfoTCP.getPort());
                 ds.servidorDatagramSocket.send(datagramPacket);
+                System.out.println("[INFO] - [ThreadServer]: O servidor " + serverInfoTCP.getIp().toString() + " está disponivel na porta " + serverInfoTCP.getPort());
 
-                //multicast
-//                ArrayList<ServerInfo> servidores = ds.servidoresUDP;
-//                Gson gson = new Gson();
-//                String jsonServerInfo = gson.toJson(servidores);
-//                System.out.println("[INFO] - [ThreadServer]: O servidor " + serverInfoTCP.getIp().toString() + " vai receber todos os servidores online");
-//                byte[] jsonBytes = jsonServerInfo.getBytes();
-//                datagramPacket.setData(jsonBytes);
-//                datagramPacket.setLength(jsonBytes.length);
-//                ds.servidorDatagramSocket.send(datagramPacket);
-
+                //Envia Lista de servers
+                byte[] listaServers = new Gson().toJson(ds.servidoresUDP).getBytes();
+                datagramPacket.setData(listaServers);
+                datagramPacket.setLength(listaServers.length);
+                ds.servidorDatagramSocket.send(datagramPacket);
 
             } catch (SocketException e) {
                 return;

@@ -1,20 +1,26 @@
-package Servidor.Runnables;
+package Servidor.Threads;
 
 import Comum.Constants;
-import Servidor.Servidor;
+import Comum.ServerInfo;
+import Servidor.Comunicacao;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.MulticastSocket;
 import java.net.SocketException;
+import java.util.ArrayList;
 
-public class PingRunnable implements Runnable, Constants {
+public class PingThread extends Thread implements Constants {
 
     private DatagramSocket datagramSocket;
+    private Comunicacao comunicacao;
 
-    public PingRunnable(DatagramSocket datagramSocket) {
+    public PingThread(DatagramSocket datagramSocket, Comunicacao comunicacao) {
         this.datagramSocket = datagramSocket;
+        this.comunicacao = comunicacao;
     }
 
     @Override
@@ -25,6 +31,14 @@ public class PingRunnable implements Runnable, Constants {
 
                 //Espera packet de um servidor (ping)
                 datagramSocket.receive(datagramPacket);
+                String json = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+
+                Type listType = new TypeToken<ArrayList<ServerInfo>>(){}.getType();
+                ArrayList<ServerInfo> servers = new Gson().fromJson(json, listType);
+                synchronized (comunicacao.servidores){
+                    comunicacao.servidores.clear();
+                    comunicacao.servidores.addAll(servers);
+                }
 
                 //Envia de volta uma mensagem a dizer que está on
                 String string = "Estou on";

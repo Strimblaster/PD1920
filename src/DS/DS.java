@@ -24,7 +24,7 @@ public class DS implements Constants {
         servidorDatagramSocket = new DatagramSocket(SERVER_PORT_DS);
         clienteDatagramSocket = new DatagramSocket(CLIENT_PORT_DS);
         servidorPingDatagramSocket = new DatagramSocket(SERVER_PORT_DS_PING);
-        proximoServidor = 0;
+        proximoServidor = -1;
         servidoresTCP = new ArrayList<>();
         servidoresUDP = new ArrayList<>();
     }
@@ -33,18 +33,13 @@ public class DS implements Constants {
     }
 
     public int getProximoServidor(){
+        servidoresTCP.sort(Comparator.comparingInt(ServerInfo::getId));
+        proximoServidor++;
         if(this.proximoServidor >= servidoresTCP.size())
-            return 0;
-        return this.proximoServidor;
-    }
-
-
-    public void incrementaProximoServidor(){
-        if(proximoServidor == servidoresTCP.size()-1)
             proximoServidor = 0;
-        else
-            proximoServidor++;
+        return proximoServidor;
     }
+
 
 
     public static void main(String[] args) throws SocketException, InterruptedException {

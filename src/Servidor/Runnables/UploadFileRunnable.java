@@ -63,7 +63,7 @@ public class UploadFileRunnable extends RunnableBase {
                 System.arraycopy(buffer, 0, temp, file.length, nRead);
                 file = temp;
             }
-            servidor.addNewSong(pedidoUploadFile.getMusica(), file);
+            servidor.saveSongFile_Full(pedidoUploadFile.getUtilizador(),pedidoUploadFile.getMusica(), file);
 
             cliente.close();
         } catch (IOException e) {

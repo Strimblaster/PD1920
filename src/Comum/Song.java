@@ -119,4 +119,8 @@ public class Song {
     public void setGenero(String genero) {
         this.genero = genero;
     }
+
+    public void setAutor(Utilizador utilizador) {
+        this.autor = utilizador;
+    }
 }
