@@ -4,7 +4,7 @@ import Comum.Pedidos.PedidoPlaylists;
 import Comum.Pedidos.Serializers.ExceptionSerializer;
 import Comum.Playlist;
 import Comum.Utilizador;
-import Servidor.Interfaces.IServer;
+import Servidor.Interfaces.Observable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -17,7 +17,7 @@ public class GetPlaylistsRunnable extends RunnableBase {
 
     PedidoPlaylists pedidoPlaylists;
 
-    public GetPlaylistsRunnable(Socket cliente, PedidoPlaylists pedidoPlaylists, IServer servidor) {
+    public GetPlaylistsRunnable(Socket cliente, PedidoPlaylists pedidoPlaylists, Observable servidor) {
         super(cliente, servidor);
         this.pedidoPlaylists = pedidoPlaylists;
     }

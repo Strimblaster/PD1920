@@ -95,3 +95,8 @@ modules.xml
 /lib/fontawesomefx-8.9.jar
 /lib/gson-2.8.6.jar
 /temp/
+/src/META-INF_Server/META-INF/
+/src/META-INF_DS/META-INF/
+/src/META-INF/
+*.MF
+

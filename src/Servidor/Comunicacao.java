@@ -11,9 +11,10 @@ import Servidor.Threads.PingThread;
 import Servidor.Utils.MulticastConfirmationMessage;
 import Servidor.Utils.MulticastMessage;
 import Servidor.Utils.PedidoSync;
+import Servidor.Utils.ThreadMode;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.$Gson$Types;
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.*;
@@ -23,7 +24,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
 
-public class Comunicacao extends Thread implements IEvent, Constants, ServerConstants {
+public class Comunicacao extends Thread implements Listener, Constants, ServerConstants {
 
     public final ArrayList<ServerInfo> servidores;
     private ServerSocket serverSocket;
@@ -31,13 +32,15 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
     private DatagramSocket datagramSocketMulticast;
     private DatagramSocket datagramSocketSync;
     private MulticastSocket multicastSocket;
-    private IServer server;
+    private Observable server;
     public ServerInfo myServerInfo;
     private InetAddress multicastAddr;
+    private InetAddress ip_DS;
 
 
-    public Comunicacao(Servidor servidor) throws IOException {
+    public Comunicacao(Servidor servidor, InetAddress ip_DS) throws IOException {
         serverSocket = new ServerSocket(0);
+        this.ip_DS = ip_DS;
         datagramSocketDS = new DatagramSocket();
         datagramSocketDS.setSoTimeout(TIMEOUT_5s);
         datagramSocketMulticast = new DatagramSocket();
@@ -61,7 +64,7 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
         byte[] b = porta.getBytes();
         int id;
 
-        DatagramPacket p = new DatagramPacket(b, b.length, InetAddress.getByName(IP_DS), SERVER_PORT_DS);
+        DatagramPacket p = new DatagramPacket(b, b.length, ip_DS, SERVER_PORT_DS);
         datagramSocketDS.send(p);
         datagramSocketDS.receive(p);
         id = Integer.parseInt(new String(p.getData(), 0, p.getLength()));
@@ -95,7 +98,14 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                 byte[] bytes = new byte[PKT_SIZE];
                 int read = inputStream.read(bytes);
                 String str = new String(bytes, 0, read);
-                Pedido pedido = gson.fromJson(str, Pedido.class);
+                Pedido pedido;
+                try {
+                    pedido = gson.fromJson(str, Pedido.class);
+                } catch (JsonParseException e){
+                    e.printStackTrace();
+                    System.out.println("Não foi possivel deserializar o pedido recebido");
+                    continue;
+                }
                 Runnable pedidoRunnable;
 
 
@@ -104,13 +114,13 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                 else if(pedido instanceof PedidoSignUp)
                     pedidoRunnable = new SignUpRunnable(s, (PedidoSignUp) pedido, server);
                 else if(pedido instanceof PedidoUploadFile)
-                    pedidoRunnable = new UploadFileRunnable(s, (PedidoUploadFile) pedido, server);
+                    pedidoRunnable = new UploadFileRunnable(s, (PedidoUploadFile) pedido, server, ThreadMode.Normal);
                 else if(pedido instanceof PedidoMusicas)
                     pedidoRunnable = new GetMusicasRunnable(s, (PedidoMusicas) pedido, server);
                 else if(pedido instanceof PedidoSearch)
                     pedidoRunnable = new SearchRunnable(s, (PedidoSearch) pedido, server);
                 else if(pedido instanceof PedidoDownloadFile)
-                    pedidoRunnable = new DownloadFileRunnable(s, (PedidoDownloadFile) pedido, server);
+                    pedidoRunnable = new DownloadFileRunnable(s, (PedidoDownloadFile) pedido, server, ThreadMode.Normal);
                 else if(pedido instanceof PedidoPlaylists)
                     pedidoRunnable = new GetPlaylistsRunnable(s, (PedidoPlaylists) pedido, server);
                 else if(pedido instanceof PedidoNewPlaylist)
@@ -122,8 +132,15 @@ public class Comunicacao extends Thread implements IEvent, Constants, ServerCons
                 else if(pedido instanceof PedidoEditPlaylist)
                     pedidoRunnable = new EditPlaylistRunnable(s, (PedidoEditPlaylist) pedido, server);
                 else if(pedido instanceof PedidoDisconnect) {
-                    System.out.println("PedidoDisconnect recebido");
-                    continue;
+                    Pedido pedidoDisc = ((PedidoDisconnect) pedido).getPedido();
+                    if(pedidoDisc instanceof PedidoDownloadFile)
+                        pedidoRunnable = new DownloadFileRunnable(s, (PedidoDownloadFile) pedidoDisc, server, ThreadMode.Disconnect);
+                    else if(pedidoDisc instanceof PedidoUploadFile)
+                        pedidoRunnable = new UploadFileRunnable(s, (PedidoUploadFile) pedidoDisc, server, ThreadMode.Disconnect);
+                    else{
+                        System.out.println("[INFO] - [Comunicação]: Recebi um pedido Disconnect não identificado");
+                        continue;
+                    }
                 }
                 else{
                     System.out.println("[INFO] - [Comunicação]: Recebi um pedido não identificado");

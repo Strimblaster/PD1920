@@ -1,40 +1,36 @@
 package Cliente;
 
-import Cliente.Interfaces.IEvent;
+import Cliente.Interfaces.Listener;
 import Cliente.JavaFX.SceneController;
 import Comum.Exceptions.*;
 import Comum.FilteredResult;
-import Comum.Pedidos.Pedido;
-import Comum.Pedidos.PedidoUploadFile;
-import Comum.Pedidos.Resposta;
 import Comum.Playlist;
 import Comum.Song;
 import Comum.Utilizador;
-import com.sun.webkit.network.Util;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import static Comum.Constants.CLIENT_DIR;
 
-public class ClientController implements IEvent {
+public class ClientController implements Listener {
     private ClientModel model;
     private SceneController sceneController;
     private File musicDirectory;
     private String clientRunningPath;
     private ArrayList<Song> songsBeingDownloaded;
 
-    ClientController(String clientDir) throws IOException, InvalidServerException {
+    ClientController(String clientDir, String ip, int port) throws IOException, InvalidServerException {
         this.clientRunningPath = clientDir;
-        this.model = new ClientModel(this);
+        this.model = new ClientModel(this, ip, port);
         songsBeingDownloaded = new ArrayList<>();
         System.out.println(model.getServer());
     }
+
 
     @Override
     public void songUploaded(String nome) {

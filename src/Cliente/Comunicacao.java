@@ -1,13 +1,12 @@
 package Cliente;
 
-import Cliente.Interfaces.IComunicacaoCliente;
-import Cliente.Interfaces.IEvent;
+import Cliente.Interfaces.Observable;
+import Cliente.Interfaces.Listener;
 import Cliente.Runnables.DownloadFileRunnable;
 import Cliente.Runnables.UploadFileRunnable;
 import Comum.Exceptions.*;
 import Comum.*;
 import Comum.Pedidos.*;
-import Comum.Pedidos.Serializers.ExceptionSerializer;
 import Comum.Pedidos.Serializers.PlaylistDeserializer;
 import Comum.Pedidos.Serializers.RespostaDeserializer;
 import com.google.gson.Gson;
@@ -19,15 +18,25 @@ import java.lang.reflect.Type;
 import java.net.*;
 import java.util.ArrayList;
 
-public class Comunicacao implements IComunicacaoCliente, Constants {
+public class Comunicacao implements Observable, Constants {
 
     ServerInfo serverInfo;
-    IEvent event;
+    Listener event;
     File musicDir;
+    InetAddress ip_DS;
+    int port_DS;
 
-    public Comunicacao(IEvent clientController) {
+    public Comunicacao(Listener clientController , String ip, int port) throws UnknownHostException {
         this.event = clientController;
+        if(ip == null){
+            ip_DS = InetAddress.getByName(IP_DS);
+            port_DS = CLIENT_PORT_DS;
+        }else{
+            ip_DS = InetAddress.getByName(ip);
+            port_DS = port;
+        }
     }
+
 
     @Override
     public ServerInfo getServerInfo() throws IOException, InvalidServerException {
@@ -39,7 +48,7 @@ public class Comunicacao implements IComunicacaoCliente, Constants {
 
         PrintWriter out = new PrintWriter(byteArrayOutputStream,true);
         out.println("Olá DS!\n");
-        DatagramPacket datagramPacket = new DatagramPacket(byteArrayOutputStream.toByteArray(), byteArrayOutputStream.toByteArray().length, InetAddress.getByName(IP_DS), CLIENT_PORT_DS);
+        DatagramPacket datagramPacket = new DatagramPacket(byteArrayOutputStream.toByteArray(), byteArrayOutputStream.toByteArray().length, ip_DS, port_DS);
         udpSocket.send(datagramPacket);
 
         datagramPacket = new DatagramPacket(incommingData, incommingData.length);

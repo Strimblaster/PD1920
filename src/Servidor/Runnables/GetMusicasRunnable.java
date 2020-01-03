@@ -1,15 +1,10 @@
 package Servidor.Runnables;
 
-import Comum.Exceptions.InvalidPasswordException;
-import Comum.Exceptions.InvalidUsernameException;
-import Comum.Pedidos.Enums.TipoExcecao;
-import Comum.Pedidos.PedidoLogin;
 import Comum.Pedidos.PedidoMusicas;
-import Comum.Pedidos.Resposta;
 import Comum.Pedidos.Serializers.ExceptionSerializer;
 import Comum.Song;
 import Comum.Utilizador;
-import Servidor.Interfaces.IServer;
+import Servidor.Interfaces.Observable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -22,7 +17,7 @@ public class GetMusicasRunnable extends RunnableBase {
 
     private PedidoMusicas pedidoMusicas;
 
-    public GetMusicasRunnable(Socket cliente, PedidoMusicas pedidoMusicas, IServer servidor) {
+    public GetMusicasRunnable(Socket cliente, PedidoMusicas pedidoMusicas, Observable servidor) {
         super(cliente, servidor);
         this.pedidoMusicas = pedidoMusicas;
     }

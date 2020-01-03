@@ -1,23 +1,15 @@
 package Servidor.Runnables;
 
 import Comum.Pedidos.*;
-import Comum.Pedidos.Serializers.ExceptionSerializer;
-import Servidor.Interfaces.IServer;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import Servidor.Interfaces.Observable;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
-
-import static Comum.Constants.PKT_SIZE;
 
 public class DisconnectedRunnable extends RunnableBase {
 
     private Pedido pedido;
 
-    public DisconnectedRunnable(Socket cliente, Pedido pedido, IServer servidor) {
+    public DisconnectedRunnable(Socket cliente, Pedido pedido, Observable servidor) {
         super(cliente, servidor);
         this.pedido = pedido;
     }

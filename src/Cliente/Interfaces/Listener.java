@@ -6,7 +6,7 @@ import Comum.Song;
 
 import java.io.File;
 
-public interface IEvent {
+public interface Listener {
     void songUploaded(String nome);
     void songDownloaded(byte[] file, File fileToReceive, String nomeDaMusica);
 

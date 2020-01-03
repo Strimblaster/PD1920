@@ -1,9 +1,8 @@
 package Cliente.Runnables;
 
 import Cliente.Comunicacao;
-import Cliente.Interfaces.IEvent;
+import Cliente.Interfaces.Listener;
 import Comum.Pedidos.PedidoDownloadFile;
-import Comum.Pedidos.PedidoUploadFile;
 import Comum.Song;
 
 import java.io.*;
@@ -15,11 +14,11 @@ public class DownloadFileRunnable implements Runnable {
 
     private Socket server;
     private PedidoDownloadFile pedido;
-    private IEvent event;
+    private Listener event;
     private File clientMusicDir;
     private Comunicacao comunicacao;
 
-    public DownloadFileRunnable(Socket server, PedidoDownloadFile pedido, IEvent event, File clientMusicDir, Comunicacao comunicacao) {
+    public DownloadFileRunnable(Socket server, PedidoDownloadFile pedido, Listener event, File clientMusicDir, Comunicacao comunicacao) {
         this.server = server;
         this.pedido = pedido;
         this.event = event;

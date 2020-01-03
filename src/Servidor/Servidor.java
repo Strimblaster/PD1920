@@ -9,8 +9,8 @@ import Comum.Pedidos.PedidoAddSong;
 import Comum.Pedidos.PedidoNewPlaylist;
 import Comum.Pedidos.PedidoSignUp;
 import Comum.Pedidos.PedidoUploadFile;
-import Servidor.Interfaces.IServer;
-import Servidor.Interfaces.IEvent;
+import Servidor.Interfaces.Observable;
+import Servidor.Interfaces.Listener;
 import Servidor.Interfaces.ServerConstants;
 import Servidor.Utils.PedidoSync;
 
@@ -21,17 +21,25 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Scanner;
 
-public class Servidor implements ServerConstants, Constants, IServer {
+public class Servidor implements ServerConstants, Constants, Observable {
 
     private Connection conn;
     private String DBName;
     private int id;
-    private IEvent listener;
+    private Listener listener;
     private File musicDir;
+    private String argDBName;
+
 
 
     private Servidor() throws SQLException {
         this.conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        argDBName = null;
+    }
+
+    private Servidor(String argDBName) throws SQLException {
+        this.conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        this.argDBName = argDBName;
     }
 
     @Override
@@ -513,7 +521,10 @@ public class Servidor implements ServerConstants, Constants, IServer {
     @Override
     public void setID(int id) {
         this.id = id;
-        DBName = "Servidor"+id;
+        if(argDBName == null)
+            DBName = "Servidor"+id;
+        else
+            DBName = argDBName+id;
 
         createServerDirectory(id);
 
@@ -593,15 +604,30 @@ public class Servidor implements ServerConstants, Constants, IServer {
     boolean validToQueryBuilder(int i){ return i!=-1;}
 
 
-    public void setListener(IEvent listener) {
+    public void setListener(Listener listener) {
         this.listener = listener;
     }
 
     public static void main(String[] args){
         try {
             System.out.println("[INFO] Servidor a arrancar...");
-            Servidor servidor = new Servidor();
-            new Comunicacao(servidor);
+            Servidor servidor;
+            InetAddress ip_DS = InetAddress.getByName(IP_DS);
+
+            if(args.length == 2) {
+                servidor = new Servidor(args[1]);
+                ip_DS = InetAddress.getByName(args[0]);
+            }
+            else if(args.length == 1)
+                servidor = new Servidor(args[0]);
+            else if(args.length == 0 )
+                servidor = new Servidor();
+            else{
+                System.out.println("Usage:\nServer.jar ip dbName\nServer.jar dbName\nServer.jar");
+                return;
+            }
+
+            new Comunicacao(servidor, ip_DS);
 
             servidor.requestID();
 
@@ -618,11 +644,12 @@ public class Servidor implements ServerConstants, Constants, IServer {
 
             while(true){
                 String s = sc.next();
-                System.out.println(s);
                 if(s.equals("sair")) break;
             }
             servidor.exit();
 
+        } catch (NumberFormatException e) {
+            System.out.println("Usage:\nServer.jar ip port db\nServer.jar ip port\nServer.jar db\nServer.jar");
         } catch (SocketException e) {
             System.out.println("[ERRO] Houve um problema com o Socket:\n"+ e.getMessage());
             e.printStackTrace();
@@ -632,7 +659,6 @@ public class Servidor implements ServerConstants, Constants, IServer {
         } catch (IOException e) {
             System.out.println("[ERRO] Houve um erro de IO:\n"+ e.getMessage());
             e.printStackTrace();
-
         }
     }
 
@@ -719,6 +745,17 @@ public class Servidor implements ServerConstants, Constants, IServer {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+    }
+
+    @Override
+    public String checkSong(Song musica) {
+        try {
+            int songIDByName = getSongIDByName(musica);
+            Song song = getMusicaByID(songIDByName);
+            return song.getId() + ".mp3";
+        } catch (SQLException e) {
+            return null;
+        }
     }
 
     @Override

@@ -1,11 +1,8 @@
 package Cliente;
 
-import Cliente.Interfaces.IComunicacaoCliente;
+import Cliente.Interfaces.Observable;
 import Comum.*;
 import Comum.Exceptions.*;
-import Comum.Pedidos.Pedido;
-import Comum.Pedidos.PedidoDownloadFile;
-import Comum.Pedidos.PedidoUploadFile;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -15,10 +12,10 @@ class ClientModel implements Constants {
 
     private ServerInfo server;
     private Utilizador utilizador;
-    private IComunicacaoCliente comunicacao;
+    private Observable comunicacao;
 
-    public ClientModel(ClientController clientController) throws IOException, InvalidServerException {
-        comunicacao = new Comunicacao(clientController);
+    public ClientModel(ClientController clientController, String ip, int port) throws IOException, InvalidServerException {
+        comunicacao = new Comunicacao(clientController, ip, port);
         this.server = comunicacao.getServerInfo();
 
     }

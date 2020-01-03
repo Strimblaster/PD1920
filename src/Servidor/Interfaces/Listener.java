@@ -9,7 +9,7 @@ import Servidor.Utils.PedidoSync;
 
 import java.io.IOException;
 
-public interface IEvent {
+public interface Listener {
 
 
     void newUser(String username, String password);

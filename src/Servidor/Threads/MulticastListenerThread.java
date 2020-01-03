@@ -3,7 +3,7 @@ package Servidor.Threads;
 import Comum.Pedidos.*;
 import Comum.ServerInfo;
 import Servidor.Comunicacao;
-import Servidor.Interfaces.IServer;
+import Servidor.Interfaces.Observable;
 import Servidor.Interfaces.ServerConstants;
 import Servidor.Utils.MulticastConfirmationMessage;
 import Servidor.Utils.MulticastMessage;
@@ -21,14 +21,14 @@ public class MulticastListenerThread extends Thread implements ServerConstants {
 
     MulticastSocket socketReceive;
     DatagramSocket datagramSocket;
-    IServer server;
+    Observable server;
     ArrayList<ServerInfo> servidores;
     ServerInfo myServerInfo;
     InetAddress multicastGroupAddr;
     Comunicacao comunicacao;
 
 
-    public MulticastListenerThread(MulticastSocket socket, DatagramSocket datagramSocket, IServer server, ArrayList<ServerInfo> servidores, ServerInfo myServerInfo, Comunicacao comunicacao) {
+    public MulticastListenerThread(MulticastSocket socket, DatagramSocket datagramSocket, Observable server, ArrayList<ServerInfo> servidores, ServerInfo myServerInfo, Comunicacao comunicacao) {
         this.socketReceive = socket;
         this.server = server;
         this.servidores = servidores;
