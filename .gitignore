@@ -98,4 +98,5 @@ modules.xml
 /src/META-INF_Server/META-INF/
 /src/META-INF_DS/META-INF/
 /src/META-INF/
+*.MF
 

@@ -35,10 +35,12 @@ public class Comunicacao extends Thread implements Listener, Constants, ServerCo
     private Observable server;
     public ServerInfo myServerInfo;
     private InetAddress multicastAddr;
+    private InetAddress ip_DS;
 
 
-    public Comunicacao(Servidor servidor) throws IOException {
+    public Comunicacao(Servidor servidor, InetAddress ip_DS) throws IOException {
         serverSocket = new ServerSocket(0);
+        this.ip_DS = ip_DS;
         datagramSocketDS = new DatagramSocket();
         datagramSocketDS.setSoTimeout(TIMEOUT_5s);
         datagramSocketMulticast = new DatagramSocket();
@@ -62,7 +64,7 @@ public class Comunicacao extends Thread implements Listener, Constants, ServerCo
         byte[] b = porta.getBytes();
         int id;
 
-        DatagramPacket p = new DatagramPacket(b, b.length, InetAddress.getByName(IP_DS), SERVER_PORT_DS);
+        DatagramPacket p = new DatagramPacket(b, b.length, ip_DS, SERVER_PORT_DS);
         datagramSocketDS.send(p);
         datagramSocketDS.receive(p);
         id = Integer.parseInt(new String(p.getData(), 0, p.getLength()));

@@ -28,10 +28,18 @@ public class Servidor implements ServerConstants, Constants, Observable {
     private int id;
     private Listener listener;
     private File musicDir;
+    private String argDBName;
+
 
 
     private Servidor() throws SQLException {
         this.conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        argDBName = null;
+    }
+
+    private Servidor(String argDBName) throws SQLException {
+        this.conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        this.argDBName = argDBName;
     }
 
     @Override
@@ -513,7 +521,10 @@ public class Servidor implements ServerConstants, Constants, Observable {
     @Override
     public void setID(int id) {
         this.id = id;
-        DBName = "Servidor"+id;
+        if(argDBName == null)
+            DBName = "Servidor"+id;
+        else
+            DBName = argDBName+id;
 
         createServerDirectory(id);
 
@@ -600,8 +611,23 @@ public class Servidor implements ServerConstants, Constants, Observable {
     public static void main(String[] args){
         try {
             System.out.println("[INFO] Servidor a arrancar...");
-            Servidor servidor = new Servidor();
-            new Comunicacao(servidor);
+            Servidor servidor;
+            InetAddress ip_DS = InetAddress.getByName(IP_DS);
+
+            if(args.length == 2) {
+                servidor = new Servidor(args[1]);
+                ip_DS = InetAddress.getByName(args[0]);
+            }
+            else if(args.length == 1)
+                servidor = new Servidor(args[0]);
+            else if(args.length == 0 )
+                servidor = new Servidor();
+            else{
+                System.out.println("Usage:\nServer.jar ip dbName\nServer.jar dbName\nServer.jar");
+                return;
+            }
+
+            new Comunicacao(servidor, ip_DS);
 
             servidor.requestID();
 
@@ -618,11 +644,12 @@ public class Servidor implements ServerConstants, Constants, Observable {
 
             while(true){
                 String s = sc.next();
-                System.out.println(s);
                 if(s.equals("sair")) break;
             }
             servidor.exit();
 
+        } catch (NumberFormatException e) {
+            System.out.println("Usage:\nServer.jar ip port db\nServer.jar ip port\nServer.jar db\nServer.jar");
         } catch (SocketException e) {
             System.out.println("[ERRO] Houve um problema com o Socket:\n"+ e.getMessage());
             e.printStackTrace();
@@ -632,7 +659,6 @@ public class Servidor implements ServerConstants, Constants, Observable {
         } catch (IOException e) {
             System.out.println("[ERRO] Houve um erro de IO:\n"+ e.getMessage());
             e.printStackTrace();
-
         }
     }
 
