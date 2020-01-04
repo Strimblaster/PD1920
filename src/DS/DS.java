@@ -5,11 +5,16 @@ import Comum.ServerInfo;
 
 import java.io.IOException;
 import java.net.*;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 
 public class DS implements Constants {
+    public final String RMIServiceName = "RegistryDS";
     private int proximoServidor;
 
     final ArrayList<ServerInfo> servidoresTCP;
@@ -17,6 +22,7 @@ public class DS implements Constants {
     DatagramSocket servidorDatagramSocket;
     DatagramSocket servidorPingDatagramSocket;
     DatagramSocket clienteDatagramSocket;
+    RMIService rmiService;
 
 
 
@@ -42,12 +48,12 @@ public class DS implements Constants {
 
 
 
-    public static void main(String[] args) throws SocketException, InterruptedException {
+    public static void main(String[] args) throws SocketException, InterruptedException, RemoteException, MalformedURLException {
         DS ds = new DS();
         Thread servidorThread = new ServerThread(ds);
         Thread clienteThread = new ClienteThread(ds);
-
         Thread pingServidores = new PingThread(ds);
+        lancaRmi(ds);
 
         servidorThread.start();
         clienteThread.start();
@@ -56,6 +62,20 @@ public class DS implements Constants {
         servidorThread.join();
         clienteThread.join();
         pingServidores.join();
+    }
+
+    private static void lancaRmi(DS ds) throws RemoteException, MalformedURLException {
+        try{
+            LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
+        }catch(RemoteException e){
+            System.out.println("Atenção: RMIRegistry provavelmente já está a correr!");
+        }
+
+        ds.rmiService = new RMIService(ds);
+
+        String registration = "rmi://localhost/"+ ds.RMIServiceName ;
+        Naming.rebind( registration, ds.rmiService );
+
     }
 
     public int getNextID() {
@@ -67,5 +87,13 @@ public class DS implements Constants {
         for (i = 0; i < servidoresUDP.size() && i == servidoresUDP.get(i).getId(); i++) ;
 
         return i;
+    }
+
+    public void notifyListeners(ServerInfo serverInfo){
+        rmiService.notifyListeners(serverInfo);
+    }
+
+    public void notifyListeners(InetAddress ip, int port){
+        rmiService.notifyListeners(ip, port);
     }
 }

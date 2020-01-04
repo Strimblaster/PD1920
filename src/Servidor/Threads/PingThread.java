@@ -29,9 +29,13 @@ public class PingThread extends Thread implements Constants {
             try {
                 DatagramPacket datagramPacket = new DatagramPacket(new byte[PKT_SIZE], PKT_SIZE);
 
-                //Espera packet de um servidor (ping)
+                //Espera packet de ds
                 datagramSocket.receive(datagramPacket);
                 String json = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+                if(json.equals("SAIR")){
+                    comunicacao.serverExit();
+                    return;
+                }
 
                 Type listType = new TypeToken<ArrayList<ServerInfo>>(){}.getType();
                 ArrayList<ServerInfo> servers = new Gson().fromJson(json, listType);
@@ -48,10 +52,11 @@ public class PingThread extends Thread implements Constants {
 
                 datagramSocket.send(datagramPacket);
 
-            } catch (SocketException e) {
+            } catch (SocketException ignored) {
+
+            }catch (IOException e) {
+                System.out.printf("[INFO] - [PingThread]: A sair...");
                 return;
-            } catch (IOException e) {
-                System.out.println("[Erro] [PingThread] - Erro: " + e.getMessage());
             }
         }
     }

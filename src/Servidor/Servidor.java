@@ -230,7 +230,7 @@ public class Servidor implements ServerConstants, Constants, Observable {
 
                 while(resultSet.next()){
                     String nomePlaylist = resultSet.getString("nome");
-                    String nomeCriador = resultSet.getString("criador");
+                    int idCriador = resultSet.getInt("criador");
                     ArrayList<Song> musicas = new ArrayList<>();
                     int idPlaylist = resultSet.getInt("id");
 
@@ -253,7 +253,7 @@ public class Servidor implements ServerConstants, Constants, Observable {
                     }
 
                     PreparedStatement owner = conn.prepareStatement("SELECT * FROM utilizadores where nome = ?");
-                    owner.setString(1, nomeCriador);
+                    owner.setString(1, getUtilizador(idCriador).getName());
                     ResultSet resultOwner = owner.executeQuery();
                     resultOwner.next();
                     Utilizador user = resultSetToUtilizador(resultOwner);
@@ -479,7 +479,7 @@ public class Servidor implements ServerConstants, Constants, Observable {
         ResultSet userResultSet = getIDUtilizadorStatement.executeQuery();
 
         if(!userResultSet.next())
-            return null;
+            throw new SQLException("Não existe utilizador com id " + id);
 
         String nome = userResultSet.getString("nome");
 
@@ -613,6 +613,7 @@ public class Servidor implements ServerConstants, Constants, Observable {
             System.out.println("[INFO] Servidor a arrancar...");
             Servidor servidor;
             InetAddress ip_DS = InetAddress.getByName(IP_DS);
+            Scanner sc = new Scanner(System.in);
 
             if(args.length == 2) {
                 servidor = new Servidor(args[1]);
@@ -640,15 +641,14 @@ public class Servidor implements ServerConstants, Constants, Observable {
             servidor.ready();
 
 
-            Scanner sc = new Scanner(System.in);
-
             while(true){
                 String s = sc.next();
                 if(s.equals("sair")) break;
             }
             servidor.exit();
 
-        } catch (NumberFormatException e) {
+        } catch (IllegalStateException e){
+        }catch (NumberFormatException e) {
             System.out.println("Usage:\nServer.jar ip port db\nServer.jar ip port\nServer.jar db\nServer.jar");
         } catch (SocketException e) {
             System.out.println("[ERRO] Houve um problema com o Socket:\n"+ e.getMessage());

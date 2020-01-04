@@ -1,8 +1,9 @@
 package Comum;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 
-public class ServerInfo {
+public class ServerInfo implements Serializable {
 
     private InetAddress ip;
     private int port;
