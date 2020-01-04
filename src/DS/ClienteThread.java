@@ -31,6 +31,7 @@ public class ClienteThread extends Thread implements Constants {
                         ServerInfo serverInfo = ds.servidoresTCP.get(nextServer);
                         Gson gson = new Gson();
                         String jsonServerInfo = gson.toJson(serverInfo);
+                        ds.notifyListeners(datagramPacket.getAddress(), datagramPacket.getPort());
                         System.out.println("[INFO] - [ThreadCliente]: - Cliente " + datagramPacket.getAddress().toString() + ":"+ datagramPacket.getPort() + " atribuido o Servidor " + nextServer );
                         byte[] jsonBytes = jsonServerInfo.getBytes();
                         datagramPacket.setData(jsonBytes);

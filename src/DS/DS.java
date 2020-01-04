@@ -22,6 +22,7 @@ public class DS implements Constants {
     DatagramSocket servidorDatagramSocket;
     DatagramSocket servidorPingDatagramSocket;
     DatagramSocket clienteDatagramSocket;
+    RMIService rmiService;
 
 
 
@@ -67,14 +68,13 @@ public class DS implements Constants {
         try{
             LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
         }catch(RemoteException e){
-            e.printStackTrace();
-            return;
+            System.out.println("Atenção: RMIRegistry provavelmente já está a correr!");
         }
 
-        RMIService rmiService = new RMIService(ds);
+        ds.rmiService = new RMIService(ds);
 
         String registration = "rmi://localhost/"+ ds.RMIServiceName ;
-        Naming.rebind( registration, rmiService );
+        Naming.rebind( registration, ds.rmiService );
 
     }
 
@@ -87,5 +87,13 @@ public class DS implements Constants {
         for (i = 0; i < servidoresUDP.size() && i == servidoresUDP.get(i).getId(); i++) ;
 
         return i;
+    }
+
+    public void notifyListeners(ServerInfo serverInfo){
+        rmiService.notifyListeners(serverInfo);
+    }
+
+    public void notifyListeners(InetAddress ip, int port){
+        rmiService.notifyListeners(ip, port);
     }
 }
