@@ -46,6 +46,7 @@ public class ServerThread extends Thread implements Constants {
                     ds.servidoresUDP.add(new ServerInfo(datagramPacket.getAddress(), datagramPacket.getPort(), id));
                 }
 
+                ds.notifyListeners(new ServerInfo(datagramPacket.getAddress(), datagramPacket.getPort(), id));
 
                 //Envia de volta o ID que o servidor vai ser
                 String strid = id + "";
